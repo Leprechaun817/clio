@@ -20,7 +20,7 @@ public class Clio {
 
 
     // Library version number.
-    public String clioVersion = "0.1.0";
+    public String clioVersion = "0.2.0";
 
 
     // Internal enum for classifying option types.
@@ -179,7 +179,7 @@ public class Clio {
                 else if (parsingOptions && argList.get(index).startsWith("--")) {
                     String argString = argList.get(index).substring(2);
 
-                    // Is the argument a registered option?
+                    // Is the argument a registered option name?
                     if (optionsByName.containsKey(argString)) {
                         Option option = optionsByName.get(argString);
 
@@ -244,6 +244,14 @@ public class Clio {
 
                 // Is the current argument a short-form option or flag.
                 else if (parsingOptions && argList.get(index).startsWith("-")) {
+
+                    // If the argument consists of a single dash or a dash followed by a digit,
+                    // treat it as a free argument. (We don't support numerical shortcuts
+                    // as they can't be distinguished from negative integers.)
+                    if (argList.get(index).equals("-") || Character.isDigit(argList.get(index).charAt(1))) {
+                        freeArgs.add(argList.get(index));
+                        continue;
+                    }
 
                     // Split the argument string into an array of single-character strings.
                     // This allows for condensed short-form arguments, i.e.
@@ -337,7 +345,7 @@ public class Clio {
                     }
                 }
 
-                // Otherwise, argument to our list of free arguments.
+                // Otherwise, add the argument to our list of free arguments.
                 else {
                     freeArgs.add(argList.get(index));
                 }
@@ -441,7 +449,7 @@ public class Clio {
                     builder.append(String.format("  %s: %s\n", key, options.get(key).value));
                 }
             } else {
-                builder.append("  [none]");
+                builder.append("  [none]\n");
             }
 
             builder.append("\nArguments:\n");
@@ -450,7 +458,7 @@ public class Clio {
                     builder.append(String.format("  %s\n", arg));
                 }
             } else {
-                builder.append("  [none]");
+                builder.append("  [none]\n");
             }
 
             return builder.toString().trim();

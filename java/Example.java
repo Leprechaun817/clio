@@ -23,20 +23,20 @@ class Example {
         parser.addFlag("bool1");
         parser.addFlag("bool2", "b");
 
-        // Register two string options, --str1 arg and --str2 arg.
-        // The second option has a single-character alias, -s arg.
+        // Register two string options, --str1 <arg> and --str2 <arg>.
+        // The second option has a single-character alias, -s <arg>.
         // Options require default values, here 'alice' and 'bob'.
         parser.addStringOption("str1", "alice");
         parser.addStringOption("str2", "s", "bob");
 
-        // Register two integer options, --int1 arg and --int2 arg.
-        // The second option has a single-character alias, -i arg.
+        // Register two integer options, --int1 <arg> and --int2 <arg>.
+        // The second option has a single-character alias, -i <arg>.
         // Options require default values, here 123 and 456.
         parser.addIntOption("int1", 123);
         parser.addIntOption("int2", "i", 456);
 
-        // Register two floating point options, --float1 arg and --float2 arg.
-        // The second option has a single-character alias, -f arg.
+        // Register two floating point options, --float1 <arg> and --float2 <arg>.
+        // The second option has a single-character alias, -f <arg>.
         // Options require default values, here 1.0 and 2.0.
         parser.addFloatOption("float1", 1.0);
         parser.addFloatOption("float2", "f", 2.0);
