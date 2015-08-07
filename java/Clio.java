@@ -24,7 +24,8 @@ public class Clio {
 
 
     // Internal enum for classifying option types.
-    // We use 'flag' as a synonym for boolean options.
+    // We use 'flag' as a synonym for boolean options, i.e. options that are either
+    // present (true) or absent (false). All other option types require an argument.
     private enum OptionType {
         Flag, String, Int, Float
     }
