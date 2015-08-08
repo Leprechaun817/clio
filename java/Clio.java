@@ -20,7 +20,7 @@ public class Clio {
 
 
     // Library version number.
-    public String clioVersion = "0.2.0";
+    public String clioVersion = "0.3.0";
 
 
     // Internal enum for classifying option types.
@@ -68,7 +68,7 @@ public class Clio {
         // Stores command callbacks indexed by command.
         private Map<String, Consumer<ArgSet>> commandCallbacks = new HashMap<String, Consumer<ArgSet>>();
 
-        // Stores free arguments parsed from the input array - i.e. arguments not associated with an option.
+        // Stores positional arguments parsed from the input array - i.e. arguments not associated with an option.
         private List<String> freeArgs = new ArrayList<String>();
 
 
@@ -106,7 +106,7 @@ public class Clio {
 
 
         // Register a string option, additionally specifying a single-letter shortcut alias.
-        void addStringOption(String name, String shortcut, String defaultValue) {
+        void addStringOption(String name, String defaultValue, String shortcut) {
             Option option = new Option(OptionType.String, defaultValue);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -120,7 +120,7 @@ public class Clio {
 
 
         // Register an integer option, additionally specifying a single-letter shortcut alias.
-        void addIntOption(String name, String shortcut, int defaultValue) {
+        void addIntOption(String name, int defaultValue, String shortcut) {
             Option option = new Option(OptionType.Int, defaultValue);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -134,7 +134,7 @@ public class Clio {
 
 
         // Register a float option, additionally specifying a single-letter shortcut alias.
-        void addFloatOption(String name, String shortcut, double defaultValue) {
+        void addFloatOption(String name, double defaultValue, String shortcut) {
             Option option = new Option(OptionType.Float, defaultValue);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -142,7 +142,7 @@ public class Clio {
 
 
         // Register a command and its associated callback.
-        ArgParser addCommand(String command, String helptext, Consumer<ArgSet> callback) {
+        ArgParser addCommand(String command, Consumer<ArgSet> callback, String helptext) {
             ArgParser commandParser = new ArgParser(helptext);
             commandParsers.put(command, commandParser);
             commandCallbacks.put(command, callback);
@@ -163,7 +163,7 @@ public class Clio {
             int index = -1;
 
             // Switch to turn off option parsing if we encounter a -- argument.
-            // Subsequent arguments beginning with a dash will be treated as free
+            // Subsequent arguments beginning with a dash will be treated as positional
             // arguments instead of options.
             boolean parsingOptions = true;
 
@@ -362,7 +362,7 @@ public class Clio {
         // Stores option objects indexed by option name.
         private Map<String, Option> options;
 
-        // Stores the set's free arguments.
+        // Stores the set's positional arguments.
         private List<String> arguments;
 
 
@@ -393,19 +393,19 @@ public class Clio {
         }
 
 
-        // Returns true if the set contains one or more free arguments.
+        // Returns true if the set contains one or more positional arguments.
         boolean hasArgs() {
             return arguments.size() > 0;
         }
 
 
-        // Returns the set's free arguments as a list of strings.
+        // Returns the set's positional arguments as a list of strings.
         List<String> getArgs() {
             return arguments;
         }
 
 
-        // Convenience function: attempts to parse and return the set's free
+        // Convenience function: attempts to parse and return the set's positional
         // arguments as a list of integers.
         List<Integer> getArgsAsInts() {
             List<Integer> intArgs = new ArrayList<Integer>();
@@ -422,7 +422,7 @@ public class Clio {
         }
 
 
-        // Convenience function: attempts to parse and return the set's free
+        // Convenience function: attempts to parse and return the set's positional
         // arguments as a list of floats.
         List<Double> getArgsAsFloats() {
             List<Double> floatArgs = new ArrayList<Double>();

@@ -27,22 +27,22 @@ class Example {
         // The second option has a single-character alias, -s <arg>.
         // Options require default values, here 'alice' and 'bob'.
         parser.addStringOption("str1", "alice");
-        parser.addStringOption("str2", "s", "bob");
+        parser.addStringOption("str2", "bob", "s");
 
         // Register two integer options, --int1 <arg> and --int2 <arg>.
         // The second option has a single-character alias, -i <arg>.
         // Options require default values, here 123 and 456.
         parser.addIntOption("int1", 123);
-        parser.addIntOption("int2", "i", 456);
+        parser.addIntOption("int2", 456, "i");
 
         // Register two floating point options, --float1 <arg> and --float2 <arg>.
         // The second option has a single-character alias, -f <arg>.
         // Options require default values, here 1.0 and 2.0.
         parser.addFloatOption("float1", 1.0);
-        parser.addFloatOption("float2", "f", 2.0);
+        parser.addFloatOption("float2", 2.0, "f");
 
         // Register a command, 'cmd'. We need to specify the command's help text and callback method.
-        Clio.ArgParser cmdParser = parser.addCommand("cmd", "Usage: example cmd...", Example::cmdCallback);
+        Clio.ArgParser cmdParser = parser.addCommand("cmd", Example::cmdCallback, "Usage: example cmd...");
 
         // Registering a command returns a new ArgParser instance dedicated to parsing the command's
         // arguments. We can register as many flags and options as we like on this sub-parser.
@@ -50,7 +50,7 @@ class Example {
 
         // The command parser can reuse the parent parser's option names without interfering.
         cmdParser.addStringOption("str1", "ciara");
-        cmdParser.addStringOption("str2", "s", "dave");
+        cmdParser.addStringOption("str2", "dave", "s");
 
         // Once all our options and commands have been registered we can call the parser's
         // parse() method with a list or array of argument strings. Only the root parser's
