@@ -3,3 +3,7 @@
 
 # Java class files.
 /java/*.class
+
+# Python byte-compiled / optimized / DLL files.
+/python/__pycache__/
+/python/*.py[cod]

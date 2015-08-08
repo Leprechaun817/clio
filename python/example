@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""
+A simple application demonstrating Clio in action.
+
+Author: Darren Mulholland <dmulholland@outlook.ie>
+License: Public Domain
+
+"""
+
+import sys
+import clio
+
+
+def main():
+
+    # We instantiate an argument parser, optionally supplying help text
+    # and a version string. Supplying help text activates the automatic
+    # --help flag, supplying a version string activates the automatic
+    # --version flag.
+    parser = clio.ArgParser("Usage: example...", "1.0.0");
+
+    # Register two flags, --bool1 and --bool2.
+    # The second flag has a single-character alias, -b.
+    # A flag is a boolean option - it is either present (true) or
+    # absent (false).
+    parser.add_flag("bool1")
+    parser.add_flag("bool2", "b")
+
+    # Register two string options, --str1 <arg> and --str2 <arg>.
+    # The second option has a single-character alias, -s <arg>.
+    # Options require default values, here 'alice' and 'bob'.
+    parser.add_str_option("str1", "alice")
+    parser.add_str_option("str2", "bob", "s")
+
+    # Register two integer options, --int1 <arg> and --int2 <arg>.
+    # The second option has a single-character alias, -i <arg>.
+    # Options require default values, here 123 and 456.
+    parser.add_int_option("int1", 123)
+    parser.add_int_option("int2", 456, "i")
+
+    # Register two floating point options, --float1 <arg> and --float2 <arg>.
+    # The second option has a single-character alias, -f <arg>.
+    # Options require default values, here 1.0 and 2.0.
+    parser.add_float_option("float1", 1.0)
+    parser.add_float_option("float2", 2.0, "f")
+
+    # Register a command, 'cmd'. We need to specify the command's help text
+    # and callback method.
+    cmd_parser = parser.add_command("cmd", cmd_callback, "Usage: example cmd...")
+
+    # Registering a command returns a new ArgParser instance dedicated to
+    # parsing the command's arguments. We can register as many flags and
+    # options as we like on this sub-parser.
+    cmd_parser.add_flag("foo")
+
+    # The sub-parser can reuse the parent's option names without interfering.
+    cmd_parser.add_str_option("str1", "ciara")
+    cmd_parser.add_str_option("str2", "dave", "s")
+
+    # Once all our options and commands have been registered we can call the
+    # parser's parse() method with a list of argument strings. Only the root
+    # parser's parse() method should be called - command arguments will be
+    # parsed automatically. The parse() method defaults to parsing the
+    # application's command line arguments.
+    argset = parser.parse()
+
+    # The parse() method returns an ArgSet instance. Here we simply print it.
+    print(argset)
+
+
+# Callback method for the 'cmd' command.
+# This method will be called if the 'cmd' command is present.
+# The method receives an ArgSet instance containing the command's
+# parsed arguments. Here we simply dump it to stdout.
+def cmd_callback(argset):
+    print("---------- running cmd ----------");
+    print(argset);
+    print("---------------------------------\n");
+
+
+if __name__ == "__main__":
+    main()
