@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 # Internal class for storing option data.
@@ -59,7 +59,7 @@ class ArgParser:
     def __init__(self, helptext=None, version=None):
 
         # Command line help text for the application or command.
-        self.helptext = helptext
+        self.helptext = helptext.strip()
 
         # Application version number as a string.
         self.version = version
