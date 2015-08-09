@@ -20,7 +20,7 @@ public class Clio {
 
 
     // Library version number.
-    public String clioVersion = "0.3.0";
+    public String clioVersion = "0.3.1";
 
 
     // Internal enum for classifying option types.
@@ -80,7 +80,7 @@ public class Clio {
 
         // Specifying a version string activates the automatic --version flag.
         ArgParser(String helptext, String version) {
-            this.helptext = helptext;
+            this.helptext = helptext.trim();
             this.version = version;
         }
 
