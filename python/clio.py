@@ -252,7 +252,7 @@ class ArgParser:
                 else:
                     sys.exit("Error: the help command requires an argument.")
 
-            # Otherwise, add argument to our list of free arguments.
+            # Otherwise, add the argument to our list of free arguments.
             else:
                 self.arguments.append(argstream.next())
 
