@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 
 # Internal class for storing option data.
@@ -270,9 +270,13 @@ class ArgSet:
         # Stores a list of positional arguments.
         self.arguments = arguments
 
-    # Enable dictionary style access: value = argset['option-name'].
-    def __getitem__(self, key):
-        return self.options[key].value
+    # Enable dictionary-style access to options: value = argset['name'].
+    def __getitem__(self, name):
+        return self.options[name].value
+
+    # Enable dictionary-style assignment: argset['name'] = value.
+    def __setitem__(self, name, value):
+        self.options[name] = Option("unknown", value)
 
     # List all options and arguments for debugging.
     def __str__(self):
@@ -297,6 +301,10 @@ class ArgSet:
     # Returns the value of the specified option.
     def get_option(self, name):
         return self.options[name].value
+
+    # Returns a dictionary containing all the set's named options.
+    def get_options(self):
+        return {name: option.value for name, option in self.options.items()}
 
     # Returns true if the set contains at least one positional argument.
     def has_args(self):
