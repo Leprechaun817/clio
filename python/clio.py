@@ -250,7 +250,7 @@ class ArgParser:
                     else:
                         sys.exit("Error: '%s' is not a recognised command." % command)
                 else:
-                    sys.exit("Error: the help command requires an argument")
+                    sys.exit("Error: the help command requires an argument.")
 
             # Otherwise, add argument to our list of free arguments.
             else:
