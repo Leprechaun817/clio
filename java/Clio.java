@@ -20,7 +20,7 @@ public class Clio {
 
 
     // Library version number.
-    public String clioVersion = "0.3.1";
+    public String clioVersion = "0.3.2";
 
 
     // Internal enum for classifying option types.
@@ -316,11 +316,12 @@ public class Clio {
                 // instance of the ArgParser class and use it to process the remaining arguments.
                 // We then pass the resulting ArgSet to the callback associated with the command.
                 else if (commandParsers.containsKey(argList.get(index))) {
-                    ArgParser parser = commandParsers.get(argList.get(index));
-                    Consumer<ArgSet> callback = commandCallbacks.get(argList.get(index));
+                    String command = argList.get(index);
+                    ArgParser parser = commandParsers.get(command);
+                    Consumer<ArgSet> callback = commandCallbacks.get(command);
                     ArgSet argSet = parser.parse(argList.subList(++index, argList.size()));
                     callback.accept(argSet);
-                    break;
+                    return new ArgSet(optionsByName, freeArgs, command, argSet);
                 }
 
                 // Automatic 'help' command for registered commands. The commands
@@ -365,10 +366,25 @@ public class Clio {
         // Stores the set's positional arguments.
         private List<String> arguments;
 
+        // Stores the command string, if a command was found.
+        private String command;
 
+        // Stores the command's ArgSet instance, if a command was found.
+        private ArgSet argSet;
+
+
+        // Constructor used when no command is found.
         ArgSet(Map<String, Option> options, List<String> arguments) {
+            this(options, arguments, null, null);
+        }
+
+
+        // Constructor used when a command is found.
+        ArgSet(Map<String, Option> options, List<String> arguments, String command, ArgSet argSet) {
             this.options = options;
             this.arguments = arguments;
+            this.command = command;
+            this.argSet = argSet;
         }
 
 
@@ -439,6 +455,24 @@ public class Clio {
         }
 
 
+        // Returns true if the set contains a command.
+        boolean hasCommand() {
+            return command != null;
+        }
+
+
+        // Returns the set's command string, if a command was found.
+        String getCommand() {
+            return command;
+        }
+
+
+        // Returns the ArgSet instance for the set's command, if a command was found.
+        ArgSet getCommandArgSet() {
+            return argSet;
+        }
+
+
         // List all options and arguments for debugging.
         public String toString() {
             StringBuilder builder = new StringBuilder();
@@ -457,6 +491,13 @@ public class Clio {
                 for (String arg: arguments) {
                     builder.append(String.format("  %s\n", arg));
                 }
+            } else {
+                builder.append("  [none]\n");
+            }
+
+            builder.append("\nCommand:\n");
+            if (hasCommand()) {
+                builder.append(String.format("  %s\n", getCommand()));
             } else {
                 builder.append("  [none]\n");
             }

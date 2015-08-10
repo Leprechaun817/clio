@@ -67,8 +67,8 @@ class Example {
     // The method receives an ArgSet instance containing the command's
     // parsed arguments. Here we simply dump it to stdout.
     public static void cmdCallback(Clio.ArgSet argset) {
-        System.out.println("---------- running cmd ----------");
+        System.out.println("---------- cmdCallback() ----------");
         System.out.println(argset);
-        System.out.println("---------------------------------\n");
+        System.out.println("...................................\n");
     }
 }
