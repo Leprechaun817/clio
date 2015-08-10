@@ -109,6 +109,11 @@ class ArgParser:
         self.callbacks[command] = callback
         return parser
 
+    # Print the parser's help text and exit.
+    def help(self):
+        sys.stdout.write(self.helptext + "\n")
+        sys.exit()
+
     # Parse a list of arguments.
     def parse(self, args=sys.argv[1:]):
 
