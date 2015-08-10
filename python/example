@@ -73,9 +73,9 @@ def main():
 # The method receives an ArgSet instance containing the command's
 # parsed arguments. Here we simply dump it to stdout.
 def cmd_callback(argset):
-    print("---------- running cmd ----------");
+    print("---------- cmd_callback() ----------");
     print(argset);
-    print("---------------------------------\n");
+    print("....................................\n");
 
 
 if __name__ == "__main__":
