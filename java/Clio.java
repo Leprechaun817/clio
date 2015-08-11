@@ -20,7 +20,7 @@ public class Clio {
 
 
     // Library version number.
-    public String clioVersion = "0.3.2";
+    public String clioVersion = "0.4.0";
 
 
     // Internal enum for classifying option types.
@@ -60,7 +60,7 @@ public class Clio {
         private Map<String, Option> optionsByName = new HashMap<String, Option>();
 
         // Stores option objects indexed by single-letter shortcut.
-        private Map<String, Option> optionsByShortcut = new HashMap<String, Option>();
+        private Map<Character, Option> optionsByShortcut = new HashMap<Character, Option>();
 
         // Stores command sub-parser instances indexed by command.
         private Map<String, ArgParser> commandParsers = new HashMap<String, ArgParser>();
@@ -92,7 +92,7 @@ public class Clio {
 
 
         // Register a flag, additionally specifying a single-letter shortcut alias.
-        void addFlag(String name, String shortcut) {
+        void addFlag(String name, char shortcut) {
             Option option = new Option(OptionType.Flag, false);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -106,7 +106,7 @@ public class Clio {
 
 
         // Register a string option, additionally specifying a single-letter shortcut alias.
-        void addStringOption(String name, String defaultValue, String shortcut) {
+        void addStringOption(String name, String defaultValue, char shortcut) {
             Option option = new Option(OptionType.String, defaultValue);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -120,7 +120,7 @@ public class Clio {
 
 
         // Register an integer option, additionally specifying a single-letter shortcut alias.
-        void addIntOption(String name, int defaultValue, String shortcut) {
+        void addIntOption(String name, int defaultValue, char shortcut) {
             Option option = new Option(OptionType.Int, defaultValue);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -134,7 +134,7 @@ public class Clio {
 
 
         // Register a float option, additionally specifying a single-letter shortcut alias.
-        void addFloatOption(String name, double defaultValue, String shortcut) {
+        void addFloatOption(String name, double defaultValue, char shortcut) {
             Option option = new Option(OptionType.Float, defaultValue);
             optionsByName.put(name, option);
             optionsByShortcut.put(shortcut, option);
@@ -254,15 +254,15 @@ public class Clio {
                     }
 
                     // Split the argument string into an array of single-character strings.
-                    // This allows for condensed short-form arguments, i.e.
+                    // This allows for compressing short-form arguments, i.e.
                     //     -a -b foo -c bar
                     // is equivalent to
                     //     -abc foo bar
-                    for (String s: argList.get(index).substring(1).split("(?!^)")) {
+                    for (char c: argList.get(index).substring(1).toCharArray()) {
 
                         // Is the character a registered shortcut?
-                        if (optionsByShortcut.containsKey(s)) {
-                            Option option = optionsByShortcut.get(s);
+                        if (optionsByShortcut.containsKey(c)) {
+                            Option option = optionsByShortcut.get(c);
 
                             // If the option type is a flag, just store the boolean true.
                             if (option.type == OptionType.Flag) {
@@ -299,14 +299,14 @@ public class Clio {
 
                             // No following argument, so print an error message and exit.
                             else {
-                                System.err.format("Error: missing argument for the -%s option.\n", s);
+                                System.err.format("Error: missing argument for the -%s option.\n", c);
                                 System.exit(1);
                             }
                         }
 
                         // Not a recognised shortcut. Print an error and exit.
                         else {
-                            System.err.format("Error: -%s is not a recognised option.\n", s);
+                            System.err.format("Error: -%s is not a recognised option.\n", c);
                             System.exit(1);
                         }
                     }

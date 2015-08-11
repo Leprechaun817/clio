@@ -21,25 +21,25 @@ class Example {
         // A flag is a boolean option - it is either present (true) or
         // absent (false).
         parser.addFlag("bool1");
-        parser.addFlag("bool2", "b");
+        parser.addFlag("bool2", 'b');
 
         // Register two string options, --str1 <arg> and --str2 <arg>.
         // The second option has a single-character alias, -s <arg>.
         // Options require default values, here 'alice' and 'bob'.
         parser.addStringOption("str1", "alice");
-        parser.addStringOption("str2", "bob", "s");
+        parser.addStringOption("str2", "bob", 's');
 
         // Register two integer options, --int1 <arg> and --int2 <arg>.
         // The second option has a single-character alias, -i <arg>.
         // Options require default values, here 123 and 456.
         parser.addIntOption("int1", 123);
-        parser.addIntOption("int2", 456, "i");
+        parser.addIntOption("int2", 456, 'i');
 
         // Register two floating point options, --float1 <arg> and --float2 <arg>.
         // The second option has a single-character alias, -f <arg>.
         // Options require default values, here 1.0 and 2.0.
         parser.addFloatOption("float1", 1.0);
-        parser.addFloatOption("float2", 2.0, "f");
+        parser.addFloatOption("float2", 2.0, 'f');
 
         // Register a command, 'cmd'. We need to specify the command's help text and callback method.
         Clio.ArgParser cmdParser = parser.addCommand("cmd", Example::cmdCallback, "Usage: example cmd...");
@@ -50,7 +50,7 @@ class Example {
 
         // The command parser can reuse the parent parser's option names without interfering.
         cmdParser.addStringOption("str1", "ciara");
-        cmdParser.addStringOption("str2", "dave", "s");
+        cmdParser.addStringOption("str2", "dave", 's');
 
         // Once all our options and commands have been registered we can call the parser's
         // parse() method with a list or array of argument strings. Only the root parser's
