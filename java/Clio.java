@@ -246,7 +246,7 @@ public class Clio {
                 else if (parsingOptions && argList.get(index).startsWith("-")) {
 
                     // If the argument consists of a single dash or a dash followed by a digit,
-                    // treat it as a free argument. (We don't support numerical shortcuts
+                    // treat it as a positional argument. (We don't support numerical shortcuts
                     // as they can't be distinguished from negative integers.)
                     if (argList.get(index).equals("-") || Character.isDigit(argList.get(index).charAt(1))) {
                         freeArgs.add(argList.get(index));
