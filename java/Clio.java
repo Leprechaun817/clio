@@ -150,6 +150,13 @@ public class Clio {
         }
 
 
+        // Print the parser's help text and exit.
+        void help() {
+            System.out.println(helptext);
+            System.exit(0);
+        }
+
+
         // Parse an array of arguments.
         ArgSet parse(String[] argArray) {
             return parse(Arrays.asList(argArray));
