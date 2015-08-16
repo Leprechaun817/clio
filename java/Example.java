@@ -14,7 +14,7 @@ class Example {
         // and a version string. Supplying help text activates the automatic
         // --help flag, supplying a version string activates the automatic
         // --version flag.
-        Clio.ArgParser parser = new Clio.ArgParser("Usage: example...", "1.0.0");
+        ArgParser parser = new ArgParser("Usage: example...", "1.0.0");
 
         // Register two flags, --bool1 and --bool2.
         // The second flag has a single-character alias, -b.
@@ -42,33 +42,34 @@ class Example {
         parser.addFloatOption("float2", 2.0, 'f');
 
         // Register a command, 'cmd'. We need to specify the command's help text and callback method.
-        Clio.ArgParser cmdParser = parser.addCommand("cmd", Example::cmdCallback, "Usage: example cmd...");
+        ArgParser cmdParser = parser.addCommand("cmd", Example::cmdCallback, "Usage: example cmd...");
 
         // Registering a command returns a new ArgParser instance dedicated to parsing the command's
         // arguments. We can register as many flags and options as we like on this sub-parser.
         cmdParser.addFlag("foo");
 
-        // The command parser can reuse the parent parser's option names without interfering.
+        // The command parser can reuse the parent parser's option names without interference.
         cmdParser.addStringOption("str1", "ciara");
         cmdParser.addStringOption("str2", "dave", 's');
 
-        // Once all our options and commands have been registered we can call the parser's
+        // Once all our options and commands have been registered we call the parser's
         // parse() method with a list or array of argument strings. Only the root parser's
         // parse() method should be called - command arguments will be parsed automatically.
-        Clio.ArgSet argset = parser.parse(args);
+        parser.parse(args);
 
-        // The parse() method returns an ArgSet instance. Here we simply dump it to stdout.
-        System.out.println(argset);
+        // We can now retrieve our option and argument values from the parser instance.
+        // Here we simply dump it to stdout.
+        System.out.println(parser);
     }
 
 
     // Callback method for the 'cmd' command.
     // This method will be called if the 'cmd' command is present.
-    // The method receives an ArgSet instance containing the command's
+    // The method receives an ArgParser instance containing the command's
     // parsed arguments. Here we simply dump it to stdout.
-    public static void cmdCallback(Clio.ArgSet argset) {
+    public static void cmdCallback(ArgParser parser) {
         System.out.println("---------- cmdCallback() ----------");
-        System.out.println(argset);
+        System.out.println(parser);
         System.out.println("...................................\n");
     }
 }
