@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 
 
 # Internal class for storing option data.
@@ -59,10 +59,10 @@ class ArgParser:
     def __init__(self, helptext=None, version=None):
 
         # Command line help text for the application or command.
-        self.helptext = helptext.strip()
+        self.helptext = helptext.strip() if helptext else None
 
         # Application version number as a string.
-        self.version = version
+        self.version = version.strip() if version else None
 
         # Stores option objects indexed by option name.
         self.options = {}
@@ -117,37 +117,48 @@ class ArgParser:
     # Parse a list of arguments.
     def parse(self, args=sys.argv[1:]):
 
-        # Switch to turn off option parsing if we encounter a -- argument.
-        # Subsequent arguments beginning with a dash will be treated as
-        # positional arguments instead of options.
-        parsing_options = True
+        # Switch to turn off parsing if we encounter a -- argument.
+        # Everything following the -- will be treated as a positional
+        # argument.
+        parsing = True
 
         # Convert the input list into a stream.
-        argstream = ArgStream(args)
+        stream = ArgStream(args)
 
         # Loop while we have arguments to process.
-        while argstream.has_next():
+        while stream.has_next():
 
-            # If we encounter a -- argument, turn off option parsing.
-            if parsing_options and argstream.peek() == "--":
-                argstream.next()
-                parsing_options = False
+            # Fetch the next argument from the stream.
+            arg = stream.next()
+
+            # If parsing has been turned off, simply add the argument to the
+            # list of positionals.
+            if not parsing:
+                self.arguments.append(arg)
+                continue
+
+            # If we encounter a -- argument, turn off parsing.
+            if arg == "--":
+                parsing = False
+                continue
 
             # Is the argument a long-form option or flag?
-            elif parsing_options and argstream.peek().startswith("--"):
-                argstring = argstream.next()[2:]
+            if arg.startswith("--"):
+
+                # Strip the prefix.
+                arg = arg[2:]
 
                 # Is the argument a registered option name?
-                if argstring in self.options:
-                    option = self.options[argstring]
+                if arg in self.options:
+                    option = self.options[arg]
 
                     # If the option is a flag, store the boolean true.
                     if option.type == "flag":
                         option.value = True
 
                     # Otherwise, check for a following argument.
-                    elif argstream.has_next():
-                        nextarg = argstream.next()
+                    elif stream.has_next():
+                        nextarg = stream.next()
 
                         if option.type == "string":
                             option.value = nextarg
@@ -166,31 +177,30 @@ class ArgParser:
 
                     # No following argument, so print an error and exit.
                     else:
-                        sys.exit("Error: missing argument for the --%s option." % argstring)
+                        sys.exit("Error: missing argument for the --%s option." % arg)
 
                 # Is the argument the automatic --help flag?
-                elif argstring == "help" and self.helptext is not None:
+                elif arg == "help" and self.helptext is not None:
                     sys.stdout.write(self.helptext + "\n")
                     sys.exit()
 
                 # Is the argument the automatic --version flag?
-                elif argstring == "version" and self.version is not None:
+                elif arg == "version" and self.version is not None:
                     sys.stdout.write(self.version + "\n")
                     sys.exit()
 
                 # The argument is not a registered or automatic option.
                 # Print an error message and exit.
                 else:
-                    sys.exit("Error: --%s is not a recognised option." % argstring)
+                    sys.exit("Error: --%s is not a recognised option." % arg)
 
             # Is the argument a short-form option or flag?
-            elif parsing_options and argstream.peek().startswith("-"):
-                argstring = argstream.next()
+            elif arg.startswith("-"):
 
                 # If the argument consists of a single dash or a dash followed
                 # by a digit, treat it as a free argument.
-                if argstring == '-' or argstring[1].isdigit():
-                    self.arguments.append(argstring)
+                if arg == '-' or arg[1].isdigit():
+                    self.arguments.append(arg)
                     continue
 
                 # Examine each character individually to allow for condensed
@@ -198,7 +208,7 @@ class ArgParser:
                 #     -a -b foo -c bar
                 # is equivalent to:
                 #     -abc foo bar
-                for c in argstring[1:]:
+                for c in arg[1:]:
 
                     # Is the character a registered shortcut?
                     if c in self.shortcuts:
@@ -209,8 +219,8 @@ class ArgParser:
                             option.value = True
 
                         # Otherwise, check for a following argument.
-                        elif argstream.has_next():
-                            nextarg = argstream.next()
+                        elif stream.has_next():
+                            nextarg = stream.next()
 
                             if option.type == "string":
                                 option.value = nextarg
@@ -236,19 +246,17 @@ class ArgParser:
                         sys.exit("Error: -%s is not a recognised option." % c)
 
             # Is the argument a registered command?
-            elif argstream.peek() in self.commands:
-                command = argstream.next()
-                parser = self.commands[command]
-                callback = self.callbacks[command]
-                argset = parser.parse(argstream.remainder())
+            elif arg in self.commands:
+                parser = self.commands[arg]
+                callback = self.callbacks[arg]
+                argset = parser.parse(stream.remainder())
                 callback(argset)
-                return ArgSet(self.options, self.arguments, command, argset)
+                return ArgSet(self.options, self.arguments, arg, argset)
 
             # Is the argument the automatic 'help' command?
-            elif argstream.peek() == "help":
-                argstream.next()
-                if argstream.has_next():
-                    command = argstream.next()
+            elif arg == "help":
+                if stream.has_next():
+                    command = stream.next()
                     if command in self.commands:
                         sys.stdout.write(self.commands[command].helptext + "\n")
                         sys.exit()
@@ -259,7 +267,7 @@ class ArgParser:
 
             # Otherwise, add the argument to our list of free arguments.
             else:
-                self.arguments.append(argstream.next())
+                self.arguments.append(arg)
 
         return ArgSet(self.options, self.arguments)
 
