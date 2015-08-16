@@ -135,10 +135,10 @@ type ArgParser struct {
     // Stores positional arguments parsed from the input array.
     arguments []string
 
-    // Stores the command string, if a command is identified.
+    // Stores the command string, if a command is found.
     command string
 
-    // Stores the command's parser instance, if a command is identified.
+    // Stores the command's parser instance, if a command is found.
     commandParser *ArgParser
 }
 
