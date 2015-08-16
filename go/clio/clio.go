@@ -251,7 +251,7 @@ func (parser *ArgParser) ParseArgs(args []string) {
             continue
         }
 
-        // If we encounter a -- argument, turn off option parsing.
+        // If we encounter a -- argument, turn off parsing.
         if arg == "--" {
             parsing = false
             continue
