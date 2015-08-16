@@ -1,8 +1,8 @@
 /*
     A simple application demonstrating Clio in action.
 
-    Author: Darren Mulholland <dmulholland@outlook.ie>
-    License: Public Domain
+      * Author: Darren Mulholland <dmulholland@outlook.ie>
+      * License: Public Domain
 */
 package main
 
@@ -16,7 +16,7 @@ func main() {
     // We instantiate an argument parser, optionally supplying help text
     // and a version string. Supplying help text activates the automatic
     // --help flag, supplying a version string activates the automatic
-    // --version flag.
+    // --version flag. Empty strings "" can be passed to avoid activating either.
     parser := clio.NewParser("Usage: example...", "1.0.0")
 
     // Register two flags, --bool1 and --bool2.
@@ -51,7 +51,7 @@ func main() {
     // arguments. We can register as many flags and options as we like on this sub-parser.
     cmdParser.AddFlag("foo");
 
-    // The command parser can reuse the parent parser's option names without interfering.
+    // The command parser can reuse the parent parser's option names without interference.
     cmdParser.AddStringOption("str1", "ciara");
     cmdParser.AddStringOption("str2", "dave", 's');
 
@@ -68,7 +68,7 @@ func main() {
 
 
 // Callback method for the 'cmd' command.
-// This method will be called if the 'cmd' command is present.
+// This method will be called if the 'cmd' command is identified.
 // The method receives an ArgParser instance containing the command's
 // parsed arguments. Here we simply dump it to stdout.
 func cmdCallback(parser *clio.ArgParser) {

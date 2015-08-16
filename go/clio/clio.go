@@ -1,5 +1,5 @@
 /*
-    Clio: A toolkit for creating elegant command line interfaces.
+    Clio: a toolkit for creating elegant command line interfaces.
 
       * Author: Darren Mulholland <dmulholland@outlook.ie>
       * License: Public Domain
@@ -17,7 +17,7 @@ import (
 )
 
 
-// Library version number.
+// Package version number.
 const Version = "0.1.0"
 
 
@@ -33,7 +33,7 @@ const (
 
 
 // An option can have a boolean, string, integer, or floating point value.
-type Option struct {
+type iOption struct {
     optionType int
     boolValue bool
     strValue string
@@ -42,8 +42,8 @@ type Option struct {
 }
 
 
-// Returns a string representation of an option element's value.
-func (option *Option) String() string {
+// String returns a string representation of the option's value.
+func (option *iOption) String() string {
     var str string
     switch option.optionType {
     case FlagOption:
@@ -59,21 +59,21 @@ func (option *Option) String() string {
 }
 
 
-// Callback type for processing commands.
+// Callback function for processing commands.
 type Callback func(*ArgParser)
 
 
-// Makes a slice of string arguments available as a stream.
-type ArgStream struct {
+// An iArgStream instance makes a slice of string arguments available as a stream.
+type iArgStream struct {
     args []string
     index int
     length int
 }
 
 
-// Initializes a new ArgStream instance.
-func newStream(args []string) *ArgStream {
-    return &ArgStream{
+// Initializes a new iArgStream instance.
+func newStream(args []string) *iArgStream {
+    return &iArgStream{
         args: args,
         index: 0,
         length: len(args),
@@ -82,32 +82,33 @@ func newStream(args []string) *ArgStream {
 
 
 // Returns true if the stream contains at least one more argument.
-func (stream *ArgStream) hasNext() bool {
+func (stream *iArgStream) hasNext() bool {
     return stream.index < stream.length
 }
 
 
 // Returns the next argument from the stream.
-func (stream *ArgStream) next() string {
+func (stream *iArgStream) next() string {
     stream.index += 1
     return stream.args[stream.index - 1]
 }
 
 
 // Returns the next argument from the stream without consuming it.
-func (stream *ArgStream) peek() string {
+func (stream *iArgStream) peek() string {
     return stream.args[stream.index]
 }
 
 
 // Returns a slice containing all the remaining arguments from the stream.
-func (stream *ArgStream) remainder() []string {
+func (stream *iArgStream) remainder() []string {
     return stream.args[stream.index:]
 }
 
 
-// ArgParser is the workhorse of the toolkit. An ArgParser instance is responsible
-// for registering options and parsing the input array of raw arguments.
+// An ArgParser instance is responsible for registering options and parsing the
+// input array of raw arguments.
+//
 // Note that every registered command recursively receives an ArgParser instance of
 // its own. In theory commands can be stacked to any depth, although in practice even
 // two levels is confusing for users and best avoided.
@@ -120,10 +121,10 @@ type ArgParser struct {
     version string
 
     // Stores option objects indexed by option name.
-    options map[string]*Option
+    options map[string]*iOption
 
     // Stores option objects indexed by single-letter shortcut.
-    shortcuts map[rune]*Option
+    shortcuts map[rune]*iOption
 
     // Stores command sub-parser instances indexed by command.
     commands map[string]*ArgParser
@@ -142,13 +143,13 @@ type ArgParser struct {
 }
 
 
-// Initialize a new ArgParser instance.
+// NewParser initializes a new ArgParser instance.
 func NewParser(helptext string, version string) *ArgParser {
     return &ArgParser {
         helptext: strings.TrimSpace(helptext),
         version: strings.TrimSpace(version),
-        options: make(map[string]*Option),
-        shortcuts: make(map[rune]*Option),
+        options: make(map[string]*iOption),
+        shortcuts: make(map[rune]*iOption),
         commands: make(map[string]*ArgParser),
         callbacks: make(map[string]Callback),
         arguments: make([]string, 0, 10),
@@ -156,59 +157,63 @@ func NewParser(helptext string, version string) *ArgParser {
 }
 
 
-// Register a flag, optionally specifying a single-letter shortcut alias.
-func (parser *ArgParser) AddFlag(name string, shortcuts ...rune) {
-    option := Option{
+// AddFlag registers a flag (a boolean option) on a parser instance.
+// The caller can optionally specify a single-letter shortcut alias.
+func (parser *ArgParser) AddFlag(name string, shortcut ...rune) {
+    option := iOption{
         optionType: FlagOption,
         boolValue: false,
     }
     parser.options[name] = &option
-    for _, shortcut := range shortcuts {
-        parser.shortcuts[shortcut] = &option
+    for _, c := range shortcut {
+        parser.shortcuts[c] = &option
     }
 }
 
 
-// Register a string option, optionally specifying a single-letter shortcut alias.
-func (parser *ArgParser) AddStringOption(name string, defValue string, shortcuts ...rune) {
-    option := Option{
+// AddStringOption registers a string option on a parser instance.
+// The caller can optionally specify a single-letter shortcut alias.
+func (parser *ArgParser) AddStringOption(name string, defValue string, shortcut ...rune) {
+    option := iOption{
         optionType: StringOption,
         strValue: defValue,
     }
     parser.options[name] = &option
-    for _, shortcut := range shortcuts {
-        parser.shortcuts[shortcut] = &option
+    for _, c := range shortcut {
+        parser.shortcuts[c] = &option
     }
 }
 
 
-// Register an integer option, optionally specifying a single-letter shortcut alias.
-func (parser *ArgParser) AddIntOption(name string, defValue int, shortcuts ...rune) {
-    option := Option{
+// AddIntOption registers an integer option on a parser instance.
+// The caller can optionally specify a single-letter shortcut alias.
+func (parser *ArgParser) AddIntOption(name string, defValue int, shortcut ...rune) {
+    option := iOption{
         optionType: IntegerOption,
         intValue: defValue,
     }
     parser.options[name] = &option
-    for _, shortcut := range shortcuts {
-        parser.shortcuts[shortcut] = &option
+    for _, c := range shortcut {
+        parser.shortcuts[c] = &option
     }
 }
 
 
-// Register a float option, optionally specifying a single-letter shortcut alias.
-func (parser *ArgParser) AddFloatOption(name string, defValue float64, shortcuts ...rune) {
-    option := Option{
+// AddFloatOption registers a float option on a parser instance.
+// The caller can optionally specify a single-letter shortcut alias.
+func (parser *ArgParser) AddFloatOption(name string, defValue float64, shortcut ...rune) {
+    option := iOption{
         optionType: FloatOption,
         floatValue: defValue,
     }
     parser.options[name] = &option
-    for _, shortcut := range shortcuts {
-        parser.shortcuts[shortcut] = &option
+    for _, c := range shortcut {
+        parser.shortcuts[c] = &option
     }
 }
 
 
-// Register a command and its associated callback.
+// AddCommand registers a command on a parser instance.
 func (parser *ArgParser) AddCommand(command string, callback Callback, helptext string) *ArgParser {
     cmdParser := NewParser(helptext, "")
     parser.commands[command] = cmdParser
@@ -217,14 +222,14 @@ func (parser *ArgParser) AddCommand(command string, callback Callback, helptext 
 }
 
 
-// Print the parser's help text and exit.
+// Help prints the parser's help text, then exits.
 func (parser *ArgParser) Help() {
     fmt.Println(parser.helptext)
     os.Exit(0)
 }
 
 
-// Parse a slice of string arguments.
+// ParseArgs parses the specified slice of string arguments.
 func (parser *ArgParser) ParseArgs(args []string) {
 
     // Switch to turn off parsing if we encounter a -- argument.
@@ -254,6 +259,8 @@ func (parser *ArgParser) ParseArgs(args []string) {
 
         // Is the argument a long-form option or flag?
         if strings.HasPrefix(arg, "--") {
+
+            // Strip the -- prefix.
             arg = arg[2:]
 
             // Is the argument a registered option name?
@@ -271,7 +278,7 @@ func (parser *ArgParser) ParseArgs(args []string) {
                     os.Exit(1)
                 }
 
-                // We have a following argument. Attempt to parse it.
+                // Fetch the argument from the stream and attempt to parse it.
                 nextarg := stream.next()
 
                 switch option.optionType {
@@ -319,7 +326,6 @@ func (parser *ArgParser) ParseArgs(args []string) {
             os.Exit(1)
         }
 
-
         // Is the argument a short-form option or flag?
         if strings.HasPrefix(arg, "-"){
 
@@ -352,7 +358,7 @@ func (parser *ArgParser) ParseArgs(args []string) {
                         os.Exit(1)
                     }
 
-                    // We have a following argument. Attempt to parse it.
+                    // Fetch the argument from the stream and attempt to parse it.
                     nextarg := stream.next()
 
                     switch option.optionType {
@@ -424,50 +430,51 @@ func (parser *ArgParser) ParseArgs(args []string) {
 }
 
 
-// Parse the application's command line arguments.
+// Parse parses the application's command line arguments.
 func (parser *ArgParser) Parse() {
     parser.ParseArgs(os.Args[1:])
 }
 
 
-// Returns true if the flag was present.
+// GetFlag returns true if the named flag was found.
 func (parser *ArgParser) GetFlag(name string) bool {
     return parser.options[name].boolValue
 }
 
 
-// Returns the value of a string option.
+// GetStringOption returns the value of the named option.
 func (parser *ArgParser) GetStringOption(name string) string {
     return parser.options[name].strValue
 }
 
 
-// Returns the value of an integer option.
+// GetIntOption returns the value of the named option.
 func (parser *ArgParser) GetIntOption(name string) int {
     return parser.options[name].intValue
 }
 
 
-// Returns the value of a float option.
+// GetFloatOption returns the value of the named option.
 func (parser *ArgParser) GetFloatOption(name string) float64 {
     return parser.options[name].floatValue
 }
 
 
-// Returns true if the parser has identified one or more positional arguments.
+// HasArgs returns true if the parser has identified one or more positional arguments.
 func (parser *ArgParser) HasArgs() bool {
     return len(parser.arguments) > 0
 }
 
 
-// Returns the positional arguments as a slice of strings.
+// GetArgs returns the parser's positional arguments as a slice of strings.
 func (parser *ArgParser) GetArgs() []string {
     return parser.arguments
 }
 
 
-// Convenience function: attempts to parse and return the positional
-// arguments as a list of integers.
+// GetArgsAsInts attempts to parse and return the parser's positional arguments
+// as a slice of integers. The application will exit with an error message if any
+// of the arguments cannot be parsed as an integer.
 func (parser *ArgParser) GetArgsAsInts() []int {
     intList := make([]int, 0, 10)
     for _, strArg := range parser.arguments {
@@ -482,8 +489,9 @@ func (parser *ArgParser) GetArgsAsInts() []int {
 }
 
 
-// Convenience function: attempts to parse and return the positional
-// arguments as a list of floats.
+// GetArgsAsFloats attempts to parse and return the parser's positional arguments
+// as a slice of floats. The application will exit with an error message if any
+// of the arguments cannot be parsed as a float.
 func (parser *ArgParser) GetArgsAsFloats() []float64 {
     floatList := make([]float64, 0, 10)
     for _, strArg := range parser.arguments {
@@ -498,25 +506,25 @@ func (parser *ArgParser) GetArgsAsFloats() []float64 {
 }
 
 
-// Returns true if the parser has identified a registered command.
+// HasCommand returns true if the parser has found a registered command.
 func (parser *ArgParser) HasCommand() bool {
     return parser.command != ""
 }
 
 
-// Returns the command string, if a command was found.
+// GetCommand returns the command string, if a command was found.
 func (parser *ArgParser) GetCommand() string {
     return parser.command
 }
 
 
-// Returns the command's parser instance, if a command was found.
+// GetCommandParser returns the command's parser instance, if a command was found.
 func (parser *ArgParser) GetCommandParser() *ArgParser {
     return parser.commandParser
 }
 
 
-// List all options and arguments for debugging.
+// String returns a string representation of the parser instance.
 func (parser *ArgParser) String() string {
     lines := make([]string, 0, 10)
 
