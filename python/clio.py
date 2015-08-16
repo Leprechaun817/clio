@@ -166,7 +166,7 @@ class ArgParser:
 
                     # No following argument, so print an error and exit.
                     else:
-                        sys.exit("Error: missing argument for the --%s option" % argstring)
+                        sys.exit("Error: missing argument for the --%s option." % argstring)
 
                 # Is the argument the automatic --help flag?
                 elif argstring == "help" and self.helptext is not None:
