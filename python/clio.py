@@ -79,6 +79,46 @@ class ArgParser:
         # Stores positional arguments parsed from the input stream.
         self.arguments = []
 
+        # Stores the command string, if a command is found while parsing.
+        self.command = None
+
+        # Stores the command's parser instance, if a command is found.
+        self.command_parser = None
+
+    # Enable dictionary-style access to options: value = parser['name'].
+    def __getitem__(self, name):
+        return self.options[name].value
+
+    # Enable dictionary-style assignment to options: parser['name'] = value.
+    def __setitem__(self, name, value):
+        self.options[name] = Option("unknown", value)
+
+    # List all options and arguments for debugging.
+    def __str__(self):
+        lines = []
+
+        lines.append("Options:")
+        if len(self.options):
+            for name in sorted(self.options):
+                lines.append("  %s: %s" % (name, self.options[name].value))
+        else:
+            lines.append("  [none]")
+
+        lines.append("\nArguments:")
+        if len(self.arguments):
+            for arg in self.arguments:
+                lines.append("  %s" % arg)
+        else:
+            lines.append("  [none]")
+
+        lines.append("\nCommand:")
+        if self.has_cmd():
+            lines.append("  %s" % self.get_cmd())
+        else:
+            lines.append("  [none]")
+
+        return "\n".join(lines)
+
     # Register an option on the parser instance.
     def _add_option(self, type, name, default, shortcut):
         option = Option(type, default)
@@ -114,7 +154,7 @@ class ArgParser:
         sys.stdout.write(self.helptext + "\n")
         sys.exit()
 
-    # Parse a list of arguments.
+    # Parse a list of string arguments.
     def parse(self, args=sys.argv[1:]):
 
         # Switch to turn off parsing if we encounter a -- argument.
@@ -247,11 +287,13 @@ class ArgParser:
 
             # Is the argument a registered command?
             elif arg in self.commands:
-                parser = self.commands[arg]
-                callback = self.callbacks[arg]
-                argset = parser.parse(stream.remainder())
-                callback(argset)
-                return ArgSet(self.options, self.arguments, arg, argset)
+                cmd_parser = self.commands[arg]
+                cmd_callback = self.callbacks[arg]
+                cmd_parser.parse(stream.remainder())
+                cmd_callback(cmd_parser)
+                self.command = arg
+                self.command_parser = cmd_parser
+                break
 
             # Is the argument the automatic 'help' command?
             elif arg == "help":
@@ -269,77 +311,23 @@ class ArgParser:
             else:
                 self.arguments.append(arg)
 
-        return ArgSet(self.options, self.arguments)
-
-
-# An ArgSet instance represents a set of parsed arguments.
-class ArgSet:
-
-    def __init__(self, options, arguments, command=None, argset=None):
-
-        # Stores a dictionary of option objects indexed by option name.
-        self.options = options
-
-        # Stores a list of positional arguments.
-        self.arguments = arguments
-
-        # Stores the command string, if a command was found.
-        self.command = command
-
-        # Stores the command's ArgSet instance, if a command was found.
-        self.argset = argset
-
-    # Enable dictionary-style access to options: value = argset['name'].
-    def __getitem__(self, name):
-        return self.options[name].value
-
-    # Enable dictionary-style assignment: argset['name'] = value.
-    def __setitem__(self, name, value):
-        self.options[name] = Option("unknown", value)
-
-    # List all options and arguments for debugging.
-    def __str__(self):
-        lines = []
-
-        lines.append("Options:")
-        if len(self.options):
-            for name in sorted(self.options):
-                lines.append("  %s: %s" % (name, self.options[name].value))
-        else:
-            lines.append("  [none]")
-
-        lines.append("\nArguments:")
-        if len(self.arguments):
-            for arg in self.arguments:
-                lines.append("  %s" % arg)
-        else:
-            lines.append("  [none]")
-
-        lines.append("\nCommand:")
-        if self.has_cmd():
-            lines.append("  %s" % self.get_cmd())
-        else:
-            lines.append("  [none]")
-
-        return "\n".join(lines)
-
     # Returns the value of the specified option.
     def get_option(self, name):
         return self.options[name].value
 
-    # Returns a dictionary containing all the set's named options.
+    # Returns a dictionary containing all the named options.
     def get_options(self):
         return {name: option.value for name, option in self.options.items()}
 
-    # Returns true if the set contains at least one positional argument.
+    # Returns true if at least one positional argument was found.
     def has_args(self):
         return len(self.arguments > 0)
 
-    # Returns a list of the set's positional arguments.
+    # Returns the positional arguments as a list of strings.
     def get_args(self):
         return self.arguments
 
-    # Convenience function: attempts to parse and return the set's positional
+    # Convenience function: attempts to parse and return the positional
     # arguments as a list of integers.
     def get_args_as_ints(self):
         args = []
@@ -350,7 +338,7 @@ class ArgSet:
                 sys.exit("Error: cannot parse '%s' as an integer." % arg)
         return args
 
-    # Convenience function: attempts to parse and return the set's positional
+    # Convenience function: attempts to parse and return the positional
     # arguments as a list of floats.
     def get_args_as_floats(self):
         args = []
@@ -361,14 +349,14 @@ class ArgSet:
                 sys.exit("Error: cannot parse '%s' as a float." % arg)
         return args
 
-    # Returns true if the set contains a command.
+    # Returns true if the parser has found a registered command.
     def has_cmd(self):
         return self.command is not None
 
-    # Returns the set's command string, if a command was found.
+    # Returns the command string, if a command was found.
     def get_cmd(self):
         return self.command
 
-    # Returns the ArgSet instance for the set's command, if a command was found.
-    def get_cmd_argset(self):
-        return self.argset
+    # Returns the command's parser instance, if a command was found.
+    def get_cmd_parser(self):
+        return self.command_parser

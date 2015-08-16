@@ -61,20 +61,21 @@ def main():
     # parser's parse() method with a list of argument strings. Only the root
     # parser's parse() method should be called - command arguments will be
     # parsed automatically. The parse() method defaults to parsing the
-    # application's command line arguments.
-    argset = parser.parse()
+    # application's command line arguments if no list is supplied.
+    parser.parse()
 
-    # The parse() method returns an ArgSet instance. Here we simply print it.
-    print(argset)
+    # We can now retrieve our option and argument values from the parser
+    # instance. Here we simply dump the parser to stdout.
+    print(parser)
 
 
 # Callback method for the 'cmd' command.
-# This method will be called if the 'cmd' command is present.
-# The method receives an ArgSet instance containing the command's
+# This method will be called if the 'cmd' command is found.
+# The method receives an ArgParser instance containing the command's
 # parsed arguments. Here we simply dump it to stdout.
-def cmd_callback(argset):
+def cmd_callback(parser):
     print("---------- cmd_callback() ----------");
-    print(argset);
+    print(parser);
     print("....................................\n");
 
 
