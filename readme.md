@@ -5,8 +5,6 @@ A minimalist argument-parsing library for building elegant command-line interfac
 
 Clio supports long and short-form options and arbitrarily-nested commands. It aims to provide a consistent interface across multiple programming languages, implemented wherever possible as a simple drop-in file.
 
-Features:
-
 * Supports long-form boolean flags with optional single-character shortcuts: `--flag`, `-f`.
 
 * Supports long-form string, integer, and floating-point options with optional
