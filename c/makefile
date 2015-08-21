@@ -1,4 +1,3 @@
-
 all:
 	@mkdir -p bin obj
 	@make example

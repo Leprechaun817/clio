@@ -73,7 +73,7 @@ typedef enum OptionType {
 } OptionType;
 
 
-// Represents an option registered on a parser.
+// An Option instance represents an option registered on a parser.
 typedef struct Option {
     OptionType type;
     union {
@@ -87,7 +87,7 @@ typedef struct Option {
 } Option;
 
 
-// Initializes a new flag (boolean) option.
+// Initializes a new flag (boolean option).
 Option * Option_new_flag(char *name, char alias, bool value) {
     Option *option = malloc(sizeof(Option));
     option->type = FLAG;
@@ -162,7 +162,7 @@ void Option_print(Option *option) {
 
 
 // A collection of Option elements indexed by name and and by
-// single-character alias.
+// single-character shortcut alias.
 typedef struct OptionMap {
     int len;
     int cap;
@@ -214,7 +214,7 @@ Option * OptionMap_get_by_name(OptionMap *map, char *name) {
 }
 
 
-// Fetches an Option element by its shortcut alias. Returns NULL is the alias
+// Fetches an Option element by its shortcut alias. Returns NULL if the alias
 // is not found.
 Option * OptionMap_get_by_alias(OptionMap *map, char alias) {
     for (int i = 0; i < map->len; i++) {
