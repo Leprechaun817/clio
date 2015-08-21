@@ -5,16 +5,18 @@ A minimalist argument-parsing library for building elegant command-line interfac
 
 Clio supports long and short-form options and arbitrarily-nested commands. It aims to provide a consistent interface across multiple programming languages, implemented wherever possible as a simple drop-in file.
 
-* Supports long-form boolean flags with optional single-character shortcuts: `--flag`, `-f`.
+All implementations support the same core feature set:
 
-* Supports long-form string, integer, and floating-point options with optional
+* Long-form boolean flags with optional single-character shortcuts: `--flag`, `-f`.
+
+* Long-form string, integer, and floating-point options with optional
   single-character shortcuts: `--option <arg>`, `-o <arg>`.
 
-* Supports condensed short-form options: `-abc <arg> <arg>`.
+* Condensed short-form options: `-abc <arg> <arg>`.
 
-* Supports automatic `--help` and `--version` flags.
+* Automatic `--help` and `--version` flags.
 
-* Supports git-style command interfaces with arbitrarily-nested commands.
+* Git-style command interfaces with arbitrarily-nested commands.
 
 Clio is currently an alpha-stage project. It lacks documentation and real-world testing and its interface remains subject to change.
 
