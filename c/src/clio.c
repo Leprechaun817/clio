@@ -24,7 +24,7 @@ typedef struct ArgParser ArgParser;
 typedef void (*CmdCallback)(ArgParser *parser);
 
 // Functions.
-void ArgParser_free(ArgParser *parser);
+static void ArgParser_free(ArgParser *parser);
 
 
 // ----------------------------------------------------------------------
@@ -33,7 +33,7 @@ void ArgParser_free(ArgParser *parser);
 
 
 // Attempts to parse a string as an integer value, exiting on failure.
-int try_str_to_int(char *str) {
+static int try_str_to_int(char *str) {
     char *endptr;
     errno = 0;
     long result = strtol(str, &endptr, 0);
@@ -46,7 +46,7 @@ int try_str_to_int(char *str) {
 
 
 // Attempts to parse a string as a double value, exiting on failure.
-double try_str_to_double(char *str) {
+static double try_str_to_double(char *str) {
     char *endptr;
     errno = 0;
     double result = strtod(str, &endptr);
@@ -88,7 +88,7 @@ typedef struct Option {
 
 
 // Initializes a new flag (boolean option).
-Option * Option_new_flag(char *name, char alias, bool value) {
+static Option * Option_new_flag(char *name, char alias, bool value) {
     Option *option = malloc(sizeof(Option));
     option->type = FLAG;
     option->name = name;
@@ -99,7 +99,7 @@ Option * Option_new_flag(char *name, char alias, bool value) {
 
 
 // Initializes a new string option.
-Option * Option_new_str(char *name, char alias, char  *value) {
+static Option * Option_new_str(char *name, char alias, char  *value) {
     Option *option = malloc(sizeof(Option));
     option->type = STRING;
     option->name = name;
@@ -110,7 +110,7 @@ Option * Option_new_str(char *name, char alias, char  *value) {
 
 
 // Initializes a new integer option.
-Option * Option_new_int(char *name, char alias, int value) {
+static Option * Option_new_int(char *name, char alias, int value) {
     Option *option = malloc(sizeof(Option));
     option->type = INTEGER;
     option->name = name;
@@ -121,7 +121,7 @@ Option * Option_new_int(char *name, char alias, int value) {
 
 
 // Initializes a new floating point option.
-Option * Option_new_float(char *name, char alias, double value) {
+static Option * Option_new_float(char *name, char alias, double value) {
     Option *option = malloc(sizeof(Option));
     option->type = FLOAT;
     option->name = name;
@@ -132,13 +132,13 @@ Option * Option_new_float(char *name, char alias, double value) {
 
 
 // Frees the memory occupied by an Option instance.
-void Option_free(Option *option) {
+static void Option_free(Option *option) {
     free(option);
 }
 
 
 // Prints an Option instance to stdout for debugging.
-void Option_print(Option *option) {
+static void Option_print(Option *option) {
     switch (option->type) {
         case FLAG:
             printf("  %s: %s\n", option->name, option->bool_val ? "true" : "false");
@@ -171,7 +171,7 @@ typedef struct OptionMap {
 
 
 // Initializes a new OptionMap instance.
-OptionMap * OptionMap_new() {
+static OptionMap * OptionMap_new() {
     OptionMap *map = malloc(sizeof(OptionMap));
     map->len = 0;
     map->cap = 10;
@@ -182,7 +182,7 @@ OptionMap * OptionMap_new() {
 
 // Frees the memory occupied by an OptionMap instance and by all its
 // associated Option instances.
-void OptionMap_free(OptionMap *map) {
+static void OptionMap_free(OptionMap *map) {
     for (int i = 0; i < map->len; i++) {
         Option_free(map->list[i]);
     }
@@ -192,7 +192,7 @@ void OptionMap_free(OptionMap *map) {
 
 
 // Adds a new Option element to the map.
-void OptionMap_add(OptionMap *map, Option *option) {
+static void OptionMap_add(OptionMap *map, Option *option) {
     if (map->len == map->cap) {
         map->cap *= 2;
         map->list = realloc(map->list, (sizeof(Option*)) * map->cap);
@@ -203,7 +203,7 @@ void OptionMap_add(OptionMap *map, Option *option) {
 
 
 // Fetches an Option element by name. Returns NULL if the name is not found.
-Option * OptionMap_get_by_name(OptionMap *map, char *name) {
+static Option * OptionMap_get_by_name(OptionMap *map, char *name) {
     for (int i = 0; i < map->len; i++) {
         Option *option = map->list[i];
         if (strcmp(name, option->name) == 0) {
@@ -216,7 +216,7 @@ Option * OptionMap_get_by_name(OptionMap *map, char *name) {
 
 // Fetches an Option element by its shortcut alias. Returns NULL if the alias
 // is not found.
-Option * OptionMap_get_by_alias(OptionMap *map, char alias) {
+static Option * OptionMap_get_by_alias(OptionMap *map, char alias) {
     for (int i = 0; i < map->len; i++) {
         Option *option = map->list[i];
         if (option->alias == alias) {
@@ -228,7 +228,7 @@ Option * OptionMap_get_by_alias(OptionMap *map, char alias) {
 
 
 // Prints an OptionMap instance to stdout for debugging.
-void OptionMap_print(OptionMap *map) {
+static void OptionMap_print(OptionMap *map) {
     puts("Options:");
     if (map->len > 0) {
         for (int i = 0; i < map->len; i++) {
@@ -263,7 +263,7 @@ typedef struct CommandMap {
 
 
 // Initializes a new CommandMap instance.
-CommandMap * CommandMap_new() {
+static CommandMap * CommandMap_new() {
     CommandMap *map = malloc(sizeof(CommandMap));
     map->len = 0;
     map->cap = 10;
@@ -274,7 +274,7 @@ CommandMap * CommandMap_new() {
 
 // Frees the memory associated with a CommandMap instance, including the
 // memory associated with each constituent command parser instance.
-void CommandMap_free(CommandMap *map) {
+static void CommandMap_free(CommandMap *map) {
     for (int i = 0; i < map->len; i++) {
         ArgParser_free(map->list[i].parser);
     }
@@ -284,7 +284,7 @@ void CommandMap_free(CommandMap *map) {
 
 
 // Adds a new entry to a CommandMap instance.
-void CommandMap_add(CommandMap *map, char *command, ArgParser *parser, CmdCallback callback) {
+static void CommandMap_add(CommandMap *map, char *command, ArgParser *parser, CmdCallback callback) {
     if (map->len == map->cap) {
         map->cap *= 2;
         map->list = realloc(map->list, sizeof(CommandMapEntry*) * map->cap);
@@ -296,7 +296,7 @@ void CommandMap_add(CommandMap *map, char *command, ArgParser *parser, CmdCallba
 
 // Returns a pointer to the CommandMapEntry corresponding to the specified
 // command, or NULL if the command is not recognised.
-CommandMapEntry * CommandMap_get(CommandMap *map, char *command) {
+static CommandMapEntry * CommandMap_get(CommandMap *map, char *command) {
     for (int i = 0; i < map->len; i++) {
         if (strcmp(map->list[i].command, command) == 0) {
             return &map->list[i];
@@ -321,7 +321,7 @@ typedef struct ArgStream {
 
 
 // Initializes a new ArgStream instance.
-ArgStream * ArgStream_new(int len, char **args) {
+static ArgStream * ArgStream_new(int len, char **args) {
     ArgStream *stream = malloc(sizeof(ArgStream));
     stream->len = len;
     stream->index = 0;
@@ -331,19 +331,19 @@ ArgStream * ArgStream_new(int len, char **args) {
 
 
 // Frees the memory associated with an ArgStream instance.
-void ArgStream_free(ArgStream *stream) {
+static void ArgStream_free(ArgStream *stream) {
     free(stream);
 }
 
 
 // Returns true if the stream contains at least one more argument.
-bool ArgStream_has_next(ArgStream *stream) {
+static bool ArgStream_has_next(ArgStream *stream) {
     return stream->index < stream->len;
 }
 
 
 // Returns the next argument from the stream.
-char * ArgStream_next(ArgStream *stream) {
+static char * ArgStream_next(ArgStream *stream) {
     return stream->args[stream->index++];
 }
 
@@ -362,7 +362,7 @@ typedef struct ArgList {
 
 
 // Initializes a new ArgList instance.
-ArgList * ArgList_new() {
+static ArgList * ArgList_new() {
     ArgList *list = malloc(sizeof(ArgList));
     list->len = 0;
     list->cap = 10;
@@ -372,7 +372,7 @@ ArgList * ArgList_new() {
 
 
 // Appends a new argument to the list.
-void ArgList_add(ArgList *list, char *arg) {
+static void ArgList_add(ArgList *list, char *arg) {
     if (list->len == list->cap) {
         list->cap *= 2;
         list->args = realloc(list->args, (sizeof(char*)) * list->cap);
@@ -383,14 +383,14 @@ void ArgList_add(ArgList *list, char *arg) {
 
 
 // Frees the memory associated with the ArgList instance.
-void ArgList_free(ArgList *list) {
+static void ArgList_free(ArgList *list) {
     free(list->args);
     free(list);
 }
 
 
 // Prints the ArgList instance to stdout for debugging.
-void ArgList_print(ArgList *list) {
+static void ArgList_print(ArgList *list) {
     puts("Arguments:");
     if (list->len > 0) {
         for (int i = 0; i < list->len; i++) {
@@ -426,7 +426,7 @@ struct ArgParser {
 // Supplying help text activates the automatic --help flag, supplying a
 // version string activates the automatic --version flag. A NULL pointer can
 // be passed for either parameter.
-ArgParser * ArgParser_new(char *helptext, char *version) {
+static ArgParser * ArgParser_new(char *helptext, char *version) {
     ArgParser *parser = malloc(sizeof(ArgParser));
     parser->helptext = helptext;
     parser->version = version;
@@ -440,7 +440,7 @@ ArgParser * ArgParser_new(char *helptext, char *version) {
 
 
 // Frees the memory associated with an ArgParser instance.
-void ArgParser_free(ArgParser *parser) {
+static void ArgParser_free(ArgParser *parser) {
     OptionMap_free(parser->options);
     ArgList_free(parser->arguments);
     CommandMap_free(parser->commands);
@@ -449,35 +449,35 @@ void ArgParser_free(ArgParser *parser) {
 
 
 // Registers a flag (boolean) option and its single-character shortcut alias.
-void ArgParser_add_flag(ArgParser *parser, char *name, char alias) {
+static void ArgParser_add_flag(ArgParser *parser, char *name, char alias) {
     Option *option = Option_new_flag(name, alias, false);
     OptionMap_add(parser->options, option);
 }
 
 
 // Registers a string option and its single-character shortcut alias.
-void ArgParser_add_str_opt(ArgParser *parser, char *name, char* def_value, char alias) {
+static void ArgParser_add_str_opt(ArgParser *parser, char *name, char* def_value, char alias) {
     Option *option = Option_new_str(name, alias, def_value);
     OptionMap_add(parser->options, option);
 }
 
 
 // Registers an integer option and its single-character shortcut alias.
-void ArgParser_add_int_opt(ArgParser *parser, char *name, int def_value, char alias) {
+static void ArgParser_add_int_opt(ArgParser *parser, char *name, int def_value, char alias) {
     Option *option = Option_new_int(name, alias, def_value);
     OptionMap_add(parser->options, option);
 }
 
 
 // Registers a float option and its single-character shortcut alias.
-void ArgParser_add_float_opt(ArgParser *parser, char *name, double def_value, char alias) {
+static void ArgParser_add_float_opt(ArgParser *parser, char *name, double def_value, char alias) {
     Option *option = Option_new_float(name, alias, def_value);
     OptionMap_add(parser->options, option);
 }
 
 
 // Registers a command and its associated callback.
-ArgParser * ArgParser_add_cmd(ArgParser *parser, char *command, CmdCallback callback, char *helptext) {
+static ArgParser * ArgParser_add_cmd(ArgParser *parser, char *command, CmdCallback callback, char *helptext) {
     ArgParser *cmd_parser = ArgParser_new(helptext, NULL);
     CommandMap_add(parser->commands, command, cmd_parser, callback);
     return cmd_parser;
@@ -485,7 +485,7 @@ ArgParser * ArgParser_add_cmd(ArgParser *parser, char *command, CmdCallback call
 
 
 // Parses the supplied stream of string arguments.
-void ArgParser_parse_stream(ArgParser *parser, ArgStream *stream) {
+static void ArgParser_parse_stream(ArgParser *parser, ArgStream *stream) {
 
     // Switch to turn off parsing if we encounter a -- argument.
     // Everything following the -- will be treated as a positional argument.
@@ -662,7 +662,7 @@ void ArgParser_parse_stream(ArgParser *parser, ArgStream *stream) {
 
 
 // Parses the supplied array of string arguments.
-void ArgParser_parse(ArgParser *parser, int argcount, char *args[]) {
+static void ArgParser_parse(ArgParser *parser, int argcount, char *args[]) {
 
     // Convert the input array into a stream.
     ArgStream *stream = ArgStream_new(argcount, args);
@@ -676,37 +676,37 @@ void ArgParser_parse(ArgParser *parser, int argcount, char *args[]) {
 
 
 // Returns true if the named flag was found.
-bool ArgParser_get_flag(ArgParser *parser, char *name) {
+static bool ArgParser_get_flag(ArgParser *parser, char *name) {
     return OptionMap_get_by_name(parser->options, name)->bool_val;
 }
 
 
 // Returns the value of the named string option.
-char * ArgParser_get_str_opt(ArgParser *parser, char *name) {
+static char * ArgParser_get_str_opt(ArgParser *parser, char *name) {
     return OptionMap_get_by_name(parser->options, name)->str_val;
 }
 
 
 // Returns the value of the named integer option.
-int ArgParser_get_int_opt(ArgParser *parser, char *name) {
+static int ArgParser_get_int_opt(ArgParser *parser, char *name) {
     return OptionMap_get_by_name(parser->options, name)->int_val;
 }
 
 
 // Returns the value of the named float option.
-double ArgParser_get_float_opt(ArgParser *parser, char *name) {
+static double ArgParser_get_float_opt(ArgParser *parser, char *name) {
     return OptionMap_get_by_name(parser->options, name)->float_val;
 }
 
 
 // Returns true if the parser has found one or more positional arguments.
-bool ArgParser_has_args(ArgParser *parser) {
+static bool ArgParser_has_args(ArgParser *parser) {
     return parser->arguments->len > 0;
 }
 
 
 // Returns the number of positional arguments.
-int ArgParser_get_arg_count(ArgParser *parser) {
+static int ArgParser_get_arg_count(ArgParser *parser) {
     return parser->arguments->len;
 }
 
@@ -714,7 +714,7 @@ int ArgParser_get_arg_count(ArgParser *parser) {
 // Returns the positional arguments as an array of string pointers.
 // The memory occupied by the returned array is not affected by calls to
 // ArgParser_free().
-char ** ArgParser_get_args(ArgParser *parser) {
+static char ** ArgParser_get_args(ArgParser *parser) {
     char **args = malloc(sizeof(char*) * parser->arguments->len);
     memcpy(args, parser->arguments->args, parser->arguments->len);
     return args;
@@ -725,7 +725,7 @@ char ** ArgParser_get_args(ArgParser *parser) {
 // integers. Exits with an error message on failure.
 // The memory occupied by the returned array is not affected by calls to
 // ArgParser_free().
-int * ArgParser_get_args_as_ints(ArgParser *parser) {
+static int * ArgParser_get_args_as_ints(ArgParser *parser) {
     int *args = malloc(sizeof(int) * parser->arguments->len);
     for (int i = 0; i < parser->arguments->len; i++) {
         *(args + i) = try_str_to_int(parser->arguments->args[i]);
@@ -738,7 +738,7 @@ int * ArgParser_get_args_as_ints(ArgParser *parser) {
 // doubles. Exits with an error message on failure.
 // The memory occupied by the returned array is not affected by calls to
 // ArgParser_free().
-double * ArgParser_get_args_as_floats(ArgParser *parser) {
+static double * ArgParser_get_args_as_floats(ArgParser *parser) {
     double *args = malloc(sizeof(double) * parser->arguments->len);
     for (int i = 0; i < parser->arguments->len; i++) {
         *(args + i) = try_str_to_double(parser->arguments->args[i]);
@@ -748,25 +748,25 @@ double * ArgParser_get_args_as_floats(ArgParser *parser) {
 
 
 // Returns true if the parser has found a command.
-bool ArgParser_has_cmd(ArgParser *parser) {
+static bool ArgParser_has_cmd(ArgParser *parser) {
     return parser->command != NULL;
 }
 
 
 // Returns the command string, if the parser has found a command.
-char * ArgParser_get_cmd(ArgParser *parser) {
+static char * ArgParser_get_cmd(ArgParser *parser) {
     return parser->command;
 }
 
 
 // Returns the command parser instance, if the parser has found a command.
-ArgParser * ArgParser_get_cmd_parser(ArgParser *parser) {
+static ArgParser * ArgParser_get_cmd_parser(ArgParser *parser) {
     return parser->command_parser;
 }
 
 
 // Prints an ArgParser instance to stdout for debugging.
-void ArgParser_print(ArgParser *parser) {
+static void ArgParser_print(ArgParser *parser) {
     OptionMap_print(parser->options);
     puts("");
     ArgList_print(parser->arguments);
