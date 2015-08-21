@@ -433,6 +433,8 @@ ArgParser * ArgParser_new(char *helptext, char *version) {
     parser->options = OptionMap_new();
     parser->arguments = ArgList_new();
     parser->commands = CommandMap_new();
+    parser->command = NULL;
+    parser->command_parser = NULL;
     return parser;
 }
 
@@ -745,11 +747,35 @@ double * ArgParser_get_args_as_floats(ArgParser *parser) {
 }
 
 
+// Returns true if the parser has found a command.
+bool ArgParser_has_cmd(ArgParser *parser) {
+    return parser->command != NULL;
+}
+
+
+// Returns the command string, if the parser has found a command.
+char * ArgParser_get_cmd(ArgParser *parser) {
+    return parser->command;
+}
+
+
+// Returns the command parser instance, if the parser has found a command.
+ArgParser * ArgParser_get_cmd_parser(ArgParser *parser) {
+    return parser->command_parser;
+}
+
+
 // Prints an ArgParser instance to stdout for debugging.
 void ArgParser_print(ArgParser *parser) {
     OptionMap_print(parser->options);
     puts("");
     ArgList_print(parser->arguments);
+    puts("\nComand:");
+    if (ArgParser_has_cmd(parser)) {
+        printf("  %s\n", ArgParser_get_cmd(parser));
+    } else {
+        puts("  [none]");
+    }
 }
 
 
@@ -847,6 +873,6 @@ void clio_free(ArgParser *parser) {
 }
 
 
-void clio_print(ArgParser *parser) {
+void clio_dump(ArgParser *parser) {
     ArgParser_print(parser);
 }

@@ -15,7 +15,7 @@
 // we simply dump the parser to stdout.
 void callback(ArgParser *parser) {
     puts("---------- callback() ----------");
-    clio_print(parser);
+    clio_dump(parser);
     puts("...................................\n");
 }
 
@@ -65,15 +65,19 @@ int main(int argc, char **argv) {
 
     // The command parser can safely reuse the parent parser's option names.
     clio_add_str(cmd_parser, "str1", "ciara", NULL);
-    clio_add_str(cmd_parser, "str2", "dave", NULL);
+    clio_add_str(cmd_parser, "str2", "dave", "s");
 
     // Once all our options and commands have been registered we call
     // clio_parse() on the root parser.
     clio_parse(parser, argc, argv);
 
-    // We can now retrieve our option and argument values from the parser instance.
-    // Here we simply dump it to stdout.
-    clio_print(parser);
+    // We can now retrieve our option and argument values from the parser instance
+    // using the range of accessor functions, e.g.
+    //
+    //  int value = clio_get_int(parser, "int1");
+    //
+    // Here we simply dump the parser to stdout.
+    clio_dump(parser);
 
     // Calling clio_free() frees the memory associated with the parser and any
     // associated command parsers.

@@ -81,4 +81,4 @@ double * clio_get_args_as_floats(ArgParser *parser);
 void clio_free(ArgParser *parser);
 
 // Dumps an ArgParser instance to stdout for debugging.
-void clio_print(ArgParser *parser);
+void clio_dump(ArgParser *parser);
