@@ -7,18 +7,18 @@ Clio supports long and short-form options and arbitrarily-nested commands. It ai
 
 Features:
 
-* Supports long-form boolean flags `--flag` with optional single-character shortcuts `-f`.
+* Supports long-form boolean flags with optional single-character shortcuts: `--flag`, `-f`.
 
-* Supports long-form string, integer, and floating-point options `--option <arg>` with optional
-  single-character shortcuts `-o <arg>`.
+* Supports long-form string, integer, and floating-point options with optional
+  single-character shortcuts: `--option <arg>`, `-o <arg>`.
 
-* Supports condensed short-form options `-abc <arg> <arg>`.
+* Supports condensed short-form options: `-abc <arg> <arg>`.
 
 * Supports automatic `--help` and `--version` flags.
 
 * Supports git-style command interfaces with arbitrarily-nested commands.
 
-Clio is currently an alpha-stage project. It works, but it lacks documentation and real-world testing, and its interface remains subject to change.
+Clio is currently an alpha-stage project. It lacks documentation and real-world testing and its interface remains subject to change.
 
 
 ## License
