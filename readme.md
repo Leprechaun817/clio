@@ -10,9 +10,9 @@ Clio supports long and short-form options and arbitrarily-nested commands. It ai
 
 All implementations support the same core feature set:
 
-* Long-form boolean flags with optional single-character shortcuts: `--flag`, `-f`.
+* Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
 
-* Long-form string, integer, and floating-point options with optional
+* Long-form string, integer, and floating-point options with
   single-character shortcuts: `--option <arg>`, `-o <arg>`.
 
 * Condensed short-form options: `-abc <arg> <arg>`.
