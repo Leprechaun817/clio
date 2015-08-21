@@ -7,3 +7,7 @@
 # Python byte-compiled / optimized / DLL files.
 /python/__pycache__/
 /python/*.py[cod]
+
+# C object and binary files.
+/c/bin/
+c/obj/
