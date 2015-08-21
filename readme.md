@@ -19,7 +19,7 @@ All implementations support the same core feature set:
 
 * Automatic `--help` and `--version` flags.
 
-* Git-style command interfaces with arbitrarily-nested commands.
+* Support for git-style command interfaces with arbitrarily-nested commands.
 
 Clio is currently an alpha-stage project. It lacks documentation and real-world testing and its interface remains subject to change.
 
