@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "0.2.1"
+__version__ = "0.2.3"
 
 
 # Internal class for storing option data.
