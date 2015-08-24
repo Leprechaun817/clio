@@ -16,7 +16,7 @@
 void callback(ArgParser *parser) {
     puts("---------- callback() ----------");
     clio_dump(parser);
-    puts("...................................\n");
+    puts("................................\n");
 }
 
 
