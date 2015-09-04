@@ -23,7 +23,7 @@ All implementations support the same core feature set:
 
 * Support for git-style command interfaces with arbitrarily-nested commands.
 
-Clio is currently a beta-stage project. It lacks documentation and real-world testing and its interface remains subject to change.
+Clio is currently a beta-stage project. It lacks documentation and and its interface remains subject to change.
 
 
 ## License
