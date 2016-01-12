@@ -67,7 +67,7 @@ class ArgParser:
         # Stores option objects indexed by option name.
         self.options = {}
 
-        # Storew option objects indexed by single-letter shortcut.
+        # Stores option objects indexed by single-letter shortcut.
         self.shortcuts = {}
 
         # Stores command sub-parser instances indexed by command.
@@ -85,13 +85,19 @@ class ArgParser:
         # Stores the command's parser instance, if a command is found.
         self.command_parser = None
 
-    # Enable dictionary-style access to options: value = parser['name'].
-    def __getitem__(self, name):
-        return self.options[name].value
+    # Enable dictionary/list-style access to options and arguments.
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.arguments[key]
+        else:
+            return self.options[key].value
 
-    # Enable dictionary-style assignment to options: parser['name'] = value.
-    def __setitem__(self, name, value):
-        self.options[name] = Option("unknown", value)
+    # Enable dictionary/list-style assignment to options and arguments.
+    def __setitem__(self, key, value):
+        if isinstance(key, int):
+            self.arguments[key] = value
+        else:
+            self.options[key] = Option("unknown", value)
 
     # List all options and arguments for debugging.
     def __str__(self):
