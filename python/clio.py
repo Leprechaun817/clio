@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "0.2.3"
+__version__ = "0.3.0"
 
 
 # Internal class for storing option data.
@@ -131,19 +131,19 @@ class ArgParser:
         self._add_option("flag", name, False, shortcut)
 
     # Register a string option, optionally specifying a single-letter shortcut.
-    def add_str_option(self, name, default, shortcut=None):
+    def add_str_opt(self, name, default, shortcut=None):
         self._add_option("string", name, default, shortcut)
 
     # Register an integer option, optionally specifying a single-letter shortcut.
-    def add_int_option(self, name, default, shortcut=None):
+    def add_int_opt(self, name, default, shortcut=None):
         self._add_option("int", name, default, shortcut)
 
     # Register a float option, optionally specifying a single-letter shortcut.
-    def add_float_option(self, name, default, shortcut=None):
+    def add_float_opt(self, name, default, shortcut=None):
         self._add_option("float", name, default, shortcut)
 
     # Register a command and its associated callback.
-    def add_command(self, command, callback, helptext):
+    def add_cmd(self, command, callback, helptext):
         parser = ArgParser(helptext)
         self.commands[command] = parser
         self.callbacks[command] = callback
@@ -312,16 +312,24 @@ class ArgParser:
                 self.arguments.append(arg)
 
     # Returns the value of the specified option.
-    def get_option(self, name):
+    def get_opt(self, name):
         return self.options[name].value
 
-    # Returns a dictionary containing all the named options.
-    def get_options(self):
-        return {name: option.value for name, option in self.options.items()}
+    # Returns a dictionary containing all the parser's options.
+    def get_opts(self):
+        return {name: opt.value for name, opt in self.options.items()}
 
     # Returns true if at least one positional argument was found.
     def has_args(self):
         return len(self.arguments) > 0
+
+    # Returns the number of positional arguments.
+    def num_args(self):
+        return len(self.arguments)
+
+    # Returns the positional argument at the specified index.
+    def get_arg(self, index):
+        return self.arguments[index]
 
     # Returns the positional arguments as a list of strings.
     def get_args(self):
