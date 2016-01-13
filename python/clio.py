@@ -67,8 +67,8 @@ class ArgParser:
         # Stores option objects indexed by option name.
         self.options = {}
 
-        # Stores option objects indexed by single-letter shortcut.
-        self.shortcuts = {}
+        # Stores option objects indexed by single-letter alias.
+        self.aliases = {}
 
         # Stores command sub-parser instances indexed by command.
         self.commands = {}
@@ -126,27 +126,27 @@ class ArgParser:
         return "\n".join(lines)
 
     # Register an option on the parser instance.
-    def _add_option(self, type, name, default, shortcut):
+    def _add_option(self, type, name, default, alias):
         option = Option(type, default)
         self.options[name] = option
-        if shortcut is not None:
-            self.shortcuts[shortcut] = option
+        if alias is not None:
+            self.aliases[alias] = option
 
-    # Register a flag, optionally specifying a single-letter shortcut.
-    def add_flag(self, name, shortcut=None):
-        self._add_option("flag", name, False, shortcut)
+    # Register a flag, optionally specifying a single-letter alias.
+    def add_flag(self, name, alias=None):
+        self._add_option("flag", name, False, alias)
 
-    # Register a string option, optionally specifying a single-letter shortcut.
-    def add_str_opt(self, name, default, shortcut=None):
-        self._add_option("string", name, default, shortcut)
+    # Register a string option, optionally specifying a single-letter alias.
+    def add_str_opt(self, name, default, alias=None):
+        self._add_option("string", name, default, alias)
 
-    # Register an integer option, optionally specifying a single-letter shortcut.
-    def add_int_opt(self, name, default, shortcut=None):
-        self._add_option("int", name, default, shortcut)
+    # Register an integer option, optionally specifying a single-letter alias.
+    def add_int_opt(self, name, default, alias=None):
+        self._add_option("int", name, default, alias)
 
-    # Register a float option, optionally specifying a single-letter shortcut.
-    def add_float_opt(self, name, default, shortcut=None):
-        self._add_option("float", name, default, shortcut)
+    # Register a float option, optionally specifying a single-letter alias.
+    def add_float_opt(self, name, default, alias=None):
+        self._add_option("float", name, default, alias)
 
     # Register a command and its associated callback.
     def add_cmd(self, command, callback, helptext):
@@ -256,9 +256,9 @@ class ArgParser:
                 #     -abc foo bar
                 for c in arg[1:]:
 
-                    # Is the character a registered shortcut?
-                    if c in self.shortcuts:
-                        option = self.shortcuts[c]
+                    # Is the character a registered alias?
+                    if c in self.aliases:
+                        option = self.aliases[c]
 
                         # If the option is a flag, store the boolean true.
                         if option.type == "flag":
@@ -287,7 +287,7 @@ class ArgParser:
                         else:
                             sys.exit("Error: missing argument for the -%s option." % c)
 
-                    # Not a recognised shortcut. Print an error and exit.
+                    # Not a recognised alias. Print an error and exit.
                     else:
                         sys.exit("Error: -%s is not a recognised option." % c)
 
