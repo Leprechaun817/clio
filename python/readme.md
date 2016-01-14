@@ -64,7 +64,8 @@ Option methods:
 
 *   `parser.get_opt(name)`
 
-    Retrieve an option value from a parser.
+    Retrieve an option value from a parser. Values can also be accessed using
+    dictionary-style syntax: `parser[name]`.
 
 All options have default values which are used when the option is omitted from the command line arguments.
 
@@ -82,6 +83,11 @@ The following methods provide access to positional arguments identified by the p
 *   `parser.num_args()`
 
     Returns the number of positional arguments.
+
+*   `parser.get_arg(index)`
+
+    Returns the positional argument at the specified index. Arguments can also
+    be accessed using list-style syntax: `parser[index]`.
 
 *   `parser.get_args()`
 
