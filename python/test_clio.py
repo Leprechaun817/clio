@@ -39,6 +39,13 @@ def test_bool_option_shortform():
     assert parser.get_opt("bool") == True
 
 
+def test_bool_option_dict_syntax():
+    parser = clio.ArgParser()
+    parser.add_flag("bool")
+    parser.parse(["--bool"])
+    assert parser["bool"] == True
+
+
 # --------------------------------------------------------------------------
 # String options.
 # --------------------------------------------------------------------------
@@ -70,6 +77,13 @@ def test_string_option_shortform():
     parser.add_str_opt("string", "default", "s")
     parser.parse(["-s", "value"])
     assert parser.get_opt("string") == "value"
+
+
+def test_string_option_dict_syntax():
+    parser = clio.ArgParser()
+    parser.add_str_opt("string", "default")
+    parser.parse(["--string", "value"])
+    assert parser["string"] == "value"
 
 
 def test_string_option_missing_value():
@@ -110,6 +124,13 @@ def test_int_option_shortform():
     parser.add_int_opt("int", 101, "i")
     parser.parse(["-i", "202"])
     assert parser.get_opt("int") == 202
+
+
+def test_int_option_dict_syntax():
+    parser = clio.ArgParser()
+    parser.add_int_opt("int", 101)
+    parser.parse(["--int", "202"])
+    assert parser["int"] == 202
 
 
 def test_int_option_missing_value():
@@ -157,6 +178,13 @@ def test_float_option_shortform():
     parser.add_float_opt("float", 1.1, "f")
     parser.parse(["-f", "2.2"])
     assert parser.get_opt("float") == 2.2
+
+
+def test_float_option_dict_syntax():
+    parser = clio.ArgParser()
+    parser.add_float_opt("float", 1.1)
+    parser.parse(["--float", "2.2"])
+    assert parser["float"] == 2.2
 
 
 def test_float_option_missing_value():
@@ -312,6 +340,13 @@ def test_positional_args():
     assert parser.num_args() == 2
     assert parser.get_arg(0) == "foo"
     assert parser.get_arg(1) == "bar"
+
+
+def test_positional_args_list_syntax():
+    parser = clio.ArgParser()
+    parser.parse(["foo", "bar"])
+    assert parser[0] == "foo"
+    assert parser[1] == "bar"
 
 
 def test_positional_args_as_ints():
