@@ -108,25 +108,25 @@ Clio supports git-style command interfaces with arbitrarily-nested commands. Reg
 
     cmd_parser = parser.add_cmd(name, callback, "helptext")
 
-This method returns an `ArgParser` instance associated with the new command. You can register flags and options on this sub-parser using the methods listed above. (Note that you do not need to call `parse()` on the sub-parser instance - calling `parse()` on the application's root parser is sufficient.)
+This method returns an `ArgParser` instance associated with the new command. You can register flags and options on this sub-parser using the methods listed above. (Note that you do not need to call `parse()` on the sub-parser instance - calling `parse()` on the root parser is sufficient.)
 
 Commands support an automatic `--help` flag and an automatic `help <cmd>` command.
 
-The supplied callback function will be called if the command is found by the parser. This function should accept the command's sub-parser instance as its sole argument.
+The supplied callback function will be called if the command is found by the parser. This callback should accept the command's sub-parser instance as its sole argument.
 
 Other command-related methods are:
 
 *   `parser.has_cmd()`
 
-    Returns true if the parser locates a command.
+    Returns true if the parser has identified a command.
 
 *   `parser.get_cmd()`
 
-    Returns the command name, if a command was located.
+    Returns the command name, if a command was identified.
 
 *   `parser.get_cmd_parser()`
 
-    Returns the command parser, if a command was located.
+    Returns the command parser, if a command was identified.
 
 
 ## License
