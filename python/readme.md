@@ -30,7 +30,7 @@ Supplying help text activates the automatic `--help` flag; supplying a version s
 
 You can now register your application's options and commands on the parser instance as explained below.
 
-Once the required options and commands have been registered, call the parser's `.parse()` method to process the application's command line arguments.
+Once the required options and commands have been registered, call the parser's `parse()` method to process the application's command line arguments.
 
     parser.parse()
 
@@ -98,11 +98,11 @@ The following methods provide access to positional arguments identified by the p
 
 ### Commands
 
-Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser using the `.add_cmd()` method:
+Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser using the `add_cmd()` method:
 
     cmd_parser = parser.add_cmd(name, callback, "helptext")
 
-This method returns an `ArgParser` instance associated with the new command. You can register flags and options on this sub-parser using the methods listed above. (Note that you do not need to call `.parse()` on the sub-parser instance - calling `.parse()` on the application's root parser is sufficient.)
+This method returns an `ArgParser` instance associated with the new command. You can register flags and options on this sub-parser using the methods listed above. (Note that you do not need to call `parse()` on the sub-parser instance - calling `parse()` on the application's root parser is sufficient.)
 
 Commands support an automatic `--help` flag and an automatic `help <cmd>` command.
 
