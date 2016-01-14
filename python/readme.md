@@ -32,7 +32,7 @@ Parsed option values can be retrieved from the parser instance itself.
 
 ### Options
 
-Clio supports long-form options (`--foo`) with single-character aliases (`-f`). Note that when registering an option you should omit the leading dashes, i.e. you should register the option name `"foo"` rather than `"--foo"`.
+Clio supports long-form options (`--foo`) with single-character aliases (`-f`). Note that when registering an option you should omit the leading dashes, i.e. you should register the option name as `"foo"` rather than `"--foo"`.
 
 Registering options:
 
