@@ -43,26 +43,26 @@ Clio supports long-form options (`--foo`) with single-character aliases (`-f`). 
 
 Option methods:
 
-*       parser.add_flag(name, alias=None)
+*   `parser.add_flag(name, alias=None)`
 
     Register a flag, optionally specifying a single-character alias. A flag is a boolean option - it takes no argument but is either present (true) or absent (false).
 
-*       parser.add_str_opt(name, default, alias=None)
+*   `parser.add_str_opt(name, default, alias=None)`
 
     Register a string option and its default value, optionally specifying a
     single-character alias.
 
-*       parser.add_int_opt(name, default, alias=None)
+*   `parser.add_int_opt(name, default, alias=None)`
 
     Register an integer option and its default value, optionally specifying a
     single-character alias.
 
-*       parser.add_float_opt(name, default, alias=None)
+*   `parser.add_float_opt(name, default, alias=None)`
 
     Register a float option and its default value, optionally specifying a
     single-character alias.
 
-*       value = parser.get_opt(name)
+*   `value = parser.get_opt(name)`
 
     Retrieve an option value from a parser.
 
@@ -75,23 +75,23 @@ Note that Clio supports the standard `--` option-parsing switch. All command lin
 
 The following methods provide access to positional arguments identified by the parser:
 
-*       parser.has_args()
+*   `parser.has_args()`
 
     Returns true if at least one positional argument has been found.
 
-*       parser.num_args()
+*   `parser.num_args()`
 
     Returns the number of positional arguments.
 
-*       parser.get_args()
+*   `parser.get_args()`
 
     Returns the positional arguments as a list of strings.
 
-*       parser.get_args_as_ints()
+*   `parser.get_args_as_ints()`
 
     Attempts to parse and return the positional arguments as a list of integers.
 
-*       parser.get_args_as_floats()
+*   `parser.get_args_as_floats()`
 
     Attempts to parse and return the positional arguments as a list of floats.
 
@@ -110,15 +110,15 @@ The supplied callback function will be called if the command is found by the par
 
 Other command-related methods are:
 
-*       parser.has_cmd()
+*   `parser.has_cmd()`
 
     Returns true if the parser locates a command.
 
-*       parser.get_cmd()
+*   `parser.get_cmd()`
 
     Returns the command name, if a command was located.
 
-*       parser.get_cmd_parser()
+*   `parser.get_cmd_parser()`
 
     Returns the command parser, if a command was located.
 
