@@ -49,10 +49,8 @@ setup(
     ),
     long_description = __doc__,
     classifiers = [
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python :: 3',
-        'Development Status :: 4 - Beta',
         'Operating System :: OS Independent',
         'License :: Public Domain',
     ],
