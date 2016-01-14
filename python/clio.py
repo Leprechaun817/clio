@@ -1,10 +1,9 @@
-"""
-Clio: A toolkit for creating elegant command line interfaces.
-
-Author: Darren Mulholland <dmulholland@outlook.ie>
-License: Public Domain
-
-"""
+# --------------------------------------------------------------------------
+# Clio: A toolkit for creating elegant command line interfaces.
+#
+# Author: Darren Mulholland <dmulholland@outlook.ie>
+# License: Public Domain
+# --------------------------------------------------------------------------
 
 import sys
 
