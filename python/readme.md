@@ -62,7 +62,7 @@ Option methods:
     Register a float option and its default value, optionally specifying a
     single-character alias.
 
-*   `value = parser.get_opt(name)`
+*   `parser.get_opt(name)`
 
     Retrieve an option value from a parser.
 
