@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 // Library version number.
-static char *clio_version = "0.1.0";
+static char *clio_version = "0.2.0";
 
 // ArgParser instances are responsible for storing registered options.
 typedef struct ArgParser ArgParser;
@@ -18,22 +18,22 @@ typedef struct ArgParser ArgParser;
 // Supplying help text activates the automatic --help flag, supplying a
 // version string activates the automatic --version flag. A NULL pointer can
 // be passed for either parameter.
-ArgParser * clio(char *helptext, char *version);
+ArgParser * clio_new(char *helptext, char *version);
 
-// Registers a flag (a boolean option) and its single-character shortcut alias.
-// A NULL pointer or the empty string "" can be passed for the alias parameter.
+// Registers a flag (a boolean option) and its single-character alias.
+// A NULL pointer can be passed for the alias parameter.
 void clio_add_flag(ArgParser *parser, char *name, char *alias);
 
-// Registers a string option and its single-character shortcut alias.
-// A NULL pointer or the empty string "" can be passed for the alias parameter.
+// Registers a string option and its single-character alias.
+// A NULL pointer can be passed for the alias parameter.
 void clio_add_str(ArgParser *parser, char *name, char* def_value, char *alias);
 
-// Registers an integer option and its single-character shortcut alias.
-// A NULL pointer or the empty string "" can be passed for the alias parameter.
+// Registers an integer option and its single-character alias.
+// A NULL pointer can be passed for the alias parameter.
 void clio_add_int(ArgParser *parser, char *name, int def_value, char *alias);
 
-// Registers a floating point option and its single-character shortcut alias.
-// A NULL pointer or the empty string "" can be passed for the alias parameter.
+// Registers a floating-point option and its single-character alias.
+// A NULL pointer can be passed for the alias parameter.
 void clio_add_float(ArgParser *parser, char *name, double def_value, char *alias);
 
 // Registers a command and its associated callback function.
@@ -54,14 +54,14 @@ char * clio_get_str(ArgParser *parser, char *name);
 // Returns the value of the named integer option.
 int clio_get_int(ArgParser *parser, char *name);
 
-// Returns the value of the named floating point option.
+// Returns the value of the named floating-point option.
 double clio_get_float(ArgParser *parser, char *name);
 
 // Returns true if the parser has found one or more positional arguments.
 bool clio_has_args(ArgParser *parser);
 
 // Returns the number of positional arguments.
-int clio_get_arg_count(ArgParser *parser);
+int clio_num_args(ArgParser *parser);
 
 // Returns the positional arguments as an array of string pointers.
 // The memory occupied by the array is not affected by calls to clio_free().
@@ -76,6 +76,15 @@ int * clio_get_args_as_ints(ArgParser *parser);
 // doubles. Exits with an error message on failure.
 // The memory occupied by the array is not affected by calls to clio_free().
 double * clio_get_args_as_floats(ArgParser *parser);
+
+// Returns true if the parser has identified a command.
+bool clio_has_cmd(ArgParser *parser);
+
+// Returns the command string, if the parser has identified a command.
+char * clio_get_cmd(ArgParser *parser);
+
+// Returns the command parser instance, if the parser has identified a command.
+ArgParser * clio_get_cmd_parser(ArgParser *parser);
 
 // Frees the memory associated with the specified ArgParser instance.
 void clio_free(ArgParser *parser);

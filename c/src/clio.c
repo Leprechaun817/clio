@@ -582,7 +582,7 @@ static void ArgParser_parse_stream(ArgParser *parser, ArgStream *stream) {
             //     -a -b foo -c bar
             // is equivalent to
             //     -abc foo bar
-            for (int i = 1; i < strlen(arg); i++) {
+            for (unsigned long i = 1; i < strlen(arg); i++) {
 
                 // Is the character at index i a registered shortcut alias?
                 Option *option = OptionMap_get_by_alias(parser->options, arg[i]);
@@ -706,7 +706,7 @@ static bool ArgParser_has_args(ArgParser *parser) {
 
 
 // Returns the number of positional arguments.
-static int ArgParser_get_arg_count(ArgParser *parser) {
+static int ArgParser_num_args(ArgParser *parser) {
     return parser->arguments->len;
 }
 
@@ -716,7 +716,7 @@ static int ArgParser_get_arg_count(ArgParser *parser) {
 // ArgParser_free().
 static char ** ArgParser_get_args(ArgParser *parser) {
     char **args = malloc(sizeof(char*) * parser->arguments->len);
-    memcpy(args, parser->arguments->args, parser->arguments->len);
+    memcpy(args, parser->arguments->args, sizeof(char*) * parser->arguments->len);
     return args;
 }
 
@@ -788,7 +788,7 @@ static void ArgParser_print(ArgParser *parser) {
 // ArgParser functions defined above.
 
 
-ArgParser * clio(char *helptext, char *version) {
+ArgParser * clio_new(char *helptext, char *version) {
     return ArgParser_new(helptext, version);
 }
 
@@ -848,8 +848,8 @@ bool clio_has_args(ArgParser *parser) {
 }
 
 
-int clio_get_arg_count(ArgParser *parser) {
-    return ArgParser_get_arg_count(parser);
+int clio_num_args(ArgParser *parser) {
+    return ArgParser_num_args(parser);
 }
 
 
@@ -865,6 +865,21 @@ int * clio_get_args_as_ints(ArgParser *parser) {
 
 double * clio_get_args_as_floats(ArgParser *parser) {
     return ArgParser_get_args_as_floats(parser);
+}
+
+
+bool clio_has_cmd(ArgParser *parser) {
+    return ArgParser_has_cmd(parser);
+}
+
+
+char * clio_get_cmd(ArgParser *parser) {
+    return ArgParser_get_cmd(parser);
+}
+
+
+ArgParser * clio_get_cmd_parser(ArgParser *parser) {
+    return ArgParser_get_cmd_parser(parser);
 }
 
 
