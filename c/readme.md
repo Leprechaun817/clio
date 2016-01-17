@@ -107,7 +107,7 @@ Clio supports git-style command interfaces with arbitrarily-nested commands. Reg
 
     ArgParser * clio_add_cmd(ArgParser *parser, char *command, void (*callback)(ArgParser *parser), char *helptext)
 
-This method returns an `ArgParser` instance associated with the new command. You can register flags and options on this sub-parser using the methods listed above. (Note that you do not need to call `clio_parse()` on the command parser instance - calling `clio_parse()` on the root parser is sufficient.)
+This method returns the `ArgParser` instance associated with the new command. You can register flags and options on this sub-parser using the methods listed above. (Note that you do not need to call `clio_parse()` on the command parser instance - calling `clio_parse()` on the root parser is sufficient.)
 
 Commands support an automatic `--help` flag and an automatic `help <cmd>` command.
 
