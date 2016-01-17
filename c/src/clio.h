@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 // Library version number.
-static char *clio_version = "0.2.0";
+static char *clio_version = "1.0.0";
 
 // ArgParser instances are responsible for storing registered options.
 typedef struct ArgParser ArgParser;
