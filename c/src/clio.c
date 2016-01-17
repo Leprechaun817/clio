@@ -624,7 +624,9 @@ static void ArgParser_parse_stream(ArgParser *parser, ArgStream *stream) {
         else if (CommandMap_get(parser->commands, arg) != NULL) {
             CommandMapEntry *entry = CommandMap_get(parser->commands, arg);
             ArgParser_parse_stream(entry->parser, stream);
-            entry->callback(entry->parser);
+            if (entry->callback != NULL) {
+                entry->callback(entry->parser);
+            }
             parser->command = arg;
             parser->command_parser = entry->parser;
             break;
