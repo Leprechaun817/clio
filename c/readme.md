@@ -5,7 +5,7 @@ To use Clio in your application add the `clio.c` and `clio.h` files to your sour
 
     #include "clio.h"
 
-The clio library exports an `ArgParser` type and a selection of `clio_*` prefixed functions.
+The header file exports an `ArgParser` type and a selection of `clio_*` prefixed functions.
 
 
 ## Usage
@@ -15,7 +15,7 @@ string:
 
     ArgParser * clio_new(char *helptext, char *version)
 
-Supplying help text activates the automatic `--help` flag; supplying a version string activates the automatic `--version` flag. A NULL pointer can be passed
+Supplying help text activates the automatic `--help` flag; supplying a version string activates the automatic `--version` flag. A `NULL` pointer can be passed
 for either parameter.
 
 You can now register your application's options and commands on the parser instance as explained below.
@@ -39,22 +39,22 @@ Registering options:
 
     Register a flag, optionally specifying a single-character alias. A flag is
     a boolean option - it takes no argument but is either present (true) or
-    absent (false). A NULL pointer can be passed for the alias parameter.
+    absent (false). A `NULL` pointer can be passed for the alias parameter.
 
 *   `void clio_add_str(ArgParser *parser, char *name, char* def_value, char *alias)`
 
     Register a string option and its default value, optionally specifying a
-    single-character alias. A NULL pointer can be passed for the alias parameter.
+    single-character alias. A `NULL` pointer can be passed for the alias parameter.
 
 *   `void clio_add_int(ArgParser *parser, char *name, int def_value, char *alias)`
 
     Register an integer option and its default value, optionally specifying a
-    single-character alias. A NULL pointer can be passed for the alias parameter.
+    single-character alias. A `NULL` pointer can be passed for the alias parameter.
 
 *   `void clio_add_float(ArgParser *parser, char *name, double def_value, char *alias)`
 
     Register a floating-point option and its default value, optionally specifying a
-    single-character alias. A NULL pointer can be passed for the alias parameter.
+    single-character alias. A `NULL` pointer can be passed for the alias parameter.
 
 Retrieving values:
 
