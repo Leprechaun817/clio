@@ -447,5 +447,5 @@ int main(int argc, char **argv) {
     test_command_present();
     test_command_with_options();
 
-    printf("\n");
+    printf(" [pass]\n");
 }
