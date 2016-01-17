@@ -1,9 +1,6 @@
-/*
-    A simple application demonstrating Clio in action.
-
-    Author: Darren Mulholland <dmulholland@outlook.ie>
-    License: Public Domain
-*/
+// -------------------------------------------------------------------------
+// A simple application demonstrating Clio in action.
+// -------------------------------------------------------------------------
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,7 +24,7 @@ int main(int argc, char **argv) {
     // and a version string. Supplying help text activates the automatic
     // --help flag, supplying a version string activates the automatic
     // --version flag.
-    ArgParser *parser = clio("Usage: example...", "1.0.0");
+    ArgParser *parser = clio_new("Usage: example...", "1.0.0");
 
     // Register two flags, --bool1 and --bool2.
     // The second flag has a single-character alias, -b.
