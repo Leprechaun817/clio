@@ -62,7 +62,6 @@ class Example {
         System.out.println(parser);
     }
 
-
     // Callback method for the 'cmd' command.
     // This method will be called if the 'cmd' command is present.
     // The method receives an ArgParser instance containing the command's

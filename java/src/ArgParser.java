@@ -90,7 +90,7 @@ class ArgParser {
     // Stores option objects indexed by option name.
     private Map<String, Option> options = new HashMap<String, Option>();
 
-    // Stores option objects indexed by single-letter shortcut.
+    // Stores option objects indexed by single-letter alias.
     private Map<Character, Option> shortcuts = new HashMap<Character, Option>();
 
     // Stores command sub-parser instances indexed by command.
@@ -140,7 +140,7 @@ class ArgParser {
     }
 
 
-    // Register a flag, additionally specifying a single-letter shortcut alias.
+    // Register a flag, additionally specifying a single-letter alias.
     void addFlag(String name, char shortcut) {
         Option option = new Option(OptionType.Flag, false);
         options.put(name, option);
@@ -154,7 +154,7 @@ class ArgParser {
     }
 
 
-    // Register a string option, additionally specifying a single-letter shortcut alias.
+    // Register a string option, additionally specifying a single-letter alias.
     void addStrOpt(String name, String defaultValue, char shortcut) {
         Option option = new Option(OptionType.String, defaultValue);
         options.put(name, option);
@@ -168,7 +168,7 @@ class ArgParser {
     }
 
 
-    // Register an integer option, additionally specifying a single-letter shortcut alias.
+    // Register an integer option, additionally specifying a single-letter alias.
     void addIntOpt(String name, int defaultValue, char shortcut) {
         Option option = new Option(OptionType.Int, defaultValue);
         options.put(name, option);
@@ -182,7 +182,7 @@ class ArgParser {
     }
 
 
-    // Register a float option, additionally specifying a single-letter shortcut alias.
+    // Register a float option, additionally specifying a single-letter alias.
     void addFloatOpt(String name, double defaultValue, char shortcut) {
         Option option = new Option(OptionType.Float, defaultValue);
         options.put(name, option);
