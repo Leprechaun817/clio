@@ -26,31 +26,31 @@ class Example {
         // Register two string options, --str1 <arg> and --str2 <arg>.
         // The second option has a single-character alias, -s <arg>.
         // Options require default values, here 'alice' and 'bob'.
-        parser.addStringOption("str1", "alice");
-        parser.addStringOption("str2", "bob", 's');
+        parser.addStrOpt("str1", "alice");
+        parser.addStrOpt("str2", "bob", 's');
 
         // Register two integer options, --int1 <arg> and --int2 <arg>.
         // The second option has a single-character alias, -i <arg>.
         // Options require default values, here 123 and 456.
-        parser.addIntOption("int1", 123);
-        parser.addIntOption("int2", 456, 'i');
+        parser.addIntOpt("int1", 123);
+        parser.addIntOpt("int2", 456, 'i');
 
         // Register two floating point options, --float1 <arg> and --float2 <arg>.
         // The second option has a single-character alias, -f <arg>.
         // Options require default values, here 1.0 and 2.0.
-        parser.addFloatOption("float1", 1.0);
-        parser.addFloatOption("float2", 2.0, 'f');
+        parser.addFloatOpt("float1", 1.0);
+        parser.addFloatOpt("float2", 2.0, 'f');
 
         // Register a command, 'cmd'. We need to specify the command's help text and callback method.
-        ArgParser cmdParser = parser.addCommand("cmd", Example::cmdCallback, "Usage: example cmd...");
+        ArgParser cmdParser = parser.addCmd("cmd", Example::cmdCallback, "Usage: example cmd...");
 
         // Registering a command returns a new ArgParser instance dedicated to parsing the command's
         // arguments. We can register as many flags and options as we like on this sub-parser.
         cmdParser.addFlag("foo");
 
         // The command parser can reuse the parent parser's option names without interference.
-        cmdParser.addStringOption("str1", "ciara");
-        cmdParser.addStringOption("str2", "dave", 's');
+        cmdParser.addStrOpt("str1", "ciara");
+        cmdParser.addStrOpt("str2", "dave", 's');
 
         // Once all our options and commands have been registered we call the parser's
         // parse() method with a list or array of argument strings. Only the root parser's

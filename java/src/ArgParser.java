@@ -137,13 +137,13 @@ class ArgParser {
 
 
     // Register an option with a string argument.
-    void addStringOption(String name, String defaultValue) {
+    void addStrOpt(String name, String defaultValue) {
         options.put(name, new Option(OptionType.String, defaultValue));
     }
 
 
     // Register a string option, additionally specifying a single-letter shortcut alias.
-    void addStringOption(String name, String defaultValue, char shortcut) {
+    void addStrOpt(String name, String defaultValue, char shortcut) {
         Option option = new Option(OptionType.String, defaultValue);
         options.put(name, option);
         shortcuts.put(shortcut, option);
@@ -151,13 +151,13 @@ class ArgParser {
 
 
     // Register an option with an integer argument.
-    void addIntOption(String name, int defaultValue) {
+    void addIntOpt(String name, int defaultValue) {
         options.put(name, new Option(OptionType.Int, defaultValue));
     }
 
 
     // Register an integer option, additionally specifying a single-letter shortcut alias.
-    void addIntOption(String name, int defaultValue, char shortcut) {
+    void addIntOpt(String name, int defaultValue, char shortcut) {
         Option option = new Option(OptionType.Int, defaultValue);
         options.put(name, option);
         shortcuts.put(shortcut, option);
@@ -165,13 +165,13 @@ class ArgParser {
 
 
     // Register an option with a floating point argument.
-    void addFloatOption(String name, double defaultValue) {
+    void addFloatOpt(String name, double defaultValue) {
         options.put(name, new Option(OptionType.Float, defaultValue));
     }
 
 
     // Register a float option, additionally specifying a single-letter shortcut alias.
-    void addFloatOption(String name, double defaultValue, char shortcut) {
+    void addFloatOpt(String name, double defaultValue, char shortcut) {
         Option option = new Option(OptionType.Float, defaultValue);
         options.put(name, option);
         shortcuts.put(shortcut, option);
@@ -179,7 +179,7 @@ class ArgParser {
 
 
     // Register a command and its associated callback.
-    ArgParser addCommand(String command, Consumer<ArgParser> callback, String helptext) {
+    ArgParser addCmd(String command, Consumer<ArgParser> callback, String helptext) {
         ArgParser commandParser = new ArgParser(helptext);
         commands.put(command, commandParser);
         callbacks.put(command, callback);
@@ -422,19 +422,19 @@ class ArgParser {
 
 
     // Returns the value of the named option.
-    String getStringOption(String name) {
+    String getStrOpt(String name) {
         return (String) options.get(name).value;
     }
 
 
     // Returns the value of the named option.
-    int getIntOption(String name) {
+    int getIntOpt(String name) {
         return (int) options.get(name).value;
     }
 
 
     // Returns the value of the named option.
-    Double getFloatOption(String name) {
+    Double getFloatOpt(String name) {
         return (Double) options.get(name).value;
     }
 
@@ -442,6 +442,18 @@ class ArgParser {
     // Returns true if the parser has found one or more positional arguments.
     boolean hasArgs() {
         return arguments.size() > 0;
+    }
+
+
+    // Returns the number of positional arguments identified by the parser.
+    int numArgs() {
+        return arguments.size();
+    }
+
+
+    // Returns the positional argument at the specified index.
+    String getArg(int index) {
+        return arguments.get(index);
     }
 
 
@@ -486,19 +498,19 @@ class ArgParser {
 
 
     // Returns true if the parser has found a command.
-    boolean hasCommand() {
+    boolean hasCmd() {
         return command != null;
     }
 
 
     // Returns the command string, if a command was found.
-    String getCommand() {
+    String getCmd() {
         return command;
     }
 
 
     // Returns the command's parser instance, if a command was found.
-    ArgParser getCommandParser() {
+    ArgParser getCmdParser() {
         return commandParser;
     }
 
@@ -526,8 +538,8 @@ class ArgParser {
         }
 
         builder.append("\nCommand:\n");
-        if (hasCommand()) {
-            builder.append(String.format("  %s\n", getCommand()));
+        if (hasCmd()) {
+            builder.append(String.format("  %s\n", getCmd()));
         } else {
             builder.append("  [none]\n");
         }
