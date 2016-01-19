@@ -57,7 +57,7 @@ Retrieving values:
 
 *   `int getIntOpt(String name)`
 
-*   `Double getFloatOpt(String name)`
+*   `double getFloatOpt(String name)`
 
 All options have default values which are used when the option is omitted from the command line arguments.
 

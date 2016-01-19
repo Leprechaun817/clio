@@ -24,7 +24,7 @@ class ArgParser {
 
 
     // Library version number.
-    String libVersion = "0.6.0";
+    String libVersion = ".7.0";
 
 
     // Internal enum for classifying option types.
@@ -446,8 +446,8 @@ class ArgParser {
 
 
     // Returns the value of the named option.
-    Double getFloatOpt(String name) {
-        return (Double) options.get(name).value;
+    double getFloatOpt(String name) {
+        return (double) options.get(name).value;
     }
 
 
