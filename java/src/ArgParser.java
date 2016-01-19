@@ -24,7 +24,7 @@ class ArgParser {
 
 
     // Library version number.
-    String libVersion = "0.5.0";
+    String libVersion = "0.6.0";
 
 
     // Internal enum for classifying option types.
@@ -109,15 +109,27 @@ class ArgParser {
     private ArgParser commandParser;
 
 
-    // Specifying a string of help-text activates the automatic --help flag.
+    // No automatic --help or --version flags.
+    ArgParser() {
+        this(null, null);
+    }
+
+
+    // Supplying help text activates the automatic --help flag.
     ArgParser(String helptext) {
         this(helptext, null);
     }
 
 
-    // Specifying a version string activates the automatic --version flag.
+    // Supplying a version string activates the automatic --version flag.
     ArgParser(String helptext, String version) {
-        this.helptext = helptext.trim();
+        if (helptext != null) {
+            helptext = helptext.trim();
+        }
+        if (version != null) {
+            version = version.trim();
+        }
+        this.helptext = helptext;
         this.version = version;
     }
 
