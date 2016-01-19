@@ -1,7 +1,7 @@
 
 # Java Version
 
-To use Clio in your Java application, add the `ArgParser.java` file directly to your application's source folder. The library exports a single `ArgParser` class.
+To use Clio in your Java application add the `ArgParser.java` file directly to your application's source folder. The library exports a single `ArgParser` class.
 
 
 ## Usage
