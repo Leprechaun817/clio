@@ -24,7 +24,7 @@ class ArgParser {
 
 
     // Library version number.
-    String libVersion = "1.0.0.dev";
+    String libVersion = "1.0.0";
 
 
     // Internal enum for classifying option types.
