@@ -32,22 +32,22 @@ Registering options:
 
     Register a flag, optionally specifying a single-character alias. A flag is
     a boolean option - it takes no argument but is either present (true) or
-    absent (false).
+    absent (false). The alias parameter may be omitted.
 
 *   `void addStrOpt(String name, String defVal, char alias)`
 
     Register a string option and its default value, optionally specifying a
-    single-character alias.
+    single-character alias. The alias parameter may be omitted.
 
 *   `void addIntOpt(String name, int defVal, char alias)`
 
     Register an integer option and its default value, optionally specifying a
-    single-character alias.
+    single-character alias. The alias parameter may be omitted.
 
 *   `void addFloatOpt(String name, double defVal, char alias)`
 
     Register a floating-point option and its default value, optionally
-    specifying a single-character alias.
+    specifying a single-character alias. The alias parameter may be omitted.
 
 Retrieving values:
 
@@ -76,7 +76,7 @@ The following methods provide access to positional arguments:
 
     Returns the number of positional arguments.
 
-*   `String getArg(index)`
+*   `String getArg(int index)`
 
     Returns the positional argument at the specified index.
 
@@ -87,10 +87,12 @@ The following methods provide access to positional arguments:
 *   `List<Integer> getArgsAsInts()`
 
     Attempts to parse and return the positional arguments as a list of integers.
+    Exits with an error message on failure.
 
 *   `List<Double> getArgsAsFloats()`
 
     Attempts to parse and return the positional arguments as a list of floats.
+    Exits with an error message on failure.
 
 
 ### Commands
