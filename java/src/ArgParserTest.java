@@ -132,6 +132,15 @@ public class ArgParserTest {
     }
 
 
+    @Test
+    public void testIntOptionNegative() {
+        ArgParser parser = new ArgParser();
+        parser.addIntOpt("int", 101);
+        parser.parse(new String[]{"--int", "-202"});
+        assertEquals(-202, parser.getIntOpt("int"));
+    }
+
+
     // ------------------------------------------------------------------
     // Float options.
     // ------------------------------------------------------------------
@@ -170,6 +179,15 @@ public class ArgParserTest {
         parser.addFloatOpt("float", 1.1, 'f');
         parser.parse(new String[]{"-f", "2.2"});
         assertEquals(2.2, (double)parser.getFloatOpt("float"), 0.01);
+    }
+
+
+    @Test
+    public void testFloatOptionNegative() {
+        ArgParser parser = new ArgParser();
+        parser.addFloatOpt("float", 1.1);
+        parser.parse(new String[]{"--float", "-2.2"});
+        assertEquals(-2.2, (double)parser.getFloatOpt("float"), 0.01);
     }
 
 
