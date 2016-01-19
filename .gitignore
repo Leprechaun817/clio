@@ -2,7 +2,7 @@
 /rust/target/
 
 # Java class files.
-/java/*.class
+*.class
 
 # Python byte-compiled / optimized / DLL files.
 /python/__pycache__/
@@ -10,4 +10,4 @@
 
 # C object and binary files.
 /c/bin/
-c/obj/
+/c/obj/
