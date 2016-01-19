@@ -42,7 +42,7 @@ class Example {
         parser.addFloatOpt("float2", 2.0, 'f');
 
         // Register a command, 'cmd'. We need to specify the command's help text and callback method.
-        ArgParser cmdParser = parser.addCmd("cmd", Example::cmdCallback, "Usage: example cmd...");
+        ArgParser cmdParser = parser.addCmd("cmd", Example::callback, "Usage: example cmd...");
 
         // Registering a command returns a new ArgParser instance dedicated to parsing the command's
         // arguments. We can register as many flags and options as we like on this sub-parser.
@@ -67,8 +67,8 @@ class Example {
     // This method will be called if the 'cmd' command is present.
     // The method receives an ArgParser instance containing the command's
     // parsed arguments. Here we simply dump it to stdout.
-    public static void cmdCallback(ArgParser parser) {
-        System.out.println("---------- cmdCallback() ----------");
+    public static void callback(ArgParser parser) {
+        System.out.println("---------- callback() ----------");
         System.out.println(parser);
         System.out.println("...................................\n");
     }
