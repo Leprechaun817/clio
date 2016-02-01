@@ -1,7 +1,7 @@
 /*
     A simple application demonstrating Clio in action.
 
-      * Author: Darren Mulholland <dmulholland@outlook.ie>
+      * Author: Darren Mulholland <darren@mulholland.xyz>
       * License: Public Domain
 */
 package main
