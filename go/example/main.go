@@ -7,8 +7,10 @@
 package main
 
 
-import "fmt"
-import "github.com/dmulholland/clio/go/clio"
+import (
+    "fmt"
+    "github.com/dmulholland/clio/go/clio"
+)
 
 
 func main() {
@@ -29,31 +31,31 @@ func main() {
     // Register two string options, --str1 <arg> and --str2 <arg>.
     // The second option has a single-character alias, -s <arg>.
     // Options require default values, here 'alice' and 'bob'.
-    parser.AddStringOption("str1", "alice");
-    parser.AddStringOption("str2", "bob", 's');
+    parser.AddStrOpt("str1", "alice");
+    parser.AddStrOpt("str2", "bob", 's');
 
     // Register two integer options, --int1 <arg> and --int2 <arg>.
     // The second option has a single-character alias, -i <arg>.
     // Options require default values, here 123 and 456.
-    parser.AddIntOption("int1", 123);
-    parser.AddIntOption("int2", 456, 'i');
+    parser.AddIntOpt("int1", 123);
+    parser.AddIntOpt("int2", 456, 'i');
 
     // Register two floating point options, --float1 <arg> and --float2 <arg>.
     // The second option has a single-character alias, -f <arg>.
     // Options require default values, here 1.0 and 2.0.
-    parser.AddFloatOption("float1", 1.0);
-    parser.AddFloatOption("float2", 2.0, 'f');
+    parser.AddFloatOpt("float1", 1.1);
+    parser.AddFloatOpt("float2", 2.2, 'f');
 
     // Register a command, 'cmd'. We need to specify the command's help text and callback method.
-    cmdParser := parser.AddCommand("cmd", cmdCallback, "Usage: example cmd...");
+    cmdParser := parser.AddCmd("cmd", callback, "Usage: example cmd...");
 
     // Registering a command returns a new ArgParser instance dedicated to parsing the command's
     // arguments. We can register as many flags and options as we like on this sub-parser.
     cmdParser.AddFlag("foo");
 
     // The command parser can reuse the parent parser's option names without interference.
-    cmdParser.AddStringOption("str1", "ciara");
-    cmdParser.AddStringOption("str2", "dave", 's');
+    cmdParser.AddStrOpt("str1", "ciara");
+    cmdParser.AddStrOpt("str2", "dave", 's');
 
     // Once all our options and commands have been registered we can call the parser's
     // Parse() method to parse the application's command line arguments. Only the root
@@ -71,8 +73,8 @@ func main() {
 // This method will be called if the 'cmd' command is identified.
 // The method receives an ArgParser instance containing the command's
 // parsed arguments. Here we simply dump it to stdout.
-func cmdCallback(parser *clio.ArgParser) {
-    fmt.Println("---------- cmdCallback() ----------");
+func callback(parser *clio.ArgParser) {
+    fmt.Println("---------- callback() ----------");
     fmt.Println(parser);
-    fmt.Println("...................................\n");
+    fmt.Println("................................\n");
 }
