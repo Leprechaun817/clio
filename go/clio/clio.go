@@ -23,7 +23,7 @@ import (
 
 
 // Package version number.
-const Version = "1.0.0.dev"
+const Version = "1.0.0"
 
 
 // Enum for classifying option types.
