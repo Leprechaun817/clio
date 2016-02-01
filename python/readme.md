@@ -93,10 +93,12 @@ The following methods provide access to positional arguments:
 *   `parser.get_args_as_ints()`
 
     Attempts to parse and return the positional arguments as a list of integers.
+    Exits with an error message on failure.
 
 *   `parser.get_args_as_floats()`
 
     Attempts to parse and return the positional arguments as a list of floats.
+    Exits with an error message on failure.
 
 
 ### Commands
