@@ -42,7 +42,7 @@ def main():
 
     # Register a command, 'cmd'. We need to specify the command's help text
     # and callback method.
-    cmd_parser = parser.add_cmd("cmd", cmd_callback, "Usage: example cmd...")
+    cmd_parser = parser.add_cmd("cmd", callback, "Usage: example cmd...")
 
     # Registering a command returns a new ArgParser instance dedicated to
     # parsing the command's arguments. We can register as many flags and
@@ -69,8 +69,8 @@ def main():
 # This method will be called if the 'cmd' command is found.
 # The method receives an ArgParser instance containing the command's
 # parsed arguments. Here we simply dump it to stdout.
-def cmd_callback(parser):
-    print("---------- cmd_callback() ----------")
+def callback(parser):
+    print("------------ callback() ------------")
     print(parser)
     print("....................................\n")
 

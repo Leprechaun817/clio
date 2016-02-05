@@ -14,12 +14,13 @@ import java.util.List;
 import java.util.function.Consumer;
 
 
-// ArgParser is the sole class exported by the library. An ArgParser instance is
-// responsible for registering options and parsing the input array of raw arguments.
+// ArgParser is the sole class exported by the library. An ArgParser instance
+// is responsible for registering options and parsing the input array of raw
+// arguments.
 //
-// Note that every registered command recursively receives an ArgParser instance of
-// its own. In theory commands can be stacked to any depth, although in practice even
-// two levels is confusing for users and best avoided.
+// Note that every registered command recursively receives an ArgParser
+// instance of its own. In theory commands can be stacked to any depth,
+// although in practice even two levels is confusing and best avoided.
 class ArgParser {
 
 
@@ -28,8 +29,9 @@ class ArgParser {
 
 
     // Internal enum for classifying option types.
-    // We use 'flag' as a synonym for boolean options, i.e. options that are either
-    // present (true) or absent (false). All other option types require an argument.
+    // We use 'flag' as a synonym for boolean options, i.e. options that are
+    // either present (true) or absent (false). All other option types require
+    // an argument.
     private enum OptionType {
         Flag, String, Int, Float
     }
@@ -74,7 +76,7 @@ class ArgParser {
             return arguments.get(index);
         }
 
-        // Returns a list containing all the remaining arguments from the stream.
+        // Returns a list containing all the remaining arguments in the stream.
         List<String> remainder() {
             return arguments.subList(index, length);
         }
@@ -99,7 +101,7 @@ class ArgParser {
     // Stores command callbacks indexed by command.
     private Map<String, Consumer<ArgParser>> callbacks = new HashMap<String, Consumer<ArgParser>>();
 
-    // Stores positional arguments parsed from the input array - i.e. arguments not associated with an option.
+    // Stores positional arguments parsed from the input array.
     private List<String> arguments = new ArrayList<String>();
 
     // Stores the command string, if a command is found while parsing.
