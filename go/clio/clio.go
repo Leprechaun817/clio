@@ -1,13 +1,6 @@
 /*
     A minimalist argument-parsing library for building elegant
     command-line interfaces.
-
-    Clio supports long and short-form options and arbitrarily-nested commands.
-    It aims to provide a consistent interface across multiple programming
-    languages, implemented wherever possible as a simple drop-in file.
-
-      * Author: Darren Mulholland <darren@mulholland.xyz>
-      * License: Public Domain
 */
 package clio
 
@@ -26,9 +19,9 @@ import (
 const Version = "1.0.0"
 
 
-// Enum for classifying option types.
-// We use 'flag' as a synonym for boolean options, i.e. options that are either
-// present (true) or absent (false). All other option types require an argument.
+// Enum for classifying option types. We use 'flag' as a synonym for boolean
+// options, i.e. options that are either present (true) or absent (false). All
+// other option types require an argument.
 const (
     flagType = iota
     strType
@@ -308,8 +301,8 @@ func (parser *ArgParser) ParseArgs(args []string) {
                     opt.floatVal = floatVal
                 }
 
-                // We have successfully parsed a long-form option with an argument.
-                // Move on to the next argument in the stream.
+                // We have successfully parsed a long-form option with an
+                // argument. Move on to the next argument in the stream.
                 continue
             }
 
