@@ -1,5 +1,5 @@
 /*
-    A minimalist argument-parsing library for building elegant
+    A minimalist argument-parsing library for creating elegant
     command-line interfaces.
 */
 package clio
