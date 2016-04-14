@@ -243,7 +243,8 @@ func (parser *ArgParser) ParseArgs(args []string) {
         // Fetch the next argument from the stream.
         arg := stream.next()
 
-        // If parsing has been turned off, simply add the argument to the list of positionals.
+        // If parsing has been turned off, simply add the argument to the
+        // list of positionals.
         if !parsing {
             parser.arguments = append(parser.arguments, arg)
             continue
