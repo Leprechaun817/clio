@@ -9,49 +9,45 @@ import clio
 
 def main():
 
-    # We instantiate an argument parser, optionally supplying help text
-    # and a version string. Supplying help text activates the automatic
-    # --help flag, supplying a version string activates the automatic
-    # --version flag.
+    # We instantiate an argument parser, optionally supplying help text and a
+    # version string. Supplying help text activates the automatic --help flag,
+    # supplying a version string activates the automatic --version flag.
     parser = clio.ArgParser("Usage: example...", "1.0.0")
 
-    # Register two flags, --bool1 and --bool2.
-    # The second flag has a single-character alias, -b.
-    # A flag is a boolean option - it is either present (true) or
-    # absent (false).
-    parser.add_flag("bool1")
-    parser.add_flag("bool2", "b")
+    # Register a flag, --bool, with a single-character alias, -b. A flag is a
+    # boolean option - it is either present (true) or absent (false).
+    parser.add_flag("bool b")
 
-    # Register two string options, --str1 <arg> and --str2 <arg>.
-    # The second option has a single-character alias, -s <arg>.
-    # Options require default values, here 'alice' and 'bob'.
-    parser.add_str_opt("str1", "alice")
-    parser.add_str_opt("str2", "bob", "s")
+    # Register a string option, --str <arg>, with a single-character alias,
+    # -s <arg>. A string option requires a default value, here 'defval'.
+    parser.add_str("str s", "defval")
 
-    # Register two integer options, --int1 <arg> and --int2 <arg>.
-    # The second option has a single-character alias, -i <arg>.
-    # Options require default values, here 123 and 456.
-    parser.add_int_opt("int1", 123)
-    parser.add_int_opt("int2", 456, "i")
+    # Register an integer option, --int <arg>, without a single-character alias.
+    # An integer option requires a default value, here 123.
+    parser.add_int("int", 123)
 
-    # Register two floating point options, --float1 <arg> and --float2 <arg>.
-    # The second option has a single-character alias, -f <arg>.
-    # Options require default values, here 1.0 and 2.0.
-    parser.add_float_opt("float1", 1.0)
-    parser.add_float_opt("float2", 2.0, "f")
+    # Register an integer list, --intlist <args>, with a single character alias,
+    # -i <args>. A list option can accept multiple values.
+    parser.add_int_list("intlist i")
 
-    # Register a command, 'cmd'. We need to specify the command's help text
-    # and callback method.
-    cmd_parser = parser.add_cmd("cmd", callback, "Usage: example cmd...")
+    # Register a float option, --float <arg>, without a single-character alias.
+    # A float option requires a default value, here 1.0.
+    parser.add_float("float", 1.0)
+
+    # Register a float list, --floatlist <args>, with a single-character alias,
+    # -f <args>. A list option can accept multiple values.
+    parser.add_float_list("floatlist f")
+
+    # Register a command 'foo', with an alias 'bar'. We need to supply the
+    # command's help text and callback method.
+    cmd_parser = parser.add_cmd("foo bar", callback, "Usage: example foo...")
 
     # Registering a command returns a new ArgParser instance dedicated to
     # parsing the command's arguments. We can register as many flags and
-    # options as we like on this sub-parser.
-    cmd_parser.add_flag("foo")
-
-    # The sub-parser can reuse the parent's option names without interfering.
-    cmd_parser.add_str_opt("str1", "ciara")
-    cmd_parser.add_str_opt("str2", "dave", "s")
+    # options as we like on this sub-parser. Note that the sub-parser can
+    # reuse the parent's option names without interference.
+    cmd_parser.add_flag("bool b")
+    cmd_parser.add_int("int i", 123)
 
     # Once all our options and commands have been registered we can call the
     # parser's parse() method with a list of argument strings. Only the root
@@ -65,10 +61,9 @@ def main():
     print(parser)
 
 
-# Callback method for the 'cmd' command.
-# This method will be called if the 'cmd' command is found.
-# The method receives an ArgParser instance containing the command's
-# parsed arguments. Here we simply dump it to stdout.
+# Callback method for the 'cmd' command. This method will be called if the
+# 'cmd' command is found. The method receives an ArgParser instance containing
+# the command's parsed arguments. Here we simply dump it to stdout.
 def callback(parser):
     print("------------ callback() ------------")
     print(parser)

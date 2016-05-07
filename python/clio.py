@@ -1,5 +1,6 @@
 # --------------------------------------------------------------------------
-# Clio: A toolkit for creating elegant command line interfaces.
+# Clio: a minimalist argument-parsing library for building elegant command
+# line interfaces
 #
 # Author: Darren Mulholland <darren@mulholland.xyz>
 # License: Public Domain
@@ -9,15 +10,30 @@ import sys
 
 
 # Library version number.
-__version__ = "1.0.0"
+__version__ = "2.0.0.dev"
 
 
-# Internal class for storing option data.
+# Print a message to stderr and exit with a non-zero error code.
+def err(msg):
+    sys.exit("Error: %s." % msg)
+
+
+# Internal class for storing option data. Type is one of 'bool', string',
+# 'int', or 'float'. A mono-valued option takes a single value.
 class Option:
 
-    def __init__(self, type, value):
+    def __init__(self, type, mono=False):
         self.type = type
-        self.value = value
+        self.mono = mono
+        self.values = []
+
+    # Appends a value to the option's internal list.
+    def append(self, value):
+        self.values.append(value)
+
+    # Clears the option's internal list of values.
+    def clear(self):
+        self.values.clear()
 
 
 # Internal class for making a list of arguments available as a stream.
@@ -63,13 +79,10 @@ class ArgParser:
         # Application version number as a string.
         self.version = version.strip() if version else None
 
-        # Stores option objects indexed by option name.
+        # Stores options indexed by name and alias.
         self.options = {}
 
-        # Stores option objects indexed by single-letter alias.
-        self.aliases = {}
-
-        # Stores command sub-parser instances indexed by command.
+        # Stores command sub-parser instances indexed by command name.
         self.commands = {}
 
         # Stores command callbacks indexed by command.
@@ -89,14 +102,14 @@ class ArgParser:
         if isinstance(key, int):
             return self.arguments[key]
         else:
-            return self.options[key].value
-
-    # Enable dictionary/list-style assignment to options and arguments.
-    def __setitem__(self, key, value):
-        if isinstance(key, int):
-            self.arguments[key] = value
-        else:
-            self.options[key] = Option("unknown", value)
+            option = self.options.get(key)
+            if option:
+                if option.mono:
+                    return option.values[0]
+                else:
+                    return option.values
+            else:
+                err("'%s' is not a recognised option" % key)
 
     # List all options and arguments for debugging.
     def __str__(self):
@@ -104,8 +117,11 @@ class ArgParser:
 
         lines.append("Options:")
         if len(self.options):
-            for name in sorted(self.options):
-                lines.append("  %s: %s" % (name, self.options[name].value))
+            for name, option in sorted(self.options.items()):
+                if option.mono:
+                    lines.append("  %s: %s" % (name, self._get_opt(name)))
+                else:
+                    lines.append("  %s: %s" % (name, self._get_opt_list(name)))
         else:
             lines.append("  [none]")
 
@@ -124,34 +140,57 @@ class ArgParser:
 
         return "\n".join(lines)
 
-    # Register an option on the parser instance.
-    def _add_option(self, type, name, default, alias):
-        option = Option(type, default)
-        self.options[name] = option
-        if alias is not None:
-            self.aliases[alias] = option
+    # Register an option with a single value.
+    def _add_opt(self, type, name, default):
+        option = Option(type, mono=True)
+        option.append(default)
+        for element in name.split():
+            self.options[element] = option
 
-    # Register a flag, optionally specifying a single-letter alias.
-    def add_flag(self, name, alias=None):
-        self._add_option("flag", name, False, alias)
+    # Register a boolean option.
+    def add_flag(self, name):
+        self._add_opt("bool", name, False)
 
-    # Register a string option, optionally specifying a single-letter alias.
-    def add_str_opt(self, name, default, alias=None):
-        self._add_option("string", name, default, alias)
+    # Register a string option.
+    def add_str(self, name, default):
+        self._add_opt("string", name, default)
 
-    # Register an integer option, optionally specifying a single-letter alias.
-    def add_int_opt(self, name, default, alias=None):
-        self._add_option("int", name, default, alias)
+    # Register an integer option.
+    def add_int(self, name, default):
+        self._add_opt("int", name, default)
 
-    # Register a float option, optionally specifying a single-letter alias.
-    def add_float_opt(self, name, default, alias=None):
-        self._add_option("float", name, default, alias)
+    # Register a float option.
+    def add_float(self, name, default):
+        self._add_opt("float", name, default)
+
+    # Register an option with multiple values.
+    def _add_opt_list(self, type, name):
+        option = Option(type)
+        for element in name.split():
+            self.options[element] = option
+
+    # Register a boolean list option.
+    def add_flag_list(self, name):
+        self._add_opt_list("bool", name)
+
+    # Register a string list option.
+    def add_str_list(self, name, default):
+        self._add_opt_list("str", name)
+
+    # Register an integer list option.
+    def add_int_list(self, name):
+        self._add_opt_list("int", name)
+
+    # Register a float list option.
+    def add_float_list(self, name):
+        self._add_opt_list("float", name)
 
     # Register a command and its associated callback.
     def add_cmd(self, command, callback, helptext):
         parser = ArgParser(helptext)
-        self.commands[command] = parser
-        self.callbacks[command] = callback
+        for element in command.split():
+            self.commands[element] = parser
+            self.callbacks[element] = callback
         return parser
 
     # Print the parser's help text and exit.
@@ -162,9 +201,8 @@ class ArgParser:
     # Parse a list of string arguments.
     def parse(self, args=sys.argv[1:]):
 
-        # Switch to turn off parsing if we encounter a -- argument.
-        # Everything following the -- will be treated as a positional
-        # argument.
+        # Switch to turn off parsing if we encounter a -- argument. Everything
+        # following the -- will be treated as a positional argument.
         parsing = True
 
         # Convert the input list into a stream.
@@ -185,110 +223,19 @@ class ArgParser:
             # If we encounter a -- argument, turn off parsing.
             if arg == "--":
                 parsing = False
-                continue
 
-            # Is the argument a long-form option or flag?
-            if arg.startswith("--"):
+            # Is the argument a long-form option?
+            elif arg.startswith("--"):
+                self._parse_longform_option(arg[2:], stream)
 
-                # Strip the prefix.
-                arg = arg[2:]
-
-                # Is the argument a registered option name?
-                if arg in self.options:
-                    option = self.options[arg]
-
-                    # If the option is a flag, store the boolean true.
-                    if option.type == "flag":
-                        option.value = True
-
-                    # Otherwise, check for a following argument.
-                    elif stream.has_next():
-                        nextarg = stream.next()
-
-                        if option.type == "string":
-                            option.value = nextarg
-
-                        elif option.type == "int":
-                            try:
-                                option.value = int(nextarg)
-                            except ValueError:
-                                sys.exit("Error: cannot parse '%s' as an integer." % nextarg)
-
-                        elif option.type == "float":
-                            try:
-                                option.value = float(nextarg)
-                            except ValueError:
-                                sys.exit("Error: cannot parse '%s' as a float." % nextarg)
-
-                    # No following argument, so print an error and exit.
-                    else:
-                        sys.exit("Error: missing argument for the --%s option." % arg)
-
-                # Is the argument the automatic --help flag?
-                elif arg == "help" and self.helptext is not None:
-                    sys.stdout.write(self.helptext + "\n")
-                    sys.exit()
-
-                # Is the argument the automatic --version flag?
-                elif arg == "version" and self.version is not None:
-                    sys.stdout.write(self.version + "\n")
-                    sys.exit()
-
-                # The argument is not a registered or automatic option.
-                # Print an error message and exit.
-                else:
-                    sys.exit("Error: --%s is not a recognised option." % arg)
-
-            # Is the argument a short-form option or flag?
+            # Is the argument a short-form option? If the argument consists of
+            # a single dash or a dash followed by a digit, we treat it as a
+            # positional argument.
             elif arg.startswith("-"):
-
-                # If the argument consists of a single dash or a dash followed
-                # by a digit, treat it as a free argument.
                 if arg == '-' or arg[1].isdigit():
                     self.arguments.append(arg)
-                    continue
-
-                # Examine each character individually to allow for condensed
-                # short-form arguments, i.e.
-                #     -a -b foo -c bar
-                # is equivalent to:
-                #     -abc foo bar
-                for c in arg[1:]:
-
-                    # Is the character a registered alias?
-                    if c in self.aliases:
-                        option = self.aliases[c]
-
-                        # If the option is a flag, store the boolean true.
-                        if option.type == "flag":
-                            option.value = True
-
-                        # Otherwise, check for a following argument.
-                        elif stream.has_next():
-                            nextarg = stream.next()
-
-                            if option.type == "string":
-                                option.value = nextarg
-
-                            elif option.type == "int":
-                                try:
-                                    option.value = int(nextarg)
-                                except ValueError:
-                                    sys.exit("Error: cannot parse '%s' as an integer." % nextarg)
-
-                            elif option.type == "float":
-                                try:
-                                    option.value = float(nextarg)
-                                except ValueError:
-                                    sys.exit("Error: cannot parse '%s' as a float." % nextarg)
-
-                        # No following argument, so print an error and exit.
-                        else:
-                            sys.exit("Error: missing argument for the -%s option." % c)
-
-                    # Not a recognised alias. Print an error and exit.
-                    else:
-                        sys.exit("Error: -%s is not a recognised option." % c)
+                else:
+                    self._parse_shortform_option(arg[1:], stream)
 
             # Is the argument a registered command?
             elif arg in self.commands:
@@ -308,23 +255,239 @@ class ArgParser:
                         sys.stdout.write(self.commands[command].helptext + "\n")
                         sys.exit()
                     else:
-                        sys.exit("Error: '%s' is not a recognised command." % command)
+                        err("'%s' is not a recognised command" % command)
                 else:
-                    sys.exit("Error: the help command requires an argument.")
+                    err("the help command requires an argument")
 
             # Otherwise, add the argument to our list of free arguments.
             else:
                 self.arguments.append(arg)
 
+    # Attempt to parse the specified argument as a string, integer, or float.
+    # (Parsing as a string is a null operation.)
+    def _try_parse_arg(self, argtype, arg):
+        if argtype == "string":
+            return arg
+        elif argtype == "int":
+            try:
+                return int(arg)
+            except ValueError:
+                err("cannot parse '%s' as an integer" % arg)
+        elif argtype == "float":
+            try:
+                return float(arg)
+            except ValueError:
+                err("cannot parse '%s' as a float" % arg)
+        else:
+            assert False, "invalid argument type '%s'" % argtype
+
+    # Parse an option of the form --name=value or -n=value.
+    def _parse_name_equals_value_option(self, prefix, arg):
+        name, value = arg.split("=", maxsplit=1)
+
+        option = self.options.get(name)
+        if not option:
+            err("%s%s is not a recognized option" % (prefix, name))
+
+        if option.type == "bool":
+            err("invalid format for boolean flag %s%s" % (prefix, name))
+
+        if not value:
+            err("missing argument for option %s%s" % (prefix, name))
+
+        self._set_opt(name, self._try_parse_arg(option.type, value))
+
+    # Parse a long-form option, i.e. an option beginning with a double dash.
+    def _parse_longform_option(self, arg, stream):
+
+        # Do we have an option of the form --name=value?
+        if "=" in arg:
+            self._parse_name_equals_value_option("--", arg)
+
+        # Is the argument a registered option name?
+        elif arg in self.options:
+            option = self.options[arg]
+
+            # If the option is a flag, store the boolean true.
+            if option.type == "bool":
+                self.set_flag(arg)
+
+            # Check for a following argument.
+            elif stream.has_next() and _is_arg(stream.peek()):
+
+                # Try to parse the argument as a value of the appropriate type.
+                value = self._try_parse_arg(option.type, stream.next())
+                self._set_opt(arg, value)
+
+                # If the option is a multi-value list, keep trying to parse
+                # values until we hit the next option or the end of the stream.
+                if not option.mono:
+                    while stream.has_next() and _is_arg(stream.peek()):
+                        value = self._try_parse_arg(option.type, stream.next())
+                        self._set_opt(arg, value)
+
+            # We're missing a required argument.
+            else:
+                err("missing argument for the --%s option" % arg)
+
+        # Is the argument the automatic --help flag?
+        elif arg == "help" and self.helptext is not None:
+            sys.stdout.write(self.helptext + "\n")
+            sys.exit()
+
+        # Is the argument the automatic --version flag?
+        elif arg == "version" and self.version is not None:
+            sys.stdout.write(self.version + "\n")
+            sys.exit()
+
+        # The argument is not a registered or automatic option name.
+        # Print an error message and exit.
+        else:
+            err("--%s is not a recognised option" % arg)
+
+    # Parse a short-form option, i.e. an option beginning with a single dash.
+    def _parse_shortform_option(self, arg, stream):
+
+        # Do we have an option of the form -n=value?
+        if "=" in arg:
+            self._parse_name_equals_value_option("-", arg)
+            return
+
+        # We handle each character individually to support condensed options:
+        #   -abc foo bar
+        # is equivalent to:
+        #   -a foo -b bar -c
+        for char in arg:
+
+            option = self.options.get(char)
+            if not option:
+                err("-%s is not a recognised option" % char)
+
+            # If the option is a flag, store the boolean true.
+            if option.type == "bool":
+                self.set_flag(char)
+
+            # Check for a following argument.
+            elif stream.has_next() and _is_arg(stream.peek()):
+
+                # Try to parse the argument as a value of the appropriate type.
+                value = self._try_parse_arg(option.type, stream.next())
+                self._set_opt(char, value)
+
+                # If the option is a multi-value list, keep trying to parse
+                # values until we hit the next option or the end of the stream.
+                if not option.mono:
+                    while stream.has_next() and _is_arg(stream.peek()):
+                        value = self._try_parse_arg(option.type, stream.next())
+                        self._set_opt(char, value)
+
+            # We're missing a required argument.
+            else:
+                err("missing argument for the -%s option" % char)
+
     # Returns the value of the specified option.
-    def get_opt(self, name):
-        return self.options[name].value
+    def _get_opt(self, name):
+        option = self.options.get(name)
+        if option:
+            return option.values[0]
+        else:
+            err("'%s' is not a recognized option" % name)
 
-    # Returns a dictionary containing all the parser's options.
-    def get_opts(self):
-        return {name: opt.value for name, opt in self.options.items()}
+    # Returns the value of the specified option.
+    def get_flag(self, name):
+        return self._get_opt(name)
 
-    # Returns true if at least one positional argument was found.
+    # Returns the value of the specified option.
+    def get_str(self, name):
+        return self._get_opt(name)
+
+    # Returns the value of the specified option.
+    def get_int(self, name):
+        return self._get_opt(name)
+
+    # Returns the value of the specified option.
+    def get_float(self, name):
+        return self._get_opt(name)
+
+    # Returns the length of the specified option list.
+    def len_list(self, name):
+        option = self.options.get(name)
+        if option:
+            return len(option.values)
+        else:
+            err("'%s' is not a recognized option" % name)
+
+    # Clears the specified option's internal list of values.
+    def clear_list(self, name):
+        option = self.options.get(name)
+        if option:
+            option.clear()
+        else:
+            err("'%s' is not a recognized option" % name)
+
+    # Returns the values of the specified option list.
+    def _get_opt_list(self, name):
+        option = self.options.get(name)
+        if option:
+            return option.values
+        else:
+            err("'%s' is not a recognized option" % name)
+
+    # Returns the values of the specified option list.
+    def get_flag_list(self, name):
+        return self._get_opt_list(name)
+
+    # Returns the values of the specified option list.
+    def get_str_list(self, name):
+        return self._get_opt_list(name)
+
+    # Returns the values of the specified option list.
+    def get_int_list(self, name):
+        return self._get_opt_list(name)
+
+    # Returns the values of the specified option list.
+    def get_float_list(self, name):
+        return self._get_opt_list(name)
+
+    # Sets the value of the specified option. (Appends to list options.)
+    def _set_opt(self, name, value):
+        option = self.options.get(name)
+        if option:
+            if option.mono:
+                option.values[0] = value
+            else:
+                option.append(value)
+        else:
+            err("'%s' is not a recognized option" % name)
+
+    # Sets the specified flag to true. (Appends to list options.)
+    def set_flag(self, name):
+        return self._set_opt(name, True)
+
+    # Sets the specified flag to false. (Clears list options.)
+    def unset_flag(self, name):
+        option = self.options.get(name)
+        if option:
+            if option.mono:
+                option.values[0] = False
+            else:
+                option.clear()
+        else:
+            err("'%s' is not a recognized option" % name)
+
+    # Sets the value of the specified option. (Appends to list options.)
+    def set_str(self, name, value):
+        return self._set_opt(name, value)
+
+    # Sets the value of the specified option. (Appends to list options.)
+    def set_int(self, name, value):
+        return self._set_opt(name, value)
+
+    # Sets the value of the specified option. (Appends to list options.)
+    def set_float(self, name, value):
+        return self._set_opt(name, value)
+
+    # Returns true if at least one positional argument has been found.
     def has_args(self):
         return len(self.arguments) > 0
 
@@ -348,7 +511,7 @@ class ArgParser:
             try:
                 args.append(int(arg))
             except ValueError:
-                sys.exit("Error: cannot parse '%s' as an integer." % arg)
+                err("cannot parse '%s' as an integer" % arg)
         return args
 
     # Convenience function: attempts to parse and return the positional
@@ -359,7 +522,7 @@ class ArgParser:
             try:
                 args.append(float(arg))
             except ValueError:
-                sys.exit("Error: cannot parse '%s' as a float." % arg)
+                err("cannot parse '%s' as a float" % arg)
         return args
 
     # Returns true if the parser has found a registered command.
@@ -373,3 +536,14 @@ class ArgParser:
     # Returns the command's parser instance, if a command was found.
     def get_cmd_parser(self):
         return self.command_parser
+
+
+# Returns true if 'arg' looks like an argument rather than an option.
+def _is_arg(arg):
+    if arg.startswith('-'):
+        if arg in ('-', '--') or arg[1].isdigit():
+            return True
+        else:
+            return False
+    else:
+        return True
