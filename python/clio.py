@@ -174,8 +174,8 @@ class ArgParser:
         self._add_opt_list("bool", name)
 
     # Register a string list option.
-    def add_str_list(self, name, default):
-        self._add_opt_list("str", name)
+    def add_str_list(self, name):
+        self._add_opt_list("string", name)
 
     # Register an integer list option.
     def add_int_list(self, name):
