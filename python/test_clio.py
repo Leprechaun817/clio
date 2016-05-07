@@ -120,6 +120,48 @@ def test_string_option_missing_value():
 
 
 # --------------------------------------------------------------------------
+# String lists.
+# --------------------------------------------------------------------------
+
+
+def test_string_list_missing():
+    parser = clio.ArgParser()
+    parser.add_str_list("string")
+    parser.parse([])
+    assert parser.len_list("string") == 0
+
+
+def test_string_list_longform():
+    parser = clio.ArgParser()
+    parser.add_str_list("string")
+    parser.parse(["--string", "foo", "bar", "--string", "baz"])
+    assert parser.len_list("string") == 3
+    assert parser.get_str_list("string")[0] == "foo"
+    assert parser.get_str_list("string")[1] == "bar"
+    assert parser.get_str_list("string")[2] == "baz"
+
+
+def test_string_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_str_list("string s")
+    parser.parse(["-s", "foo", "bar", "-s", "baz"])
+    assert parser.len_list("string") == 3
+    assert parser.get_str_list("string")[0] == "foo"
+    assert parser.get_str_list("string")[1] == "bar"
+    assert parser.get_str_list("string")[2] == "baz"
+
+
+def test_string_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_str_list("string s")
+    parser.parse(["--string", "foo", "bar", "-s", "baz"])
+    assert parser.len_list("string") == 3
+    assert parser.get_str_list("string")[0] == "foo"
+    assert parser.get_str_list("string")[1] == "bar"
+    assert parser.get_str_list("string")[2] == "baz"
+
+
+# --------------------------------------------------------------------------
 # Integer options.
 # --------------------------------------------------------------------------
 
