@@ -319,6 +319,48 @@ def test_float_option_invalid_value():
 
 
 # --------------------------------------------------------------------------
+# Float lists.
+# --------------------------------------------------------------------------
+
+
+def test_float_list_missing():
+    parser = clio.ArgParser()
+    parser.add_int_list("float")
+    parser.parse([])
+    assert parser.len_list("float") == 0
+
+
+def test_float_list_longform():
+    parser = clio.ArgParser()
+    parser.add_float_list("float")
+    parser.parse(["--float", "1.1", "2.2", "--float", "3.3"])
+    assert parser.len_list("float") == 3
+    assert parser.get_str_list("float")[0] == 1.1
+    assert parser.get_str_list("float")[1] == 2.2
+    assert parser.get_str_list("float")[2] == 3.3
+
+
+def test_float_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_float_list("float f")
+    parser.parse(["-f", "1.1", "2.2", "-f", "3.3"])
+    assert parser.len_list("float") == 3
+    assert parser.get_str_list("float")[0] == 1.1
+    assert parser.get_str_list("float")[1] == 2.2
+    assert parser.get_str_list("float")[2] == 3.3
+
+
+def test_float_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_float_list("float f")
+    parser.parse(["--float", "1.1", "2.2", "-f", "3.3"])
+    assert parser.len_list("float") == 3
+    assert parser.get_str_list("float")[0] == 1.1
+    assert parser.get_str_list("float")[1] == 2.2
+    assert parser.get_str_list("float")[2] == 3.3
+
+
+# --------------------------------------------------------------------------
 # Multiple options.
 # --------------------------------------------------------------------------
 
