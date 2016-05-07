@@ -491,8 +491,8 @@ class ArgParser:
     def has_args(self):
         return len(self.arguments) > 0
 
-    # Returns the number of positional arguments.
-    def num_args(self):
+    # Returns the length of the positional argument list.
+    def len_args(self):
         return len(self.arguments)
 
     # Returns the positional argument at the specified index.
