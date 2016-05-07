@@ -223,6 +223,48 @@ def test_int_option_invalid_value():
 
 
 # --------------------------------------------------------------------------
+# Integer lists.
+# --------------------------------------------------------------------------
+
+
+def test_int_list_missing():
+    parser = clio.ArgParser()
+    parser.add_int_list("int")
+    parser.parse([])
+    assert parser.len_list("int") == 0
+
+
+def test_int_list_longform():
+    parser = clio.ArgParser()
+    parser.add_int_list("int")
+    parser.parse(["--int", "123", "456", "--int", "789"])
+    assert parser.len_list("int") == 3
+    assert parser.get_str_list("int")[0] == 123
+    assert parser.get_str_list("int")[1] == 456
+    assert parser.get_str_list("int")[2] == 789
+
+
+def test_int_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_int_list("int i")
+    parser.parse(["-i", "123", "456", "-i", "789"])
+    assert parser.len_list("int") == 3
+    assert parser.get_str_list("int")[0] == 123
+    assert parser.get_str_list("int")[1] == 456
+    assert parser.get_str_list("int")[2] == 789
+
+
+def test_int_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_int_list("int i")
+    parser.parse(["--int", "123", "456", "-i", "789"])
+    assert parser.len_list("int") == 3
+    assert parser.get_str_list("int")[0] == 123
+    assert parser.get_str_list("int")[1] == 456
+    assert parser.get_str_list("int")[2] == 789
+
+
+# --------------------------------------------------------------------------
 # Float options.
 # --------------------------------------------------------------------------
 
