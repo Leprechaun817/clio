@@ -51,6 +51,13 @@ def test_bool_option_dict_syntax():
 # --------------------------------------------------------------------------
 
 
+def test_bool_list_missing():
+    parser = clio.ArgParser()
+    parser.add_flag_list("bool")
+    parser.parse([])
+    assert parser.len_list("bool") == 0
+
+
 def test_bool_list_longform():
     parser = clio.ArgParser()
     parser.add_flag_list("bool")
