@@ -47,6 +47,32 @@ def test_bool_option_dict_syntax():
 
 
 # --------------------------------------------------------------------------
+# Boolean lists.
+# --------------------------------------------------------------------------
+
+
+def test_bool_list_longform():
+    parser = clio.ArgParser()
+    parser.add_flag_list("bool")
+    parser.parse(["--bool", "--bool", "--bool"])
+    assert parser.len_list("bool") == 3
+
+
+def test_bool_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_flag_list("bool b")
+    parser.parse(["-b", "-bb"])
+    assert parser.len_list("bool") == 3
+
+
+def test_bool_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_flag_list("bool b")
+    parser.parse(["--bool", "-bb"])
+    assert parser.len_list("bool") == 3
+
+
+# --------------------------------------------------------------------------
 # String options.
 # --------------------------------------------------------------------------
 
