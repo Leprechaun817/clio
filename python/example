@@ -26,17 +26,18 @@ def main():
     # An integer option requires a default value, here 123.
     parser.add_int("int", 123)
 
-    # Register an integer list, --intlist <args>, with a single character alias,
-    # -i <args>. A list option can accept multiple values.
+    # Register an integer list, --intlist <arg>, with a single character alias,
+    # -i <arg>. A list option accepts multiple values.
     parser.add_int_list("intlist i")
 
     # Register a float option, --float <arg>, without a single-character alias.
     # A float option requires a default value, here 1.0.
     parser.add_float("float", 1.0)
 
-    # Register a float list, --floatlist <args>, with a single-character alias,
-    # -f <args>. A list option can accept multiple values.
-    parser.add_float_list("floatlist f")
+    # Register a 'greedy' float list, --floatlist <args>, with a single-
+    # character alias, -f <args>. A list option accepts multiple values; a
+    # 'greedy' list attempts to parse multiple consecutive arguments.
+    parser.add_float_list("floatlist f", True)
 
     # Register a command 'foo', with an alias 'bar'. We need to supply the
     # command's help text and callback method.
