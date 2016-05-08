@@ -295,7 +295,7 @@ class ArgParser:
 
         option = self.options.get(name)
         if not option:
-            err("%s%s is not a recognized option" % (prefix, name))
+            err("%s%s is not a recognised option" % (prefix, name))
 
         if option.mono and option.found:
             err("option %s%s can be set only once" % (prefix, name))
@@ -413,7 +413,7 @@ class ArgParser:
         if option:
             return option.values[0]
         else:
-            err("'%s' is not a recognized option" % name)
+            err("'%s' is not a recognised option" % name)
 
     # Returns the value of the specified option.
     def get_flag(self, name):
@@ -437,7 +437,7 @@ class ArgParser:
         if option:
             return len(option.values)
         else:
-            err("'%s' is not a recognized option" % name)
+            err("'%s' is not a recognised option" % name)
 
     # Clears the specified option's internal list of values.
     def clear_list(self, name):
@@ -445,7 +445,7 @@ class ArgParser:
         if option:
             option.clear()
         else:
-            err("'%s' is not a recognized option" % name)
+            err("'%s' is not a recognised option" % name)
 
     # Returns the values of the specified poly-valued option.
     def _get_poly_opt(self, name):
@@ -453,7 +453,7 @@ class ArgParser:
         if option:
             return option.values
         else:
-            err("'%s' is not a recognized option" % name)
+            err("'%s' is not a recognised option" % name)
 
     # Returns the values of the specified option list.
     def get_flag_list(self, name):
@@ -480,7 +480,7 @@ class ArgParser:
             else:
                 option.append(value)
         else:
-            err("'%s' is not a recognized option" % name)
+            err("'%s' is not a recognised option" % name)
 
     # Sets the specified flag to true. (Appends to list options.)
     def set_flag(self, name):
@@ -495,7 +495,7 @@ class ArgParser:
             else:
                 option.clear()
         else:
-            err("'%s' is not a recognized option" % name)
+            err("'%s' is not a recognised option" % name)
 
     # Sets the value of the specified option. (Appends to list options.)
     def set_str(self, name, value):
