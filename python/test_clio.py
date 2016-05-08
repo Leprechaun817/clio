@@ -142,15 +142,42 @@ def test_string_list_longform():
     parser = clio.ArgParser()
     parser.add_str_list("string")
     parser.parse(["--string", "foo", "bar", "--string", "baz"])
+    assert parser.len_list("string") == 2
+    assert parser.get_str_list("string")[0] == "foo"
+    assert parser.get_str_list("string")[1] == "baz"
+
+
+def test_string_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_str_list("string s")
+    parser.parse(["-s", "foo", "bar", "-s", "baz"])
+    assert parser.len_list("string") == 2
+    assert parser.get_str_list("string")[0] == "foo"
+    assert parser.get_str_list("string")[1] == "baz"
+
+
+def test_string_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_str_list("string s")
+    parser.parse(["--string", "foo", "bar", "-s", "baz"])
+    assert parser.len_list("string") == 2
+    assert parser.get_str_list("string")[0] == "foo"
+    assert parser.get_str_list("string")[1] == "baz"
+
+
+def test_string_greedy_list_longform():
+    parser = clio.ArgParser()
+    parser.add_str_list("string", True)
+    parser.parse(["--string", "foo", "bar", "--string", "baz"])
     assert parser.len_list("string") == 3
     assert parser.get_str_list("string")[0] == "foo"
     assert parser.get_str_list("string")[1] == "bar"
     assert parser.get_str_list("string")[2] == "baz"
 
 
-def test_string_list_shortform():
+def test_string_greedy_list_shortform():
     parser = clio.ArgParser()
-    parser.add_str_list("string s")
+    parser.add_str_list("string s", True)
     parser.parse(["-s", "foo", "bar", "-s", "baz"])
     assert parser.len_list("string") == 3
     assert parser.get_str_list("string")[0] == "foo"
@@ -158,9 +185,9 @@ def test_string_list_shortform():
     assert parser.get_str_list("string")[2] == "baz"
 
 
-def test_string_list_mixed():
+def test_string_greedy_list_mixed():
     parser = clio.ArgParser()
-    parser.add_str_list("string s")
+    parser.add_str_list("string s", True)
     parser.parse(["--string", "foo", "bar", "-s", "baz"])
     assert parser.len_list("string") == 3
     assert parser.get_str_list("string")[0] == "foo"
@@ -238,15 +265,42 @@ def test_int_list_longform():
     parser = clio.ArgParser()
     parser.add_int_list("int")
     parser.parse(["--int", "123", "456", "--int", "789"])
+    assert parser.len_list("int") == 2
+    assert parser.get_str_list("int")[0] == 123
+    assert parser.get_str_list("int")[1] == 789
+
+
+def test_int_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_int_list("int i")
+    parser.parse(["-i", "123", "456", "-i", "789"])
+    assert parser.len_list("int") == 2
+    assert parser.get_str_list("int")[0] == 123
+    assert parser.get_str_list("int")[1] == 789
+
+
+def test_int_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_int_list("int i")
+    parser.parse(["--int", "123", "456", "-i", "789"])
+    assert parser.len_list("int") == 2
+    assert parser.get_str_list("int")[0] == 123
+    assert parser.get_str_list("int")[1] == 789
+
+
+def test_int_greedy_list_longform():
+    parser = clio.ArgParser()
+    parser.add_int_list("int", True)
+    parser.parse(["--int", "123", "456", "--int", "789"])
     assert parser.len_list("int") == 3
     assert parser.get_str_list("int")[0] == 123
     assert parser.get_str_list("int")[1] == 456
     assert parser.get_str_list("int")[2] == 789
 
 
-def test_int_list_shortform():
+def test_int_greedy_list_shortform():
     parser = clio.ArgParser()
-    parser.add_int_list("int i")
+    parser.add_int_list("int i", True)
     parser.parse(["-i", "123", "456", "-i", "789"])
     assert parser.len_list("int") == 3
     assert parser.get_str_list("int")[0] == 123
@@ -254,9 +308,9 @@ def test_int_list_shortform():
     assert parser.get_str_list("int")[2] == 789
 
 
-def test_int_list_mixed():
+def test_int_greedy_list_mixed():
     parser = clio.ArgParser()
-    parser.add_int_list("int i")
+    parser.add_int_list("int i", True)
     parser.parse(["--int", "123", "456", "-i", "789"])
     assert parser.len_list("int") == 3
     assert parser.get_str_list("int")[0] == 123
@@ -334,15 +388,42 @@ def test_float_list_longform():
     parser = clio.ArgParser()
     parser.add_float_list("float")
     parser.parse(["--float", "1.1", "2.2", "--float", "3.3"])
+    assert parser.len_list("float") == 2
+    assert parser.get_str_list("float")[0] == 1.1
+    assert parser.get_str_list("float")[1] == 3.3
+
+
+def test_float_list_shortform():
+    parser = clio.ArgParser()
+    parser.add_float_list("float f")
+    parser.parse(["-f", "1.1", "2.2", "-f", "3.3"])
+    assert parser.len_list("float") == 2
+    assert parser.get_str_list("float")[0] == 1.1
+    assert parser.get_str_list("float")[1] == 3.3
+
+
+def test_float_list_mixed():
+    parser = clio.ArgParser()
+    parser.add_float_list("float f")
+    parser.parse(["--float", "1.1", "2.2", "-f", "3.3"])
+    assert parser.len_list("float") == 2
+    assert parser.get_str_list("float")[0] == 1.1
+    assert parser.get_str_list("float")[1] == 3.3
+
+
+def test_float_greedy_list_longform():
+    parser = clio.ArgParser()
+    parser.add_float_list("float", True)
+    parser.parse(["--float", "1.1", "2.2", "--float", "3.3"])
     assert parser.len_list("float") == 3
     assert parser.get_str_list("float")[0] == 1.1
     assert parser.get_str_list("float")[1] == 2.2
     assert parser.get_str_list("float")[2] == 3.3
 
 
-def test_float_list_shortform():
+def test_float_greedy_list_shortform():
     parser = clio.ArgParser()
-    parser.add_float_list("float f")
+    parser.add_float_list("float f", True)
     parser.parse(["-f", "1.1", "2.2", "-f", "3.3"])
     assert parser.len_list("float") == 3
     assert parser.get_str_list("float")[0] == 1.1
@@ -350,9 +431,9 @@ def test_float_list_shortform():
     assert parser.get_str_list("float")[2] == 3.3
 
 
-def test_float_list_mixed():
+def test_float_greedy_list_mixed():
     parser = clio.ArgParser()
-    parser.add_float_list("float f")
+    parser.add_float_list("float f", True)
     parser.parse(["--float", "1.1", "2.2", "-f", "3.3"])
     assert parser.len_list("float") == 3
     assert parser.get_str_list("float")[0] == 1.1
