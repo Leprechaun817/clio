@@ -25,6 +25,7 @@ class Option:
     def __init__(self, type, mono=False):
         self.type = type
         self.mono = mono
+        self.found = False
         self.values = []
 
     # Appends a value to the option's internal list.
@@ -119,9 +120,9 @@ class ArgParser:
         if len(self.options):
             for name, option in sorted(self.options.items()):
                 if option.mono:
-                    lines.append("  %s: %s" % (name, self._get_opt(name)))
+                    lines.append("  %s: %s" % (name, self._get_mono_opt(name)))
                 else:
-                    lines.append("  %s: %s" % (name, self._get_opt_list(name)))
+                    lines.append("  %s: %s" % (name, self._get_poly_opt(name)))
         else:
             lines.append("  [none]")
 
@@ -140,8 +141,8 @@ class ArgParser:
 
         return "\n".join(lines)
 
-    # Register an option with a single value.
-    def _add_opt(self, type, name, default):
+    # Register a mono-valued option.
+    def _add_mono_opt(self, type, name, default):
         option = Option(type, mono=True)
         option.append(default)
         for element in name.split():
@@ -149,41 +150,41 @@ class ArgParser:
 
     # Register a boolean option.
     def add_flag(self, name):
-        self._add_opt("bool", name, False)
+        self._add_mono_opt("bool", name, False)
 
     # Register a string option.
     def add_str(self, name, default):
-        self._add_opt("string", name, default)
+        self._add_mono_opt("string", name, default)
 
     # Register an integer option.
     def add_int(self, name, default):
-        self._add_opt("int", name, default)
+        self._add_mono_opt("int", name, default)
 
     # Register a float option.
     def add_float(self, name, default):
-        self._add_opt("float", name, default)
+        self._add_mono_opt("float", name, default)
 
-    # Register an option with multiple values.
-    def _add_opt_list(self, type, name):
+    # Register a poly-valued option.
+    def _add_poly_opt(self, type, name):
         option = Option(type)
         for element in name.split():
             self.options[element] = option
 
     # Register a boolean list option.
     def add_flag_list(self, name):
-        self._add_opt_list("bool", name)
+        self._add_poly_opt("bool", name)
 
     # Register a string list option.
     def add_str_list(self, name):
-        self._add_opt_list("string", name)
+        self._add_poly_opt("string", name)
 
     # Register an integer list option.
     def add_int_list(self, name):
-        self._add_opt_list("int", name)
+        self._add_poly_opt("int", name)
 
     # Register a float list option.
     def add_float_list(self, name):
-        self._add_opt_list("float", name)
+        self._add_poly_opt("float", name)
 
     # Register a command and its associated callback.
     def add_cmd(self, command, callback, helptext):
@@ -386,7 +387,7 @@ class ArgParser:
                 err("missing argument for the -%s option" % char)
 
     # Returns the value of the specified option.
-    def _get_opt(self, name):
+    def _get_mono_opt(self, name):
         option = self.options.get(name)
         if option:
             return option.values[0]
@@ -395,19 +396,19 @@ class ArgParser:
 
     # Returns the value of the specified option.
     def get_flag(self, name):
-        return self._get_opt(name)
+        return self._get_mono_opt(name)
 
     # Returns the value of the specified option.
     def get_str(self, name):
-        return self._get_opt(name)
+        return self._get_mono_opt(name)
 
     # Returns the value of the specified option.
     def get_int(self, name):
-        return self._get_opt(name)
+        return self._get_mono_opt(name)
 
     # Returns the value of the specified option.
     def get_float(self, name):
-        return self._get_opt(name)
+        return self._get_mono_opt(name)
 
     # Returns the length of the specified option list.
     def len_list(self, name):
@@ -425,8 +426,8 @@ class ArgParser:
         else:
             err("'%s' is not a recognized option" % name)
 
-    # Returns the values of the specified option list.
-    def _get_opt_list(self, name):
+    # Returns the values of the specified poly-valued option.
+    def _get_poly_opt(self, name):
         option = self.options.get(name)
         if option:
             return option.values
@@ -435,19 +436,19 @@ class ArgParser:
 
     # Returns the values of the specified option list.
     def get_flag_list(self, name):
-        return self._get_opt_list(name)
+        return self._get_poly_opt(name)
 
     # Returns the values of the specified option list.
     def get_str_list(self, name):
-        return self._get_opt_list(name)
+        return self._get_poly_opt(name)
 
     # Returns the values of the specified option list.
     def get_int_list(self, name):
-        return self._get_opt_list(name)
+        return self._get_poly_opt(name)
 
     # Returns the values of the specified option list.
     def get_float_list(self, name):
-        return self._get_opt_list(name)
+        return self._get_poly_opt(name)
 
     # Sets the value of the specified option. (Appends to list options.)
     def _set_opt(self, name, value):
