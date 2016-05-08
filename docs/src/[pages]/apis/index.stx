@@ -1,2 +1,9 @@
 
 # Language APIs
+
+Clio is currently implemented in the following languages:
+
+* [C](@root/apis/c//)
+* [Go](@root/apis/go//)
+* [Java](@root/apis/java//)
+* [Python](@root/apis/python//)
