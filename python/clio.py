@@ -19,8 +19,9 @@ def err(msg):
 
 
 # Internal class for storing option data. Type is one of 'bool', string',
-# 'int', or 'float'. A mono-valued option takes a single value; a poly-valued
-# option assembles a list of values.
+# 'int', or 'float'. A mono-valued option has a single value; a poly-valued
+# option assembles a list of values. A 'greedy' list option attempts to parse
+# multiple consecutive arguments.
 class Option:
 
     def __init__(self, type):
@@ -169,27 +170,28 @@ class ArgParser:
         self._add_mono_opt("float", name, default)
 
     # Register a poly-valued option.
-    def _add_poly_opt(self, type, name):
+    def _add_poly_opt(self, type, name, greedy):
         option = Option(type)
         option.poly = True
+        option.greedy = greedy
         for element in name.split():
             self.options[element] = option
 
     # Register a boolean list option.
     def add_flag_list(self, name):
-        self._add_poly_opt("bool", name)
+        self._add_poly_opt("bool", name, False)
 
     # Register a string list option.
-    def add_str_list(self, name):
-        self._add_poly_opt("string", name)
+    def add_str_list(self, name, greedy=False):
+        self._add_poly_opt("string", name, greedy)
 
     # Register an integer list option.
-    def add_int_list(self, name):
-        self._add_poly_opt("int", name)
+    def add_int_list(self, name, greedy=False):
+        self._add_poly_opt("int", name, greedy)
 
     # Register a float list option.
-    def add_float_list(self, name):
-        self._add_poly_opt("float", name)
+    def add_float_list(self, name, greedy=False):
+        self._add_poly_opt("float", name, greedy)
 
     # Register a command and its associated callback.
     def add_cmd(self, command, callback, helptext):
@@ -334,9 +336,9 @@ class ArgParser:
                 value = self._try_parse_arg(option.type, stream.next())
                 self._set_opt(arg, value)
 
-                # If the option is a multi-value list, keep trying to parse
-                # values until we hit the next option or the end of the stream.
-                if not option.mono:
+                # If the option is a greedy list, keep trying to parse values
+                # until we hit the next option or the end of the stream.
+                if option.greedy:
                     while stream.has_next() and _is_arg(stream.peek()):
                         value = self._try_parse_arg(option.type, stream.next())
                         self._set_opt(arg, value)
@@ -394,9 +396,9 @@ class ArgParser:
                 value = self._try_parse_arg(option.type, stream.next())
                 self._set_opt(char, value)
 
-                # If the option is a multi-value list, keep trying to parse
-                # values until we hit the next option or the end of the stream.
-                if not option.mono:
+                # If the option is a greedy list, keep trying to parse values
+                # until we hit the next option or the end of the stream.
+                if option.greedy:
                     while stream.has_next() and _is_arg(stream.peek()):
                         value = self._try_parse_arg(option.type, stream.next())
                         self._set_opt(char, value)
