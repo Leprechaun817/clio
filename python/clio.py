@@ -19,13 +19,16 @@ def err(msg):
 
 
 # Internal class for storing option data. Type is one of 'bool', string',
-# 'int', or 'float'. A mono-valued option takes a single value.
+# 'int', or 'float'. A mono-valued option takes a single value; a poly-valued
+# option assembles a list of values.
 class Option:
 
-    def __init__(self, type, mono=False):
+    def __init__(self, type):
         self.type = type
-        self.mono = mono
+        self.mono = False
+        self.poly = False
         self.found = False
+        self.greedy = False
         self.values = []
 
     # Appends a value to the option's internal list.
@@ -143,7 +146,8 @@ class ArgParser:
 
     # Register a mono-valued option.
     def _add_mono_opt(self, type, name, default):
-        option = Option(type, mono=True)
+        option = Option(type)
+        option.mono = True
         option.append(default)
         for element in name.split():
             self.options[element] = option
@@ -167,6 +171,7 @@ class ArgParser:
     # Register a poly-valued option.
     def _add_poly_opt(self, type, name):
         option = Option(type)
+        option.poly = True
         for element in name.split():
             self.options[element] = option
 
@@ -290,11 +295,15 @@ class ArgParser:
         if not option:
             err("%s%s is not a recognized option" % (prefix, name))
 
+        if option.mono and option.found:
+            err("option %s%s can be set only once" % (prefix, name))
+        option.found = True
+
         if option.type == "bool":
             err("invalid format for boolean flag %s%s" % (prefix, name))
 
         if not value:
-            err("missing argument for option %s%s" % (prefix, name))
+            err("missing argument for the %s%s option" % (prefix, name))
 
         self._set_opt(name, self._try_parse_arg(option.type, value))
 
@@ -308,6 +317,11 @@ class ArgParser:
         # Is the argument a registered option name?
         elif arg in self.options:
             option = self.options[arg]
+
+            # Do we have multiple instances of a mono-valued option?
+            if option.mono and option.found:
+                err("option --%s can be set only once" % arg)
+            option.found = True
 
             # If the option is a flag, store the boolean true.
             if option.type == "bool":
@@ -363,6 +377,11 @@ class ArgParser:
             option = self.options.get(char)
             if not option:
                 err("-%s is not a recognised option" % char)
+
+            # Do we have multiple instances of a mono-valued option?
+            if option.mono and option.found:
+                err("option -%s can be set only once" % char)
+            option.found = True
 
             # If the option is a flag, store the boolean true.
             if option.type == "bool":
