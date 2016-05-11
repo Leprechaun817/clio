@@ -563,7 +563,7 @@ class ArgParser:
 # Returns true if 'arg' looks like an argument rather than an option.
 def _is_arg(arg):
     if arg.startswith('-'):
-        if arg in ('-', '--') or arg[1].isdigit():
+        if arg == '-' or arg[1].isdigit():
             return True
         else:
             return False
