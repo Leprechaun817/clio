@@ -1,6 +1,6 @@
 # --------------------------------------------------------------------------
-# Clio: a minimalist argument-parsing library for building elegant command
-# line interfaces
+# Clio: a minimalist argument-parsing library designed for building elegant
+# command line interfaces.
 #
 # Author: Darren Mulholland <darren@mulholland.xyz>
 # License: Public Domain
@@ -18,10 +18,18 @@ def err(msg):
     sys.exit("Error: %s." % msg)
 
 
-# Internal class for storing option data. Type is one of 'bool', string',
-# 'int', or 'float'. A mono-valued option has a single value; a poly-valued
-# option assembles a list of values. A 'greedy' list option attempts to parse
-# multiple consecutive arguments.
+# Exception raised when an invalid API call is attempted. (Invalid user input
+# does not raise an exception; instead the application exits with an error
+# message.)
+class ParserError(Exception):
+    pass
+
+
+# Internal class for storing option data.
+#  * Type is one of 'bool', 'string', 'int', or 'float'.
+#  * A mono-valued option has a single value.
+#  * A poly-valued option assembles a list of values.
+#  * A 'greedy' list option attempts to parse mulitple consecutive arguments.
 class Option:
 
     def __init__(self, type):
@@ -105,7 +113,10 @@ class ArgParser:
     # Enable dictionary/list-style access to options and arguments.
     def __getitem__(self, key):
         if isinstance(key, int):
-            return self.arguments[key]
+            if key < len(self.arguments):
+                return self.arguments[key]
+            else:
+                raise ParserError("argument index [%s] is out of bounds" % key)
         else:
             option = self.options.get(key)
             if option:
@@ -114,7 +125,7 @@ class ArgParser:
                 else:
                     return option.values
             else:
-                err("'%s' is not a recognised option" % key)
+                raise ParserError("'%s' is not a registered option" % key)
 
     # List all options and arguments for debugging.
     def __str__(self):
@@ -150,8 +161,8 @@ class ArgParser:
         option = Option(type)
         option.mono = True
         option.append(default)
-        for element in name.split():
-            self.options[element] = option
+        for alias in name.split():
+            self.options[alias] = option
 
     # Register a boolean option.
     def add_flag(self, name):
@@ -174,8 +185,8 @@ class ArgParser:
         option = Option(type)
         option.poly = True
         option.greedy = greedy
-        for element in name.split():
-            self.options[element] = option
+        for alias in name.split():
+            self.options[alias] = option
 
     # Register a boolean list option.
     def add_flag_list(self, name):
@@ -196,9 +207,9 @@ class ArgParser:
     # Register a command and its associated callback.
     def add_cmd(self, command, callback, helptext):
         parser = ArgParser(helptext)
-        for element in command.split():
-            self.commands[element] = parser
-            self.callbacks[element] = callback
+        for alias in command.split():
+            self.commands[alias] = parser
+            self.callbacks[alias] = callback
         return parser
 
     # Print the parser's help text and exit.
@@ -206,11 +217,13 @@ class ArgParser:
         sys.stdout.write(self.helptext + "\n")
         sys.exit()
 
-    # Parse a list of string arguments.
+    # Parse a list of strings. We default to parsing the application's
+    # command line arguments, skipping the application path.
     def parse(self, args=sys.argv[1:]):
 
-        # Switch to turn off parsing if we encounter a -- argument. Everything
-        # following the -- will be treated as a positional argument.
+        # Switch to turn off option parsing if we encounter a double dash, '--'.
+        # Everything following the '--' will be treated as a positional
+        # argument.
         parsing = True
 
         # Convert the input list into a stream.
@@ -222,13 +235,13 @@ class ArgParser:
             # Fetch the next argument from the stream.
             arg = stream.next()
 
-            # If parsing has been turned off, simply add the argument to the
-            # list of positionals.
+            # If option parsing has been turned off, simply add the argument to
+            # the list of positionals.
             if not parsing:
                 self.arguments.append(arg)
                 continue
 
-            # If we encounter a -- argument, turn off parsing.
+            # If we encounter a '--' argument, turn off parsing.
             if arg == "--":
                 parsing = False
 
@@ -258,16 +271,16 @@ class ArgParser:
             # Is the argument the automatic 'help' command?
             elif arg == "help":
                 if stream.has_next():
-                    command = stream.next()
-                    if command in self.commands:
-                        sys.stdout.write(self.commands[command].helptext + "\n")
+                    cmdname = stream.next()
+                    if cmdname in self.commands:
+                        sys.stdout.write(self.commands[cmdname].helptext + "\n")
                         sys.exit()
                     else:
-                        err("'%s' is not a recognised command" % command)
+                        err("'%s' is not a recognised command" % cmdname)
                 else:
                     err("the help command requires an argument")
 
-            # Otherwise, add the argument to our list of free arguments.
+            # Otherwise, add the argument to our list of positional arguments.
             else:
                 self.arguments.append(arg)
 
@@ -287,7 +300,7 @@ class ArgParser:
             except ValueError:
                 err("cannot parse '%s' as a float" % arg)
         else:
-            assert False, "invalid argument type '%s'" % argtype
+            raise ParserError("invalid argument type '%s'" % argtype)
 
     # Parse an option of the form --name=value or -n=value.
     def _parse_name_equals_value_option(self, prefix, arg):
@@ -407,13 +420,13 @@ class ArgParser:
             else:
                 err("missing argument for the -%s option" % char)
 
-    # Returns the value of the specified option.
+    # Returns the value of the specified mono-valued option.
     def _get_mono_opt(self, name):
         option = self.options.get(name)
         if option:
             return option.values[0]
         else:
-            err("'%s' is not a recognised option" % name)
+            raise ParserError("'%s' is not a registered option" % name)
 
     # Returns the value of the specified option.
     def get_flag(self, name):
@@ -431,45 +444,45 @@ class ArgParser:
     def get_float(self, name):
         return self._get_mono_opt(name)
 
-    # Returns the length of the specified option list.
-    def len_list(self, name):
-        option = self.options.get(name)
-        if option:
-            return len(option.values)
-        else:
-            err("'%s' is not a recognised option" % name)
-
-    # Clears the specified option's internal list of values.
-    def clear_list(self, name):
-        option = self.options.get(name)
-        if option:
-            option.clear()
-        else:
-            err("'%s' is not a recognised option" % name)
-
     # Returns the values of the specified poly-valued option.
     def _get_poly_opt(self, name):
         option = self.options.get(name)
         if option:
             return option.values
         else:
-            err("'%s' is not a recognised option" % name)
+            raise ParserError("'%s' is not a registered option" % name)
 
-    # Returns the values of the specified option list.
+    # Returns the values of the specified list-option.
     def get_flag_list(self, name):
         return self._get_poly_opt(name)
 
-    # Returns the values of the specified option list.
+    # Returns the values of the specified list-option.
     def get_str_list(self, name):
         return self._get_poly_opt(name)
 
-    # Returns the values of the specified option list.
+    # Returns the values of the specified list-option.
     def get_int_list(self, name):
         return self._get_poly_opt(name)
 
-    # Returns the values of the specified option list.
+    # Returns the values of the specified list-option.
     def get_float_list(self, name):
         return self._get_poly_opt(name)
+
+    # Returns the length of the specified option's list of values.
+    def len_list(self, name):
+        option = self.options.get(name)
+        if option:
+            return len(option.values)
+        else:
+            raise ParserError("'%s' is not a registered option" % name)
+
+    # Clears the specified option's list of values.
+    def clear_list(self, name):
+        option = self.options.get(name)
+        if option:
+            option.clear()
+        else:
+            raise ParserError("'%s' is not a registered option" % name)
 
     # Sets the value of the specified option. (Appends to list options.)
     def _set_opt(self, name, value):
@@ -480,7 +493,7 @@ class ArgParser:
             else:
                 option.append(value)
         else:
-            err("'%s' is not a recognised option" % name)
+            raise ParserError("'%s' is not a registered option" % name)
 
     # Sets the specified flag to true. (Appends to list options.)
     def set_flag(self, name):
@@ -495,7 +508,7 @@ class ArgParser:
             else:
                 option.clear()
         else:
-            err("'%s' is not a recognised option" % name)
+            raise ParserError("'%s' is not a registered option" % name)
 
     # Sets the value of the specified option. (Appends to list options.)
     def set_str(self, name, value):
