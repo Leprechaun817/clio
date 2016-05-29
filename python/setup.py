@@ -44,7 +44,7 @@ setup(
     url = 'https://github.com/dmulholland/clio',
     license = 'Public Domain',
     description = (
-        'A minimalist argument-parsing library for building elegant '
+        'A minimalist argument-parsing library designed for building elegant '
         'command-line interfaces.'
     ),
     long_description = __doc__,

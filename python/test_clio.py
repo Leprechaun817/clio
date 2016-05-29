@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------
-# Unit tests for the clio module. Run with pytest.
+# Unit tests for the clio module. Run using pytest.
 # --------------------------------------------------------------------------
 
 import clio
