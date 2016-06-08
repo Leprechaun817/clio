@@ -29,7 +29,7 @@ class ParserError(Exception):
 #  * Type is one of 'bool', 'string', 'int', or 'float'.
 #  * A mono-valued option has a single value.
 #  * A poly-valued option assembles a list of values.
-#  * A 'greedy' list option attempts to parse mulitple consecutive arguments.
+#  * A 'greedy' list option attempts to parse multiple consecutive arguments.
 class Option:
 
     def __init__(self, type):
@@ -72,7 +72,9 @@ class ArgStream:
 
     # Returns a list containing all the remaining arguments from the stream.
     def remainder(self):
-        return self.args[self.index:]
+        remainder = self.args[self.index:]
+        self.index = self.length
+        return remainder
 
 
 # ArgParser is the workhorse class of the toolkit. An ArgParser instance is
@@ -92,23 +94,23 @@ class ArgParser:
         # Application version number as a string.
         self.version = version.strip() if version else None
 
-        # Stores options indexed by name and alias.
+        # Stores Option instances indexed by name and alias.
         self.options = {}
 
         # Stores command sub-parser instances indexed by command name.
         self.commands = {}
 
-        # Stores command callbacks indexed by command.
+        # Stores command callbacks indexed by command name.
         self.callbacks = {}
 
         # Stores positional arguments parsed from the input stream.
         self.arguments = []
 
-        # Stores the command string, if a command is found while parsing.
-        self.command = None
+        # Stores the command name, if a command was found while parsing.
+        self.cmd_name = None
 
-        # Stores the command's parser instance, if a command is found.
-        self.command_parser = None
+        # Stores the command's parser instance, if a command was found.
+        self.cmd_parser = None
 
     # Enable dictionary/list-style access to options and arguments.
     def __getitem__(self, key):
@@ -205,9 +207,9 @@ class ArgParser:
         self._add_poly_opt("float", name, greedy)
 
     # Register a command and its associated callback.
-    def add_cmd(self, command, callback, helptext):
+    def add_cmd(self, name, callback, helptext):
         parser = ArgParser(helptext)
-        for alias in command.split():
+        for alias in name.split():
             self.commands[alias] = parser
             self.callbacks[alias] = callback
         return parser
@@ -241,7 +243,7 @@ class ArgParser:
                 self.arguments.append(arg)
                 continue
 
-            # If we encounter a '--' argument, turn off parsing.
+            # If we encounter a '--' argument, turn off option-parsing.
             if arg == "--":
                 parsing = False
 
@@ -264,19 +266,18 @@ class ArgParser:
                 cmd_callback = self.callbacks[arg]
                 cmd_parser.parse(stream.remainder())
                 cmd_callback(cmd_parser)
-                self.command = arg
-                self.command_parser = cmd_parser
-                break
+                self.cmd_name = arg
+                self.cmd_parser = cmd_parser
 
             # Is the argument the automatic 'help' command?
             elif arg == "help":
                 if stream.has_next():
-                    cmdname = stream.next()
-                    if cmdname in self.commands:
-                        sys.stdout.write(self.commands[cmdname].helptext + "\n")
+                    name = stream.next()
+                    if name in self.commands:
+                        sys.stdout.write(self.commands[name].helptext + "\n")
                         sys.exit()
                     else:
-                        err("'%s' is not a recognised command" % cmdname)
+                        err("'%s' is not a recognised command" % name)
                 else:
                     err("the help command requires an argument")
 
@@ -562,15 +563,15 @@ class ArgParser:
 
     # Returns true if the parser has found a registered command.
     def has_cmd(self):
-        return self.command is not None
+        return self.cmd_name is not None
 
     # Returns the command string, if a command was found.
-    def get_cmd(self):
-        return self.command
+    def get_cmd_name(self):
+        return self.cmd_name
 
     # Returns the command's parser instance, if a command was found.
     def get_cmd_parser(self):
-        return self.command_parser
+        return self.cmd_parser
 
 
 # Returns true if 'arg' looks like an argument rather than an option.

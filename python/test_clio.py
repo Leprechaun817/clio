@@ -621,27 +621,27 @@ def test_option_parsing_switch():
 
 def test_command_absent():
     parser = clio.ArgParser()
-    cmdparser = parser.add_cmd("cmd", lambda p: None, "helptext")
+    cmd_parser = parser.add_cmd("cmd", lambda p: None, "helptext")
     parser.parse([])
     assert parser.has_cmd() == False
 
 
 def test_command_present():
     parser = clio.ArgParser()
-    cmdparser = parser.add_cmd("cmd", lambda p: None, "helptext")
+    cmd_parser = parser.add_cmd("cmd", lambda p: None, "helptext")
     parser.parse(["cmd"])
     assert parser.has_cmd() == True
-    assert parser.get_cmd() == "cmd"
-    assert parser.get_cmd_parser() == cmdparser
+    assert parser.get_cmd_name() == "cmd"
+    assert parser.get_cmd_parser() == cmd_parser
 
 
 def test_command_with_options():
     parser = clio.ArgParser()
-    cmdparser = parser.add_cmd("cmd", lambda p: None, "helptext")
-    cmdparser.add_flag("bool")
-    cmdparser.add_str("string", "default")
-    cmdparser.add_int("int", 101)
-    cmdparser.add_float("float", 1.1)
+    cmd_parser = parser.add_cmd("cmd", lambda p: None, "helptext")
+    cmd_parser.add_flag("bool")
+    cmd_parser.add_str("string", "default")
+    cmd_parser.add_int("int", 101)
+    cmd_parser.add_float("float", 1.1)
     parser.parse([
         "cmd",
         "foo", "bar",
@@ -650,10 +650,10 @@ def test_command_with_options():
         "--float", "2.2",
     ])
     assert parser.has_cmd() == True
-    assert parser.get_cmd() == "cmd"
-    assert parser.get_cmd_parser() == cmdparser
-    assert cmdparser.has_args() == True
-    assert cmdparser.len_args() == 2
-    assert cmdparser["string"] == "value"
-    assert cmdparser["int"] == 202
-    assert cmdparser["float"] == 2.2
+    assert parser.get_cmd_name() == "cmd"
+    assert parser.get_cmd_parser() == cmd_parser
+    assert cmd_parser.has_args() == True
+    assert cmd_parser.len_args() == 2
+    assert cmd_parser["string"] == "value"
+    assert cmd_parser["int"] == 202
+    assert cmd_parser["float"] == 2.2
