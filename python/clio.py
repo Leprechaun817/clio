@@ -566,11 +566,11 @@ class ArgParser:
     def has_cmd(self):
         return self.cmd_name is not None
 
-    # Returns the command string, if a command was found.
+    # Returns the command name, if the parser has found a command.
     def get_cmd_name(self):
         return self.cmd_name
 
-    # Returns the command's parser instance, if a command was found.
+    # Returns the command's parser instance, if the parser has found a command.
     def get_cmd_parser(self):
         return self.cmd_parser
 

@@ -1,20 +1,19 @@
 /*
-    Clio: A toolkit for creating elegant command line interfaces.
+    Clio: a minimalist argument-parsing library designed for building elegant
+    command line interfaces.
 
     Author: Darren Mulholland <darren@mulholland.xyz>
     License: Public Domain
+    Version: 2.0.0.dev
 */
 
 #pragma once
 #include <stdbool.h>
 
-// Library version number.
-static char *clio_version = "1.0.0";
-
-// ArgParser instances are responsible for storing registered options.
+// An ArgParser instance stores registered options and commands.
 typedef struct ArgParser ArgParser;
 
-// Initializes and returns a new ArgParser instance.
+// Initialize a new ArgParser instance.
 // Supplying help text activates the automatic --help flag, supplying a
 // version string activates the automatic --version flag. A NULL pointer can
 // be passed for either parameter.
