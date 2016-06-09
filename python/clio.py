@@ -71,6 +71,7 @@ class ArgStream:
         return self.args[self.index]
 
     # Returns a list containing all the remaining arguments from the stream.
+    # This exhausts the stream.
     def remainder(self):
         remainder = self.args[self.index:]
         self.index = self.length
