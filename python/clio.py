@@ -422,6 +422,14 @@ class ArgParser:
             else:
                 err("missing argument for the -%s option" % char)
 
+    # Returns true if the specified option was found while parsing.
+    def found(self, name):
+        option = self.options.get(name)
+        if option:
+            return option.found
+        else:
+            raise ParserError("'%s' is not a registered option" % name)
+
     # Returns the value of the specified mono-valued option.
     def _get_mono_opt(self, name):
         option = self.options.get(name)
