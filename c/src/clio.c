@@ -240,8 +240,6 @@ typedef union OptionValue {
 //  * A 'greedy' list option attempts to parse multiple consecutive arguments.
 typedef struct Option {
     OptionType type;
-    bool mono;
-    bool poly;
     bool found;
     bool greedy;
     int len;
@@ -273,48 +271,27 @@ static void option_append(Option *opt, OptionValue value) {
 }
 
 
-// Set the value of an Option instance. (Appends to list options).
-static void option_set(Option *opt, OptionValue value) {
-    if (opt->mono) {
-        opt->values[0] = value;
-        opt->len = 1;
-    } else {
-        option_append(opt, value);
-    }
+// Append a value to a boolean option's internal list.
+static void option_set_flag(Option *opt, bool value) {
+    option_append(opt, (OptionValue){.bool_val = value});
 }
 
 
-// Set the value of a boolean option to true. (Appends to list options).
-static void option_set_flag(Option *opt) {
-    option_set(opt, (OptionValue){.bool_val = true});
-}
-
-
-// Set the value of a boolean option to false. (Clears list options).
-static void option_unset_flag(Option *opt) {
-    if (opt->mono) {
-        option_set(opt, (OptionValue){.bool_val = false});
-    } else {
-        option_clear(opt);
-    }
-}
-
-
-// Set the value of a string option. (Appends to list options.)
+// Append a value to a string option's internal list.
 static void option_set_str(Option *opt, char *value) {
-    option_set(opt, (OptionValue){.str_val = value});
+    option_append(opt, (OptionValue){.str_val = value});
 }
 
 
-// Set the value of an integer option. (Appends to list options.)
+// Append a value to an integer option's internal list.
 static void option_set_int(Option *opt, int value) {
-    option_set(opt, (OptionValue){.int_val = value});
+    option_append(opt, (OptionValue){.int_val = value});
 }
 
 
-// Set the value of a floating-point option. (Appends to list options.)
+// Append a value to a floating-point option's internal list.
 static void option_set_float(Option *opt, double value) {
-    option_set(opt, (OptionValue){.float_val = value});
+    option_append(opt, (OptionValue){.float_val = value});
 }
 
 
@@ -336,8 +313,6 @@ static void option_try_set(Option *opt, char *arg) {
 // Initialize a new Option instance.
 static Option* option_new() {
     Option *option = malloc(sizeof(Option));
-    option->mono = false;
-    option->poly = false;
     option->found = false;
     option->greedy = false;
     option->len = 0;
@@ -347,80 +322,72 @@ static Option* option_new() {
 }
 
 
-// Initialize a mono-valued boolean option.
+// Initialize a boolean option.
 static Option* option_new_flag() {
     Option *opt = option_new();
     opt->type = FLAG;
-    option->mono = true;
-    option_unset_flag(opt);
+    option_set_flag(opt, true);
     return opt;
 }
 
 
-// Initialize a mono-valued string option with a default value.
+// Initialize a string option with a default value.
 static Option* option_new_str(char *value) {
     Option *opt = option_new(true);
     opt->type = STRING;
-    option->mono = true;
     option_set_str(opt, value);
     return opt;
 }
 
 
-// Initialize a mono-valued integer option with a default value.
+// Initialize an integer option with a default value.
 static Option* option_new_int(int value) {
     Option *opt = option_new();
     opt->type = INTEGER;
-    option->mono = true;
     option_set_int(opt, value);
     return opt;
 }
 
 
-// Initialize a mono-valued floating-point option with a default value.
+// Initialize a floating-point option with a default value.
 static Option* option_new_float(double value) {
     Option *opt = option_new();
     opt->type = FLOAT;
-    option->mono = true;
     option_set_float(opt, value);
     return opt;
 }
 
 
-// Initialize a poly-valued boolean option.
+// Initialize a boolean list option.
 static Option* option_new_flag_list() {
     Option *opt = option_new();
     opt->type = FLAG;
-    option->poly = true;
     return opt;
 }
 
 
-// Initialize a poly-valued string option.
+// Initialize a string list option.
 static Option* option_new_str_list(bool greedy) {
     Option *opt = option_new();
     opt->type = STRING;
-    option->poly = true;
     option->greedy = greedy;
     return opt;
 }
 
 
-// Initialize a poly-valued integer option.
+// Initialize a integer list option.
 static Option* option_new_int_list(bool greedy) {
     Option *opt = option_new();
     opt->type = INTEGER;
-    option->poly = true;
     option->greedy = greedy;
     return opt;
 }
 
 
-// Initialize a poly-valued floating-point option.
-static Option* option_new_str_list(bool greedy) {
+// Initialize a floating-point list option.
+static Option* option_new_float_list(bool greedy) {
     Option *opt = option_new();
     opt->type = FLOAT;
-    option->poly = true;
     option->greedy = greedy;
     return opt;
 }
@@ -428,25 +395,25 @@ static Option* option_new_str_list(bool greedy) {
 
 // Returns the value of a boolean option.
 static bool option_get_flag(Option *opt) {
-    return opt->values[0].bool_val;
+    return opt->values[opt->len - 1].bool_val;
 }
 
 
 // Returns the value of a string option.
 static char* option_get_str(Option *opt) {
-    return opt->values[0].str_val;
+    return opt->values[opt->len - 1].str_val;
 }
 
 
 // Returns the value of an integer option.
 static int option_get_int(Option *opt) {
-    return opt->values[0].int_val;
+    return opt->values[opt->len - 1].int_val;
 }
 
 
 // Returns the value of a floating-point option.
 static double option_get_float(Option *opt) {
-    return opt->values[0].float_val;
+    return opt->values[opt->len - 1].float_val;
 }
 
 
@@ -834,35 +801,28 @@ static void argparser_clear_list(ArgParser *parser, char *name) {
 }
 
 
-// Set the specified boolean option to true. (Appends to list options.)
-static void argparser_set_flag(ArgParser *parser, char *name) {
+// Append a value to a boolean option's internal list.
+static void argparser_set_flag(ArgParser *parser, char *name, bool value) {
     Option *opt = argparser_get_opt(parser, name);
-    option_set_flag(opt);
+    option_set_flag(opt, value);
 }
 
 
-// Set the specified boolean option to false. (Clears list options.)
-static void argparser_unset_flag(ArgParser *parser, char *name) {
-    Option *opt = argparser_get_opt(parser, name);
-    option_unset_flag(opt);
-}
-
-
-// Set the value of the specified string option. (Appends to list options.)
+// Append a value to a string option's internal list.
 static void argparser_set_str(ArgParser *parser, char *name, char *value) {
     Option *opt = argparser_get_opt(parser, name);
     option_set_str(opt, value);
 }
 
 
-// Set the value of the specified integer option. (Appends to list options.)
+// Append a value to an integer option's internal list.
 static void argparser_set_int(ArgParser *parser, char *name, int value) {
     Option *opt = argparser_get_opt(parser, name);
     option_set_int(opt, value);
 }
 
 
-// Set the value of the specified float option. (Appends to list options.)
+// Append a value to a floating-point option's internal list.
 static void argparser_set_float(ArgParser *parser, char *name, double value) {
     Option *opt = argparser_get_opt(parser, name);
     option_set_float(opt, value);
@@ -973,12 +933,6 @@ static void argparser_parse_equals_option(
         fprintf(stderr, "Error: %s%s is not a recognised option.\n", prefix, name);
         exit(1);
     }
-
-    // Do we have multiple instances of a mono-valued option?
-    if (opt->mono && opt->found) {
-        fprintf(stderr, "Error: option %s%s can be set only once.\n", prefix, name);
-        exit(1);
-    }
     opt->found = true;
 
     // Boolean flags can never contain an equals sign.
@@ -1013,17 +967,11 @@ static void argparser_parse_long_option(
     // Is the argument a registered option name?
     else if (map_contains(parser->options, arg)) {
         Option *opt = map_get(parser->options, arg);
-
-        // Do we have multiple instances of a mono-valued option?
-        if (opt->mono && opt->found) {
-            fprintf(stderr, "Error: option --%s can be set only once.\n", arg);
-            exit(1);
-        }
         opt->found = true;
 
         // If the option is a flag, store the boolean true.
         if (opt->type == FLAG) {
-            option_set_flag(opt);
+            option_set_flag(opt, true);
         }
 
         // Not a flag so check for a following option value.
@@ -1092,17 +1040,11 @@ static void argparser_parse_short_option(
             fprintf(stderr, "Error: -%s is not a recognised option.\n", key);
             exit(1);
         }
-
-        // Do we have multiple instances of a mono-valued option?
-        if (opt->mono && opt->found) {
-            fprintf(stderr, "Error: option -%s can be set only once.\n", key);
-            exit(1);
-        }
         opt->found = true;
 
         // If the option is a flag, store the boolean true.
         if (opt->type == FLAG) {
-            option_set_flag(opt);
+            option_set_flag(opt, true);
         }
 
         // Not a flag so check for a following option value.
@@ -1248,8 +1190,8 @@ void ap_free(ArgParser *parser) {
 }
 
 
-void ap_parse(ArgParser *parser, int len, char *args[]) {
-    argparser_parse(parser, len - 1, args + 1);
+void ap_parse(ArgParser *parser, int argc, char *argv[]) {
+    argparser_parse(parser, argc - 1, argv + 1);
 }
 
 
@@ -1307,6 +1249,7 @@ bool ap_get_flag(ArgParser *parser, char *name) {
     return argparser_get_flag(parser, name);
 }
 
+
 char* ap_get_str(ArgParser *parser, char *name) {
     return argparser_get_str(parser, name);
 }
@@ -1352,13 +1295,8 @@ void ap_clear_list(ArgParser *parser, char *name) {
 }
 
 
-void ap_set_flag(ArgParser *parser, char *name) {
-    argparser_set_flag(parser, name);
-}
-
-
-void ap_unset_flag(ArgParser *parser, char *name) {
-    argparser_unset_flag(parser, name);
+void ap_set_flag(ArgParser *parser, char *name, bool value) {
+    argparser_set_flag(parser, name, value);
 }
 
 

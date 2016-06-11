@@ -41,8 +41,11 @@ void ap_free(ArgParser *parser);
 // Parsing arguments.
 // -------------------------------------------------------------------------
 
-// Parse an array of string arguments.
-void ap_parse(ArgParser *parser, int len, char *args[]);
+// Parse an array of string arguments. Note that argc and argv are assumed
+// to be the application's command line arguments as supplied to main(), i.e.
+// the first element of the array is assumed to be the program name and will
+// be ignored.
+void ap_parse(ArgParser *parser, int argc, char *argv[]);
 
 
 // -------------------------------------------------------------------------
@@ -117,22 +120,19 @@ double* ap_get_float_list(ArgParser *parser, char *name);
 // Setting option values.
 // -------------------------------------------------------------------------
 
-// Clear a list-option's list of values.
+// Clear the specified option's internal list of values.
 void ap_clear_list(ArgParser *parser, char *name);
 
-// Set the specified boolean option to true. (Appends to list options.)
-void ap_set_flag(ArgParser *parser, char *name);
+// Append a value to a boolean option's internal list.
+void ap_set_flag(ArgParser *parser, char *name, bool value);
 
-// Set the specified boolean option to false. (Clears list options.)
-void ap_unset_flag(ArgParser *parser, char *name);
-
-// Set the value of the specified string option. (Appends to list options.)
+// Append a value to a string option's internal list.
 void ap_set_str(ArgParser *parser, char *name, char *value);
 
-// Set the value of the specified integer option. (Appends to list options.)
+// Append a value to an integer option's internal list.
 void ap_set_int(ArgParser *parser, char *name, int value);
 
-// Set the value of the specified float option. (Appends to list options.)
+// Append a value to a floating-point option's internal list.
 void ap_set_float(ArgParser *parser, char *name, double value);
 
 
