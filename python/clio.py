@@ -48,6 +48,11 @@ class Option:
     def clear(self):
         self.values.clear()
 
+    # Returns the last value from the option's internal list.
+    @property
+    def value(self):
+        return self.values[-1]
+
 
 # Internal class for making a list of arguments available as a stream.
 class ArgStream:
@@ -56,10 +61,6 @@ class ArgStream:
         self.args = list(args)
         self.length = len(self.args)
         self.index = 0
-
-    # Returns true if the stream contains another argument.
-    def has_next(self):
-        return self.index < self.length
 
     # Returns the next argument from the stream.
     def next(self):
@@ -76,6 +77,24 @@ class ArgStream:
         remainder = self.args[self.index:]
         self.index = self.length
         return remainder
+
+    # Returns true if the stream contains at least one more element.
+    def has_next(self):
+        return self.index < self.length
+
+    # Returns true if the stream contains at least one more element and that
+    # element has the form of an option value.
+    def has_next_value(self):
+        if self.has_next():
+            arg = self.peek()
+            if arg.startswith('-'):
+                if arg == '-' or arg[1].isdigit():
+                    return True
+                else:
+                    return False
+            else:
+                return True
+        return False
 
 
 # ArgParser is the workhorse class of the toolkit. An ArgParser instance is
@@ -305,7 +324,7 @@ class ArgParser:
             raise ParserError("invalid argument type '%s'" % argtype)
 
     # Parse an option of the form --name=value or -n=value.
-    def _parse_name_equals_value_option(self, prefix, arg):
+    def _parse_equals_option(self, prefix, arg):
         name, value = arg.split("=", maxsplit=1)
 
         option = self.options.get(name)
@@ -329,7 +348,7 @@ class ArgParser:
 
         # Do we have an option of the form --name=value?
         if "=" in arg:
-            self._parse_name_equals_value_option("--", arg)
+            self._parse_equals_option("--", arg)
 
         # Is the argument a registered option name?
         elif arg in self.options:
@@ -344,8 +363,8 @@ class ArgParser:
             if option.type == "bool":
                 self.set_flag(arg)
 
-            # Check for a following argument.
-            elif stream.has_next() and _is_arg(stream.peek()):
+            # Check for a following option value.
+            elif stream.has_next_value():
 
                 # Try to parse the argument as a value of the appropriate type.
                 value = self._try_parse_arg(option.type, stream.next())
@@ -354,11 +373,11 @@ class ArgParser:
                 # If the option is a greedy list, keep trying to parse values
                 # until we hit the next option or the end of the stream.
                 if option.greedy:
-                    while stream.has_next() and _is_arg(stream.peek()):
+                    while stream.has_next_value():
                         value = self._try_parse_arg(option.type, stream.next())
                         self._set_opt(arg, value)
 
-            # We're missing a required argument.
+            # We're missing a required option value.
             else:
                 err("missing argument for the --%s option" % arg)
 
@@ -382,7 +401,7 @@ class ArgParser:
 
         # Do we have an option of the form -n=value?
         if "=" in arg:
-            self._parse_name_equals_value_option("-", arg)
+            self._parse_equals_option("-", arg)
             return
 
         # We handle each character individually to support condensed options:
@@ -404,8 +423,8 @@ class ArgParser:
             if option.type == "bool":
                 self.set_flag(char)
 
-            # Check for a following argument.
-            elif stream.has_next() and _is_arg(stream.peek()):
+            # Check for a following option value.
+            elif stream.has_next_value():
 
                 # Try to parse the argument as a value of the appropriate type.
                 value = self._try_parse_arg(option.type, stream.next())
@@ -414,11 +433,11 @@ class ArgParser:
                 # If the option is a greedy list, keep trying to parse values
                 # until we hit the next option or the end of the stream.
                 if option.greedy:
-                    while stream.has_next() and _is_arg(stream.peek()):
+                    while stream.has_next_value():
                         value = self._try_parse_arg(option.type, stream.next())
                         self._set_opt(char, value)
 
-            # We're missing a required argument.
+            # We're missing a required option value.
             else:
                 err("missing argument for the -%s option" % char)
 
@@ -581,14 +600,3 @@ class ArgParser:
     # Returns the command's parser instance, if the parser has found a command.
     def get_cmd_parser(self):
         return self.cmd_parser
-
-
-# Returns true if 'arg' looks like an argument rather than an option.
-def _is_arg(arg):
-    if arg.startswith('-'):
-        if arg == '-' or arg[1].isdigit():
-            return True
-        else:
-            return False
-    else:
-        return True
