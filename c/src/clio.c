@@ -15,22 +15,18 @@
 #include <ctype.h>
 
 
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // Local Declarations
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
-// Types.
 typedef struct ArgParser ArgParser;
 typedef void (*CmdCB)(ArgParser *parser);
 
-// Functions.
-//static void ArgParser_free(ArgParser *parser);
 
-
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // Utility Functions
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
 // Attempt to parse a string as an integer value, exiting on failure.
@@ -81,9 +77,9 @@ static char* strdup(char *str) {
 }
 
 
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // Map
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
 // Callback type for freeing a value stored in a Map instance.
@@ -214,9 +210,9 @@ static void* map_get(Map *map, char *key) {
 }
 
 
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // Option Elements
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
 // We use 'flag' as a synonym for boolean options, i.e. options that are either
@@ -322,6 +318,21 @@ static void option_set_float(Option *opt, double value) {
 }
 
 
+// Try setting an option by parsing the value of a string argument. Exits with
+// an error message on failure.
+static void option_try_set(Option *opt, char *arg) {
+    if (opt->type == STRING) {
+        option_set_str(opt, arg);
+    }
+    else if (opt->type == INT) {
+        option_set_int(opt, try_str_to_int(arg));
+    }
+    else if (opt->type == FLOAT) {
+        option_set_float(opt, try_str_to_double(arg));
+    }
+}
+
+
 // Initialize a new Option instance.
 static Option* option_new() {
     Option *option = malloc(sizeof(Option));
@@ -377,11 +388,10 @@ static Option* option_new_float(double value) {
 
 
 // Initialize a poly-valued boolean option.
-static Option* option_new_flag_list(bool greedy) {
+static Option* option_new_flag_list() {
     Option *opt = option_new();
     opt->type = FLAG;
     option->poly = true;
-    option->greedy = greedy;
     return opt;
 }
 
@@ -492,9 +502,9 @@ static double* option_get_float_list(Option *opt) {
 }
 
 
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // ArgStream
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
 // An ArgStream instance is a wrapper for an array of string pointers,
@@ -522,21 +532,46 @@ static ArgStream* argstream_new(int len, char **args) {
 }
 
 
-// Returns true if the stream contains at least one more argument.
-static bool argstream_has_next(ArgStream *stream) {
-    return stream->index < stream->len;
-}
-
-
 // Returns the next argument from the stream.
 static char* argstream_next(ArgStream *stream) {
     return stream->args[stream->index++];
 }
 
 
-// ----------------------------------------------------------------------
+// Returns the next argument from the stream without consuming it.
+static char* argstream_peek(ArgStream *stream) {
+    return stream->args[stream->index];
+}
+
+
+// Returns true if the stream contains at least one more element.
+static bool argstream_has_next(ArgStream *stream) {
+    return stream->index < stream->len;
+}
+
+
+// Returns true if the stream contains at least one more element and that
+// element has the form of an option value.
+static bool argstream_has_next_value(ArgStream *stream) {
+    if (argstream_has_next(stream)) {
+        char *next = argstream_peek(stream);
+        if (next[0] == '-') {
+            if (strlen(next) == 1 || isdigit(next[1])) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+// -------------------------------------------------------------------------
 // ArgList
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
 // Container for storing positional arguments parsed from the input stream.
@@ -588,9 +623,9 @@ static void arglist_print(ArgList *list) {
 }
 
 
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // ArgParser
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 
 // An ArgParser instance is responsible for storing registered options and
@@ -636,6 +671,11 @@ static ArgParser* argparser_new(char *helptext, char *version) {
 }
 
 
+// -------------------------------------------------------------------------
+// ArgParser: registering options.
+// -------------------------------------------------------------------------
+
+
 // Register a boolean option.
 static void argparser_add_flag(ArgParser *parser, char *name) {
     Option *opt = option_new_flag();
@@ -672,35 +712,29 @@ static void argparser_add_flag_list(ArgParser *parser, char *name) {
 
 
 // Register a string list option.
-static void argparser_add_str_list(ArgParser *parser, char *name) {
-    Option *opt = option_new_str_list();
+static void argparser_add_str_list(ArgParser *parser, char *name, bool greedy) {
+    Option *opt = option_new_str_list(greedy);
     map_add_splitkey(parser->options, name, opt);
 }
 
 
 // Register an integer list option.
-static void argparser_add_int_list(ArgParser *parser, char *name) {
-    Option *opt = option_new_int_list();
+static void argparser_add_int_list(ArgParser *parser, char *name, bool greedy) {
+    Option *opt = option_new_int_list(greedy);
     map_add_splitkey(parser->options, name, opt);
 }
 
 
 // Register a floating-point list option.
-static void argparser_add_float_list(ArgParser *parser, char *name) {
-    Option *opt = option_new_float_list();
+static void argparser_add_float_list(ArgParser *parser, char *name, bool greedy) {
+    Option *opt = option_new_float_list(greedy);
     map_add_splitkey(parser->options, name, opt);
 }
 
 
-// Register a command and its associated callback.
-static ArgParser* argparser_add_cmd(
-    ArgParser *parser, char *name, CmdCB callback, char *helptext
-) {
-    ArgParser *cmd_parser = argparser_new(helptext, NULL);
-    map_add_splitkey(parser->commands, name, cmd_parser);
-    map_add_splitkey(parser->callbacks, name, callback);
-    return cmd_parser;
-}
+// -------------------------------------------------------------------------
+// ArgParser: retrieving options.
+// -------------------------------------------------------------------------
 
 
 // Retrieve a registered Option instance.
@@ -711,6 +745,13 @@ static Option* argparser_get_opt(ArgParser *parser, char *name) {
         exit(1);
     }
     return opt;
+}
+
+
+// Returns true if the specified option was found while parsing.
+static bool argparser_found(ArgParser *parser, char *name) {
+    Option *opt = argparser_get_opt(parser, name);
+    return opt->found;
 }
 
 
@@ -739,6 +780,13 @@ static int argparser_get_int(ArgParser *parser, char *name) {
 static double argparser_get_float(ArgParser *parser, char *name) {
     Option *opt = argparser_get_opt(parser, name);
     return option_get_float(opt);
+}
+
+
+// Returns the length of the specified option's internal list of values.
+static int argparser_len_list(ArgParser *parser, char *name) {
+    Option *opt = argparser_get_opt(parser, name);
+    return opt->len;
 }
 
 
@@ -774,11 +822,9 @@ static double* argparser_get_float_list(ArgParser *parser, char *name) {
 }
 
 
-// Returns the length of the specified option's internal list of values.
-static int argparser_len_list(ArgParser *parser, char *name) {
-    Option *opt = argparser_get_opt(parser, name);
-    return opt->len;
-}
+// -------------------------------------------------------------------------
+// ArgParser: setting options.
+// -------------------------------------------------------------------------
 
 
 // Clear the specified option's internal list of values.
@@ -821,6 +867,11 @@ static void argparser_set_float(ArgParser *parser, char *name, double value) {
     Option *opt = argparser_get_opt(parser, name);
     option_set_float(opt, value);
 }
+
+
+// -------------------------------------------------------------------------
+// ArgParser: positional arguments.
+// -------------------------------------------------------------------------
 
 
 // Returns true if the parser has found one or more positional arguments.
@@ -869,6 +920,22 @@ static double* argparser_get_args_as_floats(ArgParser *parser) {
 }
 
 
+// -------------------------------------------------------------------------
+// ArgParser: commands.
+// -------------------------------------------------------------------------
+
+
+// Register a command and its associated callback.
+static ArgParser* argparser_add_cmd(
+    ArgParser *parser, char *name, CmdCB callback, char *helptext
+) {
+    ArgParser *cmd_parser = argparser_new(helptext, NULL);
+    map_add_splitkey(parser->commands, name, cmd_parser);
+    map_add_splitkey(parser->callbacks, name, callback);
+    return cmd_parser;
+}
+
+
 // Returns true if the parser has found a command.
 static bool argparser_has_cmd(ArgParser *parser) {
     return parser->cmd_name != NULL;
@@ -887,56 +954,60 @@ static ArgParser* argparser_get_cmd_parser(ArgParser *parser) {
 }
 
 
-
-
-
-
-
-
+// -------------------------------------------------------------------------
+// ArgParser: parsing arguments.
+// -------------------------------------------------------------------------
 
 
 // Parse an option of the form --name=value or -n=value.
-static void argparser_parse_name_equals_value(
+static void argparser_parse_equals_option(
     ArgParser *parser, char *prefix, char *arg
 ) {
-    char *name;
-    char *value;
-    char *saveptr;
-    char *arg_cpy = strdup(arg);
+    char *name = strdup(arg);
+    *strchr(name, '=') = "\0";
+    char *value = strchr(arg, '=') + 1;
 
-    name = strtok_r(arg_cpy, "=", &saveptr);
-    value = strtok_r(NULL, "=", &saveptr);
-
-
-
-    free(arg_cpy);
-
-
-
-
-
-    char *key;
-    char *saveptr;
-    char *keystr_cpy = strdup(keystr);
-
-    key = strtok_r(keystr_cpy, " ", &saveptr);
-    while (key != NULL) {
-        map_add(map, key, value);
-        key = strtok_r(NULL, " ", &saveptr);
+    // Do we have the name of a registered option?
+    Option *opt = map_get(parser->options, name);
+    if (opt == NULL) {
+        fprintf(stderr, "Error: %s%s is not a recognised option.\n", prefix, name);
+        exit(1);
     }
 
-    free(keystr_cpy);
+    // Do we have multiple instances of a mono-valued option?
+    if (opt->mono && opt->found) {
+        fprintf(stderr, "Error: option %s%s can be set only once.\n", prefix, name);
+        exit(1);
+    }
+    opt->found = true;
 
+    // Boolean flags can never contain an equals sign.
+    if (opt->type == FLAG) {
+        fprintf(stderr, "Error: invalid format for boolean flag %s%s.\n", prefix, name);
+        exit(1);
+    }
+
+    // Check that a value has been supplied.
+    if (strlen(value) == 0) {
+        fprintf(stderr, "Error: missing argument for the %s%s option.\n", prefix, name);
+        exit(1);
+    }
+
+    option_try_set(opt, value);
+
+    // The map stores a copy of the name as its key so we can safely free
+    // the memory used by our duplicated argument string.
+    free(name);
 }
 
 
 // Parse a long-form option, i.e. an option beginning with a double dash.
-static void argparser_parse_longform(
+static void argparser_parse_long_option(
     ArgParser *parser, char *arg, ArgStream *stream
 ) {
     // Do we have an option of the form --name=value?
     if (strstr(arg, "=") != NULL) {
-        argparser_parse_name_equals_value(parser, "--", arg);
+        argparser_parse_equals_option(parser, "--", arg);
     }
 
     // Is the argument a registered option name?
@@ -948,11 +1019,33 @@ static void argparser_parse_longform(
             fprintf(stderr, "Error: option --%s can be set only once.\n", arg);
             exit(1);
         }
+        opt->found = true;
 
+        // If the option is a flag, store the boolean true.
+        if (opt->type == FLAG) {
+            option_set_flag(opt);
+        }
 
+        // Not a flag so check for a following option value.
+        else if (argstream_has_next_value(stream)) {
 
+            // Try to parse the argument as a value of the appropriate type.
+            option_try_set(opt, argstream_next(stream));
 
+            // If the option is a greedy list, keep trying to parse values
+            // until we run out of arguments.
+            if (opt->greedy) {
+                while (argstream_has_next_value(stream)) {
+                    option_try_set(opt, argstream_next(stream));
+                }
+            }
+        }
 
+        // We're missing a required option value.
+        else {
+            fprintf(stderr, "Error: missing argument for the --%s option.\n", arg);
+            exit(1);
+        }
     }
 
     // Is the argument the automatic --help flag?
@@ -972,6 +1065,66 @@ static void argparser_parse_longform(
     else {
         fprintf(stderr, "Error: --%s is not a recognised option.\n", arg);
         exit(1);
+    }
+}
+
+
+// Parse a short-form option, i.e. an option beginning with a single dash.
+static void argparser_parse_short_option(
+    ArgParser *parser, char *arg, ArgStream *stream
+) {
+    // Do we have an option of the form -n=value?
+    if (strstr(arg, "=") != NULL) {
+        argparser_parse_equals_option(parser, "-", arg);
+        return;
+    }
+
+    // We handle each character individually to support condensed options:
+    //    -abc foo bar
+    // is equivalent to:
+    //    -a foo -b bar -c
+    for (int i = 0; i < strlen(arg); i++) {
+
+        // Do we have the name of a registered option?
+        char key[] = {arg[i], 0};
+        Option *opt = map_get(parser->options, key);
+        if (opt == NULL) {
+            fprintf(stderr, "Error: -%s is not a recognised option.\n", key);
+            exit(1);
+        }
+
+        // Do we have multiple instances of a mono-valued option?
+        if (opt->mono && opt->found) {
+            fprintf(stderr, "Error: option -%s can be set only once.\n", key);
+            exit(1);
+        }
+        opt->found = true;
+
+        // If the option is a flag, store the boolean true.
+        if (opt->type == FLAG) {
+            option_set_flag(opt);
+        }
+
+        // Not a flag so check for a following option value.
+        else if (argstream_has_next_value(stream)) {
+
+            // Try to parse the argument as a value of the appropriate type.
+            option_try_set(opt, argstream_next(stream));
+
+            // If the option is a greedy list, keep trying to parse values
+            // until we run out of arguments.
+            if (opt->greedy) {
+                while (argstream_has_next_value(stream)) {
+                    option_try_set(opt, argstream_next(stream));
+                }
+            }
+        }
+
+        // We're missing a required option value.
+        else {
+            fprintf(stderr, "Error: missing argument for the -%s option.\n", key);
+            exit(1);
+        }
     }
 }
 
@@ -1004,7 +1157,7 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
 
         // Is the argument a long-form option or flag?
         else if (strncmp(arg, "--", 2) == 0) {
-            argparser_parse_longform(parser, arg + 2, stream);
+            argparser_parse_long_option(parser, arg + 2, stream);
         }
 
         // Is the argument a short-form option or flag? If the argument
@@ -1014,7 +1167,7 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
             if (strlen(arg) == 1 || isdigit(arg[1])) {
                 arglist_append(parser->arguments, arg);
             } else {
-                argparser_parse_shortform(parser, arg + 1, stream);
+                argparser_parse_short_option(parser, arg + 1, stream);
             }
         }
 
@@ -1057,273 +1210,213 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
         else {
             arglist_append(parser->arguments, arg);
         }
-
-////////////////////////////////////////////////////////////////////////////////
-        // Is the argument a long-form option or flag?
-        if (strncmp(arg, "--", 2) == 0) {
-
-            // Strip the prefix.
-            arg +=2;
-
-            // Is the argument a registered option name?
-            Option *option = OptionMap_get_by_name(parser->options, arg);
-            if (option != NULL) {
-
-                // If the option is a flag, store the boolean true.
-                if (option->type == FLAG) {
-                    option->bool_val = true;
-                }
-
-                // Otherwise, check for a following argument.
-                else if (ArgStream_has_next(stream)) {
-
-                    char *nextarg = ArgStream_next(stream);
-
-                    if (option->type == STRING) {
-                        option->str_val = nextarg;
-                    }
-                    else if (option->type == INTEGER) {
-                        option->int_val = try_str_to_int(nextarg);
-                    }
-                    else if (option->type == FLOAT) {
-                        option->float_val = try_str_to_double(nextarg);
-                    }
-                }
-
-                // No following argument, so print an error and exit.
-                else {
-                    fprintf(stderr, "Error: missing argument for the --%s option.\n", arg);
-                    exit(1);
-                }
-            }
-
-            // Else, is the argument the automatic --help flag?
-            else if (strcmp(arg, "help") == 0 && parser->helptext != NULL) {
-                puts(parser->helptext);
-                exit(0);
-            }
-
-            // Else, is the argument the automatic --version flag?
-            else if (strcmp(arg, "version") == 0 && parser->version != NULL) {
-                puts(parser->version);
-                exit(0);
-            }
-
-            // The argument is not a registered or automatic option.
-            // Print an error message and exit.
-            else {
-                fprintf(stderr, "Error: --%s is not a recognised option.\n", arg);
-                exit(1);
-            }
-        }
-
-        // Is the argument a short-form option or flag?
-        else if (arg[0] == '-') {
-
-            // If the argument consists of a sigle dash or a dash followed by a
-            // digit, treat it as a positional argument.
-            if (strlen(arg) == 1 || isdigit(arg[1])) {
-                ArgList_add(parser->arguments, arg);
-                continue;
-            }
-
-            // Examine each character individually to allow for condensed
-            // short-form arguments, i.e.
-            //     -a -b foo -c bar
-            // is equivalent to
-            //     -abc foo bar
-            for (unsigned long i = 1; i < strlen(arg); i++) {
-
-                // Is the character at index i a registered shortcut alias?
-                Option *option = OptionMap_get_by_alias(parser->options, arg[i]);
-                if (option == NULL) {
-                    fprintf(stderr, "Error: -%c is not a recognised option.\n", arg[i]);
-                    exit(1);
-                }
-
-                // If the option type is a flag, store the boolean true.
-                if (option->type == FLAG) {
-                    option->bool_val = true;
-                }
-
-                // Otherwise, check for a following argument.
-                else if (ArgStream_has_next(stream)) {
-
-                    char *nextarg = ArgStream_next(stream);
-
-                    if (option->type == STRING) {
-                        option->str_val = nextarg;
-                    }
-                    else if (option->type == INTEGER) {
-                        option->int_val = try_str_to_int(nextarg);
-                    }
-                    else if (option->type == FLOAT) {
-                        option->float_val = try_str_to_double(nextarg);
-                    }
-                }
-
-                // No following argument. Print an error message and exit.
-                else {
-                    fprintf(stderr, "Error: missing argument for the -%c option.\n", arg[i]);
-                    exit(1);
-                }
-            }
-        }
-////////////////////////////////////////////////////////////////////////////////
     }
 }
 
 
 // Parse an array of string arguments.
 static void argparser_parse(ArgParser *parser, int len, char *args[]) {
-
-    // Convert the input array into a stream.
     ArgStream *stream = argstream_new(len, args);
-
-    // Parse the stream.
     argparser_parse_stream(parser, stream);
-
-    // Free the memory associated with the stream.
     argstream_free(stream);
 }
 
 
+// -------------------------------------------------------------------------
+// ArgParser: utilities.
+// -------------------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
-
-
-// Prints an ArgParser instance to stdout for debugging.
-static void ArgParser_print(ArgParser *parser) {
-    OptionMap_print(parser->options);
-    puts("");
-    ArgList_print(parser->arguments);
-    puts("\nComand:");
-    if (ArgParser_has_cmd(parser)) {
-        printf("  %s\n", ArgParser_get_cmd(parser));
-    } else {
-        puts("  [none]");
-    }
+// Print a parser instance to stdout.
+static void argparser_print(ArgParser *parser) {
+    puts("parser!")
 }
 
 
-// ----------------------------------------------------------------------
+// -------------------------------------------------------------------------
 // Public Interface
-// ----------------------------------------------------------------------
-
-// The functions below constitute the public interface of the library.
-// For the most part they are simple wrappers for the corresponding
-// ArgParser functions defined above.
+// -------------------------------------------------------------------------
 
 
-ArgParser * clio_new(char *helptext, char *version) {
-    return ArgParser_new(helptext, version);
+ArgParser* ap_new(char *helptext, char *version) {
+    return argparser_new(helptext, version);
 }
 
 
-void clio_add_flag(ArgParser *parser, char *name, char *alias) {
-    ArgParser_add_flag(parser, name, alias == NULL ? 0 : alias[0]);
+void ap_free(ArgParser *parser) {
+    argparser_free(parser);
 }
 
 
-void clio_add_str(ArgParser *parser, char *name, char* def_value, char *alias) {
-    ArgParser_add_str_opt(parser, name, def_value, alias == NULL ? 0 : alias[0]);
+void ap_parse(ArgParser *parser, int len, char *args[]) {
+    argparser_parse(parser, len - 1, args + 1);
 }
 
 
-void clio_add_int(ArgParser *parser, char *name, int def_value, char *alias) {
-    ArgParser_add_int_opt(parser, name, def_value, alias == NULL ? 0 : alias[0]);
+void ap_add_flag(ArgParser *parser, char *name) {
+    argparser_add_flag(parser, name);
 }
 
 
-void clio_add_float(ArgParser *parser, char *name, double def_value, char *alias) {
-    ArgParser_add_float_opt(parser, name, def_value, alias == NULL ? 0 : alias[0]);
+void ap_add_str(ArgParser *parser, char *name, char* value) {
+    argparser_add_str(parser, name, value);
 }
 
 
-ArgParser * clio_add_cmd(ArgParser *parser, char *command, CmdCallback callback, char *helptext) {
-    return ArgParser_add_cmd(parser, command, callback, helptext);
+void ap_add_int(ArgParser *parser, char *name, int value) {
+    argparser_add_int(parser, name, value);
 }
 
 
-void clio_parse(ArgParser *parser, int argc, char **argv) {
-    ArgParser_parse(parser, argc - 1, argv + 1);
+void ap_add_float(ArgParser *parser, char *name, double value) {
+    argparser_add_float(parser, name, value);
 }
 
 
-bool clio_get_flag(ArgParser *parser, char *name) {
-    return ArgParser_get_flag(parser, name);
+void ap_add_flag_list(ArgParser *parser, char *name) {
+    argparser_add_flag_list(parser, name);
 }
 
 
-char * clio_get_str(ArgParser *parser, char *name) {
-    return ArgParser_get_str_opt(parser, name);
+void ap_add_str_list(ArgParser *parser, char *name, bool greedy) {
+    argparser_add_str_list(parser, name, greedy);
 }
 
 
-int clio_get_int(ArgParser *parser, char *name) {
-    return ArgParser_get_int_opt(parser, name);
+void ap_add_int_list(ArgParser *parser, char *name, bool greedy) {
+    argparser_add_int_list(parser, name, greedy);
 }
 
 
-double clio_get_float(ArgParser *parser, char *name) {
-    return ArgParser_get_float_opt(parser, name);
+void ap_add_float_list(ArgParser *parser, char *name, bool greedy) {
+    argparser_add_float_list(parser, name, greedy);
 }
 
 
-bool clio_has_args(ArgParser *parser) {
-    return ArgParser_has_args(parser);
+ArgParser* ap_add_cmd(ArgParser *parser, char *name, CmdCB cb, char *help) {
+    return argparser_add_cmd(parser, name, cb, help);
 }
 
 
-int clio_num_args(ArgParser *parser) {
-    return ArgParser_num_args(parser);
+bool ap_found(ArgParser *parser, char *name) {
+    return argparser_found(parser, name);
 }
 
 
-char ** clio_get_args(ArgParser *parser) {
-    return ArgParser_get_args(parser);
+bool ap_get_flag(ArgParser *parser, char *name) {
+    return argparser_get_flag(parser, name);
+}
+
+char* ap_get_str(ArgParser *parser, char *name) {
+    return argparser_get_str(parser, name);
 }
 
 
-int * clio_get_args_as_ints(ArgParser *parser) {
-    return ArgParser_get_args_as_ints(parser);
+int ap_get_int(ArgParser *parser, char *name) {
+    return argparser_get_int(parser, name);
 }
 
 
-double * clio_get_args_as_floats(ArgParser *parser) {
-    return ArgParser_get_args_as_floats(parser);
+double ap_get_float(ArgParser *parser, char *name) {
+    return argparser_get_float(parser, name);
 }
 
 
-bool clio_has_cmd(ArgParser *parser) {
-    return ArgParser_has_cmd(parser);
+bool* ap_get_flag_list(ArgParser *parser, char *name) {
+    return argparser_get_flag_list(parser, name);
 }
 
 
-char * clio_get_cmd(ArgParser *parser) {
-    return ArgParser_get_cmd(parser);
+char** ap_get_str_list(ArgParser *parser, char *name) {
+    return argparser_get_str_list(parser, name);
 }
 
 
-ArgParser * clio_get_cmd_parser(ArgParser *parser) {
-    return ArgParser_get_cmd_parser(parser);
+int* ap_get_int_list(ArgParser *parser, char *name) {
+    return argparser_get_int_list(parser, name);
 }
 
 
-void clio_free(ArgParser *parser) {
-    ArgParser_free(parser);
+double* ap_get_float_list(ArgParser *parser, char *name) {
+    return argparser_get_float_list(parser, name);
 }
 
 
-void clio_dump(ArgParser *parser) {
-    ArgParser_print(parser);
+int ap_len_list(ArgParser *parser, char *name) {
+    return argparser_len_list(parser, name);
+}
+
+
+void ap_clear_list(ArgParser *parser, char *name) {
+    argparser_clear_list(parser, name);
+}
+
+
+void ap_set_flag(ArgParser *parser, char *name) {
+    argparser_set_flag(parser, name);
+}
+
+
+void ap_unset_flag(ArgParser *parser, char *name) {
+    argparser_unset_flag(parser, name);
+}
+
+
+void ap_set_str(ArgParser *parser, char *name, char *value) {
+    argparser_set_str(parser, name, value);
+}
+
+
+void ap_set_int(ArgParser *parser, char *name, int value) {
+    argparser_set_int(parser, name, value);
+}
+
+
+void ap_set_float(ArgParser *parser, char *name, double value) {
+    argparser_set_float(parser, name, value);
+}
+
+
+bool ap_has_args(ArgParser *parser) {
+    return argparser_has_args(parser);
+}
+
+
+int ap_len_args(ArgParser *parser) {
+    return argparser_len_args(parser);
+}
+
+
+char** ap_get_args(ArgParser *parser) {
+    return argparser_get_args(parser);
+}
+
+
+int* ap_get_args_as_ints(ArgParser *parser) {
+    return argparser_get_args_as_ints(parser);
+}
+
+
+double* ap_get_args_as_floats(ArgParser *parser) {
+    return argparser_get_args_as_floats(parser);
+}
+
+
+bool ap_has_cmd(ArgParser *parser) {
+    return argparser_has_cmd(parser);
+}
+
+
+char* ap_get_cmd_name(ArgParser *parser) {
+    return argparser_get_cmd_name(parser);
+}
+
+
+ArgParser* ap_get_cmd_parser(ArgParser *parser) {
+    return argparser_get_cmd_parser(parser);
+}
+
+
+static void ap_print(ArgParser *parser) {
+    argparser_print(parser);
 }

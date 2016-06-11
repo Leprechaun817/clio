@@ -2,6 +2,8 @@
     Clio: a minimalist argument-parsing library designed for building elegant
     command line interfaces.
 
+    Clio is written in portable C99.
+
     Author: Darren Mulholland <darren@mulholland.xyz>
     License: Public Domain
     Version: 2.0.0.dev
@@ -10,83 +12,178 @@
 #pragma once
 #include <stdbool.h>
 
-// An ArgParser instance stores registered options and commands.
+
+// -------------------------------------------------------------------------
+// Types.
+// -------------------------------------------------------------------------
+
+// An ArgParser instance is responsible for storing registered options and
+// commands. Note that every registered command recursively receives an
+// ArgParser instance of its own. In theory commands can be stacked to any
+// depth, although in practice even two levels is confusing for users.
 typedef struct ArgParser ArgParser;
 
-// Initialize a new ArgParser instance.
-// Supplying help text activates the automatic --help flag, supplying a
-// version string activates the automatic --version flag. A NULL pointer can
-// be passed for either parameter.
-ArgParser * clio_new(char *helptext, char *version);
 
-// Registers a flag (a boolean option) and its single-character alias.
-// A NULL pointer can be passed for the alias parameter.
-void clio_add_flag(ArgParser *parser, char *name, char *alias);
+// -------------------------------------------------------------------------
+// ArgParser initialization and teardown.
+// -------------------------------------------------------------------------
 
-// Registers a string option and its single-character alias.
-// A NULL pointer can be passed for the alias parameter.
-void clio_add_str(ArgParser *parser, char *name, char* def_value, char *alias);
+// Initialize a new ArgParser instance. Supplying help text activates the
+// automatic --help flag, supplying a version string activates the automatic
+// --version flag. NULL can be passed for either parameter.
+ArgParser* ap_new(char *helptext, char *version);
 
-// Registers an integer option and its single-character alias.
-// A NULL pointer can be passed for the alias parameter.
-void clio_add_int(ArgParser *parser, char *name, int def_value, char *alias);
+// Free the memory associated with an ArgParser instance.
+void ap_free(ArgParser *parser);
 
-// Registers a floating-point option and its single-character alias.
-// A NULL pointer can be passed for the alias parameter.
-void clio_add_float(ArgParser *parser, char *name, double def_value, char *alias);
 
-// Registers a command and its associated callback function.
-// The callback should accept a pointer to an ArgParser instance and return void.
-ArgParser * clio_add_cmd(ArgParser *parser, char *command, void (*callback)(ArgParser *parser), char *helptext);
+// -------------------------------------------------------------------------
+// Parsing arguments.
+// -------------------------------------------------------------------------
 
-// Parses the supplied array of string pointers. The arguments are assumed to
-// be argc and argv as supplied to main(), i.e., the first element of the
-// array is assumed to be the application name and will be ignored.
-void clio_parse(ArgParser *parser, int argc, char **argv);
+// Parse an array of string arguments.
+void ap_parse(ArgParser *parser, int len, char *args[]);
 
-// Returns the value of the named flag.
-bool clio_get_flag(ArgParser *parser, char *name);
 
-// Returns the value of the named string option.
-char * clio_get_str(ArgParser *parser, char *name);
+// -------------------------------------------------------------------------
+// Registering options.
+// -------------------------------------------------------------------------
 
-// Returns the value of the named integer option.
-int clio_get_int(ArgParser *parser, char *name);
+// Register a boolean option.
+void ap_add_flag(ArgParser *parser, char *name);
 
-// Returns the value of the named floating-point option.
-double clio_get_float(ArgParser *parser, char *name);
+// Register a string option with a default value.
+void ap_add_str(ArgParser *parser, char *name, char* value);
+
+// Register an integer option with a default value.
+void ap_add_int(ArgParser *parser, char *name, int value);
+
+// Register a floating-point option with a default value.
+void ap_add_float(ArgParser *parser, char *name, double value);
+
+// Register a boolean list option.
+void ap_add_flag_list(ArgParser *parser, char *name);
+
+// Register a string list option.
+void ap_add_str_list(ArgParser *parser, char *name, bool greedy);
+
+// Register an integer list option.
+void ap_add_int_list(ArgParser *parser, char *name, bool greedy);
+
+// Register a floating-point list option.
+void ap_add_float_list(ArgParser *parser, char *name, bool greedy);
+
+
+// -------------------------------------------------------------------------
+// Retrieving option values.
+// -------------------------------------------------------------------------
+
+// Returns true if the specified option was found while parsing.
+bool ap_found(ArgParser *parser, char *name);
+
+// Returns the value of a boolean option.
+bool ap_get_flag(ArgParser *parser, char *name);
+
+// Returns the value of a string option.
+char* ap_get_str(ArgParser *parser, char *name);
+
+// Returns the value of an integer option.
+int ap_get_int(ArgParser *parser, char *name);
+
+// Returns the value of a floating-point option.
+double ap_get_float(ArgParser *parser, char *name);
+
+// Returns the length of a list-option's list of values.
+int ap_len_list(ArgParser *parser, char *name);
+
+// Returns a list-option's values as a freshly-allocated array of booleans.
+// The array's memory is not affected by calls to argparser_free().
+bool* ap_get_flag_list(ArgParser *parser, char *name);
+
+// Returns a list-option's values as a freshly-allocated array of string
+// pointers. The array's memory is not affected by calls to argparser_free().
+char** ap_get_str_list(ArgParser *parser, char *name);
+
+// Returns a list-option's values as a freshly-allocated array of integers.
+// The array's memory is not affected by calls to argparser_free().
+int* ap_get_int_list(ArgParser *parser, char *name);
+
+// Returns a list-option's values as a freshly-allocated array of doubles.
+// The array's memory is not affected by calls to argparser_free().
+double* ap_get_float_list(ArgParser *parser, char *name);
+
+
+// -------------------------------------------------------------------------
+// Setting option values.
+// -------------------------------------------------------------------------
+
+// Clear a list-option's list of values.
+void ap_clear_list(ArgParser *parser, char *name);
+
+// Set the specified boolean option to true. (Appends to list options.)
+void ap_set_flag(ArgParser *parser, char *name);
+
+// Set the specified boolean option to false. (Clears list options.)
+void ap_unset_flag(ArgParser *parser, char *name);
+
+// Set the value of the specified string option. (Appends to list options.)
+void ap_set_str(ArgParser *parser, char *name, char *value);
+
+// Set the value of the specified integer option. (Appends to list options.)
+void ap_set_int(ArgParser *parser, char *name, int value);
+
+// Set the value of the specified float option. (Appends to list options.)
+void ap_set_float(ArgParser *parser, char *name, double value);
+
+
+// -------------------------------------------------------------------------
+// Positional arguments.
+// -------------------------------------------------------------------------
 
 // Returns true if the parser has found one or more positional arguments.
-bool clio_has_args(ArgParser *parser);
+bool ap_has_args(ArgParser *parser);
 
 // Returns the number of positional arguments.
-int clio_num_args(ArgParser *parser);
+int ap_len_args(ArgParser *parser);
 
-// Returns the positional arguments as an array of string pointers.
-// The memory occupied by the array is not affected by calls to clio_free().
-char ** clio_get_args(ArgParser *parser);
+// Returns the positional arguments as a freshly-allocated array of string
+// pointers. The memory occupied by the returned array is not affected by
+// calls to argparser_free().
+char** ap_get_args(ArgParser *parser);
 
-// Attempts to parse and return the positional arguments as an array of
-// integers. Exits with an error message on failure.
-// The memory occupied by the array is not affected by calls to clio_free().
-int * clio_get_args_as_ints(ArgParser *parser);
+// Attempts to parse and return the positional arguments as a freshly-allocated
+// array of integers. Exits with an error message on failure. The memory
+// occupied by the returned array is not affected by calls to argparser_free().
+int* ap_get_args_as_ints(ArgParser *parser);
 
-// Attempts to parse and return the positional arguments as an array of
-// doubles. Exits with an error message on failure.
-// The memory occupied by the array is not affected by calls to clio_free().
-double * clio_get_args_as_floats(ArgParser *parser);
+// Attempts to parse and return the positional arguments as a freshly-allocated
+// array of doubles. Exits with an error message on failure. The memory
+// occupied by the returned array is not affected by calls to argparser_free().
+double* ap_get_args_as_ints(ArgParser *parser);
 
-// Returns true if the parser has identified a command.
-bool clio_has_cmd(ArgParser *parser);
 
-// Returns the command string, if the parser has identified a command.
-char * clio_get_cmd(ArgParser *parser);
+// -------------------------------------------------------------------------
+// Commands.
+// -------------------------------------------------------------------------
 
-// Returns the command parser instance, if the parser has identified a command.
-ArgParser * clio_get_cmd_parser(ArgParser *parser);
+// Register a command with its associated callback and helptext.
+ArgParser* ap_add_cmd(
+    ArgParser *parser, char *name, void (*cb)(ArgParser *parser), char *help
+);
 
-// Frees the memory associated with the specified ArgParser instance.
-void clio_free(ArgParser *parser);
+// Returns true if the parser has found a command.
+bool ap_has_cmd(ArgParser *parser);
 
-// Dumps an ArgParser instance to stdout for debugging.
-void clio_dump(ArgParser *parser);
+// Returns the command name, if the parser has found a command.
+char* ap_get_cmd_name(ArgParser *parser);
+
+// Returns the command's parser instance, if the parser has found a command.
+ArgParser* ap_get_cmd_parser(ArgParser *parser);
+
+
+// -------------------------------------------------------------------------
+// Utilities.
+// -------------------------------------------------------------------------
+
+// Print a parser instance to stdout.
+void ap_print(ArgParser *parser);
