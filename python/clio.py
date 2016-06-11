@@ -159,7 +159,7 @@ class ArgParser:
 
         lines.append("\nCommand:")
         if self.has_cmd():
-            lines.append("  %s" % self.get_cmd())
+            lines.append("  %s" % self.get_cmd_name())
         else:
             lines.append("  [none]")
 
