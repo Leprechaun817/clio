@@ -26,16 +26,12 @@ class ParserError(Exception):
 
 
 # Internal class for storing option data.
-#  * Type is one of 'bool', 'string', 'int', or 'float'.
-#  * A mono-valued option has a single value.
-#  * A poly-valued option assembles a list of values.
+#  * Option type is one of 'bool', 'string', 'int', or 'float'.
 #  * A 'greedy' list option attempts to parse multiple consecutive arguments.
 class Option:
 
     def __init__(self, type):
         self.type = type
-        self.mono = False
-        self.poly = False
         self.found = False
         self.greedy = False
         self.values = []
@@ -140,14 +136,8 @@ class ArgParser:
             else:
                 raise ParserError("argument index [%s] is out of bounds" % key)
         else:
-            option = self.options.get(key)
-            if option:
-                if option.mono:
-                    return option.values[0]
-                else:
-                    return option.values
-            else:
-                raise ParserError("'%s' is not a registered option" % key)
+            option = self._get_opt(key)
+            return option.value
 
     # List all options and arguments for debugging.
     def __str__(self):
@@ -156,10 +146,7 @@ class ArgParser:
         lines.append("Options:")
         if len(self.options):
             for name, option in sorted(self.options.items()):
-                if option.mono:
-                    lines.append("  %s: %s" % (name, self._get_mono_opt(name)))
-                else:
-                    lines.append("  %s: %s" % (name, self._get_poly_opt(name)))
+                lines.append("  %s: %s" % (name, option.values))
         else:
             lines.append("  [none]")
 
@@ -178,53 +165,151 @@ class ArgParser:
 
         return "\n".join(lines)
 
-    # Register a mono-valued option.
-    def _add_mono_opt(self, type, name, default):
+    # Print the parser's help text and exit.
+    def help(self):
+        sys.stdout.write(self.helptext + "\n")
+        sys.exit()
+
+    # ----------------------------------------------------------------------
+    # Registering options.
+    # ----------------------------------------------------------------------
+
+    # Register an option with a default value.
+    def _add_opt(self, type, name, default):
         option = Option(type)
-        option.mono = True
         option.append(default)
         for alias in name.split():
             self.options[alias] = option
 
-    # Register a boolean option.
+    # Register a boolean option with a default value of false.
     def add_flag(self, name):
-        self._add_mono_opt("bool", name, False)
+        self._add_opt("bool", name, False)
 
-    # Register a string option.
+    # Register a string option with a default value.
     def add_str(self, name, default):
-        self._add_mono_opt("string", name, default)
+        self._add_opt("string", name, default)
 
-    # Register an integer option.
+    # Register an integer option with a default value.
     def add_int(self, name, default):
-        self._add_mono_opt("int", name, default)
+        self._add_opt("int", name, default)
 
-    # Register a float option.
+    # Register a float option with a default value.
     def add_float(self, name, default):
-        self._add_mono_opt("float", name, default)
+        self._add_opt("float", name, default)
 
-    # Register a poly-valued option.
-    def _add_poly_opt(self, type, name, greedy):
+    # Register a list option.
+    def _add_list_opt(self, type, name, greedy):
         option = Option(type)
-        option.poly = True
         option.greedy = greedy
         for alias in name.split():
             self.options[alias] = option
 
     # Register a boolean list option.
     def add_flag_list(self, name):
-        self._add_poly_opt("bool", name, False)
+        self._add_list_opt("bool", name, False)
 
     # Register a string list option.
     def add_str_list(self, name, greedy=False):
-        self._add_poly_opt("string", name, greedy)
+        self._add_list_opt("string", name, greedy)
 
     # Register an integer list option.
     def add_int_list(self, name, greedy=False):
-        self._add_poly_opt("int", name, greedy)
+        self._add_list_opt("int", name, greedy)
 
     # Register a float list option.
     def add_float_list(self, name, greedy=False):
-        self._add_poly_opt("float", name, greedy)
+        self._add_list_opt("float", name, greedy)
+
+    # ----------------------------------------------------------------------
+    # Retrieving options.
+    # ----------------------------------------------------------------------
+
+    # Returns true if the specified option was found while parsing.
+    def found(self, name):
+        option = self._get_opt(name)
+        return option.found
+
+    # Returns the specified Option instance or raises an exception.
+    def _get_opt(self, name):
+        option = self.options.get(name)
+        if option:
+            return option
+        else:
+            raise ParserError("'%s' is not a registered option" % name)
+
+    # Returns the value of the specified option.
+    def get_flag(self, name):
+        return self._get_opt(name).value
+
+    # Returns the value of the specified option.
+    def get_str(self, name):
+        return self._get_opt(name).value
+
+    # Returns the value of the specified option.
+    def get_int(self, name):
+        return self._get_opt(name).value
+
+    # Returns the value of the specified option.
+    def get_float(self, name):
+        return self._get_opt(name).value
+
+    # Returns the length of the specified option's list of values.
+    def len_list(self, name):
+        return len(self._get_opt(name).values)
+
+    # Returns the values of the specified list-option.
+    def get_flag_list(self, name):
+        return self._get_opt(name).values
+
+    # Returns the values of the specified list-option.
+    def get_str_list(self, name):
+        return self._get_opt(name).values
+
+    # Returns the values of the specified list-option.
+    def get_int_list(self, name):
+        return self._get_opt(name).values
+
+    # Returns the values of the specified list-option.
+    def get_float_list(self, name):
+        return self._get_opt(name).values
+
+    # ----------------------------------------------------------------------
+    # Setting options.
+    # ----------------------------------------------------------------------
+
+    # Clears the specified option's internal list of values.
+    def clear_list(self, name):
+        option = self._get_opt(name)
+        option.clear()
+
+    # Appends a value to the specified option's internal list.
+    def _set_opt(self, name, value):
+        option = self._get_opt(name)
+        option.append(value)
+
+    # Appends a value to the specified option's internal list.
+    def set_flag(self, name, value):
+        option = self._get_opt(name)
+        option.append(value)
+
+    # Appends a value to the specified option's internal list.
+    def set_str(self, name, value):
+        option = self._get_opt(name)
+        option.append(value)
+
+    # Appends a value to the specified option's internal list.
+    def set_int(self, name, value):
+        option = self._get_opt(name)
+        option.append(value)
+
+    # Appends a value to the specified option's internal list.
+    def set_float(self, name, value):
+        option = self._get_opt(name)
+        option.append(value)
+
+    # ----------------------------------------------------------------------
+    # Commands.
+    # ----------------------------------------------------------------------
 
     # Register a command and its associated callback.
     def add_cmd(self, name, callback, helptext):
@@ -234,10 +319,63 @@ class ArgParser:
             self.callbacks[alias] = callback
         return parser
 
-    # Print the parser's help text and exit.
-    def help(self):
-        sys.stdout.write(self.helptext + "\n")
-        sys.exit()
+    # Returns true if the parser has found a registered command.
+    def has_cmd(self):
+        return self.cmd_name is not None
+
+    # Returns the command name, if the parser has found a command.
+    def get_cmd_name(self):
+        return self.cmd_name
+
+    # Returns the command's parser instance, if the parser has found a command.
+    def get_cmd_parser(self):
+        return self.cmd_parser
+
+    # ----------------------------------------------------------------------
+    # Positional arguments.
+    # ----------------------------------------------------------------------
+
+    # Returns true if at least one positional argument has been found.
+    def has_args(self):
+        return len(self.arguments) > 0
+
+    # Returns the length of the positional argument list.
+    def len_args(self):
+        return len(self.arguments)
+
+    # Returns the positional argument at the specified index.
+    def get_arg(self, index):
+        return self.arguments[index]
+
+    # Returns the positional arguments as a list of strings.
+    def get_args(self):
+        return self.arguments
+
+    # Convenience function: attempts to parse and return the positional
+    # arguments as a list of integers.
+    def get_args_as_ints(self):
+        args = []
+        for arg in self.arguments:
+            try:
+                args.append(int(arg))
+            except ValueError:
+                err("cannot parse '%s' as an integer" % arg)
+        return args
+
+    # Convenience function: attempts to parse and return the positional
+    # arguments as a list of floats.
+    def get_args_as_floats(self):
+        args = []
+        for arg in self.arguments:
+            try:
+                args.append(float(arg))
+            except ValueError:
+                err("cannot parse '%s' as a float" % arg)
+        return args
+
+    # ----------------------------------------------------------------------
+    # Parsing arguments.
+    # ----------------------------------------------------------------------
 
     # Parse a list of strings. We default to parsing the application's
     # command line arguments, skipping the application path.
@@ -321,7 +459,7 @@ class ArgParser:
             except ValueError:
                 err("cannot parse '%s' as a float" % arg)
         else:
-            raise ParserError("invalid argument type '%s'" % argtype)
+            raise ParserError("invalid option type '%s'" % argtype)
 
     # Parse an option of the form --name=value or -n=value.
     def _parse_equals_option(self, prefix, arg):
@@ -330,9 +468,6 @@ class ArgParser:
         option = self.options.get(name)
         if not option:
             err("%s%s is not a recognised option" % (prefix, name))
-
-        if option.mono and option.found:
-            err("option %s%s can be set only once" % (prefix, name))
         option.found = True
 
         if option.type == "bool":
@@ -353,15 +488,11 @@ class ArgParser:
         # Is the argument a registered option name?
         elif arg in self.options:
             option = self.options[arg]
-
-            # Do we have multiple instances of a mono-valued option?
-            if option.mono and option.found:
-                err("option --%s can be set only once" % arg)
             option.found = True
 
             # If the option is a flag, store the boolean true.
             if option.type == "bool":
-                self.set_flag(arg)
+                self.set_flag(arg, True)
 
             # Check for a following option value.
             elif stream.has_next_value():
@@ -409,19 +540,14 @@ class ArgParser:
         # is equivalent to:
         #   -a foo -b bar -c
         for char in arg:
-
             option = self.options.get(char)
             if not option:
                 err("-%s is not a recognised option" % char)
-
-            # Do we have multiple instances of a mono-valued option?
-            if option.mono and option.found:
-                err("option -%s can be set only once" % char)
             option.found = True
 
             # If the option is a flag, store the boolean true.
             if option.type == "bool":
-                self.set_flag(char)
+                self.set_flag(char, True)
 
             # Check for a following option value.
             elif stream.has_next_value():
@@ -440,163 +566,3 @@ class ArgParser:
             # We're missing a required option value.
             else:
                 err("missing argument for the -%s option" % char)
-
-    # Returns true if the specified option was found while parsing.
-    def found(self, name):
-        option = self.options.get(name)
-        if option:
-            return option.found
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Returns the value of the specified mono-valued option.
-    def _get_mono_opt(self, name):
-        option = self.options.get(name)
-        if option:
-            return option.values[0]
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Returns the value of the specified option.
-    def get_flag(self, name):
-        return self._get_mono_opt(name)
-
-    # Returns the value of the specified option.
-    def get_str(self, name):
-        return self._get_mono_opt(name)
-
-    # Returns the value of the specified option.
-    def get_int(self, name):
-        return self._get_mono_opt(name)
-
-    # Returns the value of the specified option.
-    def get_float(self, name):
-        return self._get_mono_opt(name)
-
-    # Returns the values of the specified poly-valued option.
-    def _get_poly_opt(self, name):
-        option = self.options.get(name)
-        if option:
-            return option.values
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Returns the values of the specified list-option.
-    def get_flag_list(self, name):
-        return self._get_poly_opt(name)
-
-    # Returns the values of the specified list-option.
-    def get_str_list(self, name):
-        return self._get_poly_opt(name)
-
-    # Returns the values of the specified list-option.
-    def get_int_list(self, name):
-        return self._get_poly_opt(name)
-
-    # Returns the values of the specified list-option.
-    def get_float_list(self, name):
-        return self._get_poly_opt(name)
-
-    # Returns the length of the specified option's list of values.
-    def len_list(self, name):
-        option = self.options.get(name)
-        if option:
-            return len(option.values)
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Clears the specified option's list of values.
-    def clear_list(self, name):
-        option = self.options.get(name)
-        if option:
-            option.clear()
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Sets the value of the specified option. (Appends to list options.)
-    def _set_opt(self, name, value):
-        option = self.options.get(name)
-        if option:
-            if option.mono:
-                option.values[0] = value
-            else:
-                option.append(value)
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Sets the specified flag to true. (Appends to list options.)
-    def set_flag(self, name):
-        return self._set_opt(name, True)
-
-    # Sets the specified flag to false. (Clears list options.)
-    def unset_flag(self, name):
-        option = self.options.get(name)
-        if option:
-            if option.mono:
-                option.values[0] = False
-            else:
-                option.clear()
-        else:
-            raise ParserError("'%s' is not a registered option" % name)
-
-    # Sets the value of the specified option. (Appends to list options.)
-    def set_str(self, name, value):
-        return self._set_opt(name, value)
-
-    # Sets the value of the specified option. (Appends to list options.)
-    def set_int(self, name, value):
-        return self._set_opt(name, value)
-
-    # Sets the value of the specified option. (Appends to list options.)
-    def set_float(self, name, value):
-        return self._set_opt(name, value)
-
-    # Returns true if at least one positional argument has been found.
-    def has_args(self):
-        return len(self.arguments) > 0
-
-    # Returns the length of the positional argument list.
-    def len_args(self):
-        return len(self.arguments)
-
-    # Returns the positional argument at the specified index.
-    def get_arg(self, index):
-        return self.arguments[index]
-
-    # Returns the positional arguments as a list of strings.
-    def get_args(self):
-        return self.arguments
-
-    # Convenience function: attempts to parse and return the positional
-    # arguments as a list of integers.
-    def get_args_as_ints(self):
-        args = []
-        for arg in self.arguments:
-            try:
-                args.append(int(arg))
-            except ValueError:
-                err("cannot parse '%s' as an integer" % arg)
-        return args
-
-    # Convenience function: attempts to parse and return the positional
-    # arguments as a list of floats.
-    def get_args_as_floats(self):
-        args = []
-        for arg in self.arguments:
-            try:
-                args.append(float(arg))
-            except ValueError:
-                err("cannot parse '%s' as a float" % arg)
-        return args
-
-    # Returns true if the parser has found a registered command.
-    def has_cmd(self):
-        return self.cmd_name is not None
-
-    # Returns the command name, if the parser has found a command.
-    def get_cmd_name(self):
-        return self.cmd_name
-
-    # Returns the command's parser instance, if the parser has found a command.
-    def get_cmd_parser(self):
-        return self.cmd_parser
