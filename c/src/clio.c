@@ -70,9 +70,9 @@ static double try_str_to_double(char *str) {
 
 
 // Duplicate a string.
-static char* strdup(char *str) {
+static char* str_dup(char *str) {
     size_t len = strlen(str) + 1;
-    char *copy = malloc(len)
+    char *copy = malloc(len);
     return copy ? memcpy(copy, str, len) : NULL;
 }
 
@@ -112,8 +112,8 @@ static void map_free(Map *map) {
 
     // Loop over all the entries in the map.
     for (int i = 0; i < map->len; i++) {
-        char *key = map->entries[i]->key;
-        void *value = map->entries[i]->value;
+        char *key = map->entries[i].key;
+        void *value = map->entries[i].value;
 
         // Free the memory occupied by the entry's key.
         free(key);
@@ -136,7 +136,7 @@ static void map_free(Map *map) {
         }
     }
 
-    free(freed_values)
+    free(freed_values);
     free(map->entries);
     free(map);
 }
@@ -160,11 +160,10 @@ static void map_add(Map *map, char *key, void *value) {
     if (map->len == map->cap) {
         map->cap *= 2;
         map->entries = realloc(map->entries, sizeof(MapEntry) * map->cap);
-        map->values = realloc(map->values, sizeof(void*) * map->cap);
     }
 
     // Make a copy of the key.
-    char *copiedkey = strdup(key);
+    char *copiedkey = str_dup(key);
 
     // Add a MapEntry instance to the map's entry list.
     map->entries[map->len++] = (MapEntry){.key = copiedkey, .value = value};
@@ -176,7 +175,7 @@ static void map_add(Map *map, char *key, void *value) {
 static void map_add_splitkey(Map *map, char *keystr, void *value) {
     char *key;
     char *saveptr;
-    char *keystr_cpy = strdup(keystr);
+    char *keystr_cpy = str_dup(keystr);
 
     key = strtok_r(keystr_cpy, " ", &saveptr);
     while (key != NULL) {
@@ -191,7 +190,7 @@ static void map_add_splitkey(Map *map, char *keystr, void *value) {
 // Test if a Map instance contains the specified key.
 static bool map_contains(Map *map, char *key) {
     for (int i = 0; i < map->len; i++) {
-        if (strcmp(key, map->entries[i]->key) == 0) {
+        if (strcmp(key, map->entries[i].key) == 0) {
             return true;
         }
     }
@@ -202,8 +201,8 @@ static bool map_contains(Map *map, char *key) {
 // Retrieve a value from a Map instance. Returns NULL if the key is not found.
 static void* map_get(Map *map, char *key) {
     for (int i = 0; i < map->len; i++) {
-        if (strcmp(key, map->entries[i]->key) == 0) {
-            return map->entries[i]->value;
+        if (strcmp(key, map->entries[i].key) == 0) {
+            return map->entries[i].value;
         }
     }
     return NULL;
@@ -255,6 +254,12 @@ static void option_free(Option *opt) {
 }
 
 
+// Callback for freeing an Option instance stored in a Map.
+static void option_free_cb(void *opt) {
+    option_free((Option*)opt);
+}
+
+
 // Clear an Option instance's internal list of values.
 static void option_clear(Option *opt) {
     opt->len = 0;
@@ -301,7 +306,7 @@ static void option_try_set(Option *opt, char *arg) {
     if (opt->type == STRING) {
         option_set_str(opt, arg);
     }
-    else if (opt->type == INT) {
+    else if (opt->type == INTEGER) {
         option_set_int(opt, try_str_to_int(arg));
     }
     else if (opt->type == FLOAT) {
@@ -333,7 +338,7 @@ static Option* option_new_flag() {
 
 // Initialize a string option with a default value.
 static Option* option_new_str(char *value) {
-    Option *opt = option_new(true);
+    Option *opt = option_new();
     opt->type = STRING;
     option_set_str(opt, value);
     return opt;
@@ -370,7 +375,7 @@ static Option* option_new_flag_list() {
 static Option* option_new_str_list(bool greedy) {
     Option *opt = option_new();
     opt->type = STRING;
-    option->greedy = greedy;
+    opt->greedy = greedy;
     return opt;
 }
 
@@ -379,7 +384,7 @@ static Option* option_new_str_list(bool greedy) {
 static Option* option_new_int_list(bool greedy) {
     Option *opt = option_new();
     opt->type = INTEGER;
-    option->greedy = greedy;
+    opt->greedy = greedy;
     return opt;
 }
 
@@ -388,7 +393,7 @@ static Option* option_new_int_list(bool greedy) {
 static Option* option_new_float_list(bool greedy) {
     Option *opt = option_new();
     opt->type = FLOAT;
-    option->greedy = greedy;
+    opt->greedy = greedy;
     return opt;
 }
 
@@ -621,6 +626,12 @@ static void argparser_free(ArgParser *parser) {
 }
 
 
+// Callback for freeing an ArgParser instance stored in a Map.
+static void argparser_free_cb(void *parser) {
+    argparser_free((ArgParser*)parser);
+}
+
+
 // Initialize a new ArgParser instance. Supplying help text activates the
 // automatic --help flag, supplying a version string activates the automatic
 // --version flag. NULL can be passed for either parameter.
@@ -628,8 +639,8 @@ static ArgParser* argparser_new(char *helptext, char *version) {
     ArgParser *parser = malloc(sizeof(ArgParser));
     parser->helptext = helptext;
     parser->version = version;
-    parser->options = map_new(option_free);
-    parser->commands = map_new(argparser_free);
+    parser->options = map_new(option_free_cb);
+    parser->commands = map_new(argparser_free_cb);
     parser->callbacks = map_new(NULL);
     parser->arguments = arglist_new();
     parser->cmd_name = NULL;
@@ -923,8 +934,8 @@ static ArgParser* argparser_get_cmd_parser(ArgParser *parser) {
 static void argparser_parse_equals_option(
     ArgParser *parser, char *prefix, char *arg
 ) {
-    char *name = strdup(arg);
-    *strchr(name, '=') = "\0";
+    char *name = str_dup(arg);
+    *strchr(name, '=') = '\0';
     char *value = strchr(arg, '=') + 1;
 
     // Do we have the name of a registered option?
@@ -1031,7 +1042,7 @@ static void argparser_parse_short_option(
     //    -abc foo bar
     // is equivalent to:
     //    -a foo -b bar -c
-    for (int i = 0; i < strlen(arg); i++) {
+    for (size_t i = 0; i < strlen(arg); i++) {
 
         // Do we have the name of a registered option?
         char key[] = {arg[i], 0};
@@ -1139,7 +1150,7 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
                     puts(cmd_parser->helptext);
                     exit(0);
                 } else {
-                    fprintf(stderr, "Error: '%s' is not a recognised command.\n", command);
+                    fprintf(stderr, "Error: '%s' is not a recognised command.\n", name);
                     exit(1);
                 }
             } else {
@@ -1171,7 +1182,9 @@ static void argparser_parse(ArgParser *parser, int len, char *args[]) {
 
 // Print a parser instance to stdout.
 static void argparser_print(ArgParser *parser) {
-    puts("parser!")
+    puts("parser!");
+
+    arglist_print(parser->arguments);
 }
 
 
@@ -1355,6 +1368,6 @@ ArgParser* ap_get_cmd_parser(ArgParser *parser) {
 }
 
 
-static void ap_print(ArgParser *parser) {
+void ap_print(ArgParser *parser) {
     argparser_print(parser);
 }

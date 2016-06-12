@@ -159,7 +159,7 @@ int* ap_get_args_as_ints(ArgParser *parser);
 // Attempts to parse and return the positional arguments as a freshly-allocated
 // array of doubles. Exits with an error message on failure. The memory
 // occupied by the returned array is not affected by calls to argparser_free().
-double* ap_get_args_as_ints(ArgParser *parser);
+double* ap_get_args_as_floats(ArgParser *parser);
 
 
 // -------------------------------------------------------------------------
