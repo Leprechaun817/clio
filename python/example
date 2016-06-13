@@ -12,7 +12,7 @@ def main():
     # We instantiate an argument parser, optionally supplying help text and a
     # version string. Supplying help text activates the automatic --help flag,
     # supplying a version string activates the automatic --version flag.
-    parser = clio.ArgParser("Usage: example...", "1.0.0")
+    parser = clio.ArgParser("Help!", "Version!")
 
     # Register a flag, --bool, with a single-character alias, -b. A flag is a
     # boolean option - it is either present (true) or absent (false).
@@ -26,13 +26,13 @@ def main():
     # An integer option requires a default value, here 123.
     parser.add_int("int", 123)
 
-    # Register an integer list, --intlist <arg>, with a single character alias,
-    # -i <arg>. A list option accepts multiple values.
-    parser.add_int_list("intlist i")
-
     # Register a float option, --float <arg>, without a single-character alias.
     # A float option requires a default value, here 1.0.
     parser.add_float("float", 1.0)
+
+    # Register an integer list, --intlist <arg>, with a single character alias,
+    # -i <arg>. A list option accepts multiple values.
+    parser.add_int_list("intlist i")
 
     # Register a 'greedy' float list, --floatlist <args>, with a single-
     # character alias, -f <args>. A list option accepts multiple values; a
@@ -41,7 +41,7 @@ def main():
 
     # Register a command 'foo', with an alias 'bar'. We need to supply the
     # command's help text and callback method.
-    cmd_parser = parser.add_cmd("foo bar", callback, "Usage: example foo...")
+    cmd_parser = parser.add_cmd("foo bar", callback, "Command!")
 
     # Registering a command returns a new ArgParser instance dedicated to
     # parsing the command's arguments. We can register as many flags and
@@ -62,9 +62,9 @@ def main():
     print(parser)
 
 
-# Callback method for the 'cmd' command. This method will be called if the
-# 'cmd' command is found. The method receives an ArgParser instance containing
-# the command's parsed arguments. Here we simply dump it to stdout.
+# Callback method for the 'foo' command. This method will be called if the
+# command is found. The method receives an ArgParser instance containing the
+# command's parsed arguments. Here we simply dump it to stdout.
 def callback(parser):
     print("------------ callback() ------------")
     print(parser)
