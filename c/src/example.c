@@ -7,76 +7,68 @@
 #include "clio.h"
 
 
-// Callback function for the 'cmd' command. The function receives a pointer
+// Callback function for the 'foo' command. The function receives a pointer
 // to an ArgParser instance containing the command's parsed arguments. Here
 // we simply dump the parser to stdout.
 void callback(ArgParser *parser) {
-    puts("---------- callback() ----------");
-    clio_dump(parser);
-    puts("................................\n");
+    puts("-------------------- callback() --------------------");
+    ap_print(parser);
+    puts("....................................................\n");
 }
 
 
-// Application entry point.
 int main(int argc, char **argv) {
 
-    // We instantiate an argument parser, optionally supplying help text
-    // and a version string. Supplying help text activates the automatic
-    // --help flag, supplying a version string activates the automatic
-    // --version flag.
-    ArgParser *parser = clio_new("Usage: example...", "1.0.0");
+    // We instantiate an argument parser, optionally supplying help text and a
+    // version string. Supplying help text activates the automatic --help flag,
+    // supplying a version string activates the automatic --version flag.
+    // We can pass NULL for either parameter.
+    ArgParser *parser = ap_new("Help!", "Version!");
 
-    // Register two flags, --bool1 and --bool2.
-    // The second flag has a single-character alias, -b.
-    // A flag is a boolean option - it is either present (true) or
-    // absent (false).
-    clio_add_flag(parser, "bool1", NULL);
-    clio_add_flag(parser, "bool2", "b");
+    // Register a flag, --bool, with a single-character alias, -b. A flag is a
+    // boolean option - it's either present (true) or absent (false).
+    ap_add_flag(parser, "bool b");
 
-    // Register two string options, --str1 <arg> and --str2 <arg>.
-    // The second option has a single-character alias, -s <arg>.
-    // Options require default values, here 'alice' and 'bob'.
-    clio_add_str(parser, "str1", "alice", NULL);
-    clio_add_str(parser, "str2", "bob", "s");
+    // Register a string option, --str <arg>, with a single-character alias,
+    // -s <arg>. A string argument requires a default value, here 'defval'.
+    ap_add_str(parser, "str s", "defval");
 
-    // Register two integer options, --int1 <arg> and --int2 <arg>.
-    // The second option has a single-character alias, -i <arg>.
-    // Options require default values, here 123 and 456.
-    clio_add_int(parser, "int1", 123, NULL);
-    clio_add_int(parser, "int2", 456, "i");
+    // Register an integer option, --int <arg>. An integer option requires a
+    // default value, here 123.
+    ap_add_int(parser, "int", 123);
 
-    // Register two floating point options, --float1 <arg> and --float2 <arg>.
-    // The second option has a single-character alias, -f <arg>.
-    // Options require default values, here 1.0 and 2.0.
-    clio_add_float(parser, "float1", 1.0, NULL);
-    clio_add_float(parser, "float2", 2.0, "f");
+    // Register a float option, --float <arg>. A float option requires a
+    // default value, here 1.0.
+    ap_add_float(parser, "float", 1.0);
 
-    // Register a command, 'cmd'.
-    // We need to specify the command's help text and callback method.
-    ArgParser *cmd_parser = clio_add_cmd(parser, "cmd", callback, "Usage: example cmd...");
+    // Register an integer list, --intlist <arg>, with a single character
+    // alias, -i <arg>. A list option accepts multiple values. The final
+    // parameter specifies that the option is not 'greedy'.
+    ap_add_int_list(parser, "intlist i", false);
 
-    // Registering a command returns a new ArgParser instance dedicated
-    // to parsing the command's arguments. We can register as many flags
-    // and options as we like on this sub-parser.
-    clio_add_flag(cmd_parser, "foo", NULL);
+    // Register a 'greedy' float list, --floatlist <args>, with a single-
+    // character alias, -f <args>. A list option accepts multiple values; a
+    // 'greedy' list attempts to parse multiple consecutive arguments.
+    ap_add_float_list(parser, "floatlist f", true);
 
-    // The command parser can safely reuse the parent parser's option names.
-    clio_add_str(cmd_parser, "str1", "ciara", NULL);
-    clio_add_str(cmd_parser, "str2", "dave", "s");
+    // Register a command 'foo', with an alias 'bar'. We need to supply the
+    // command's help text and callback method.
+    ArgParser *cmd_parser = ap_add_cmd(parser, "foo bar", callback, "Command!");
 
-    // Once all our options and commands have been registered we call
-    // clio_parse() on the root parser.
-    clio_parse(parser, argc, argv);
+    // Registering a command returns a new ArgParser instance dedicated to
+    // parsing the command's arguments. We can register as many flags and
+    // options as we like on this sub-parser. Note that the sub-parser can
+    // reuse the parent's option names without interference.
+    ap_add_flag(cmd_parser, "bool b");
+    ap_add_int(cmd_parser, "int i", 123);
 
-    // We can now retrieve our option and argument values from the parser instance
-    // using the range of accessor functions, e.g.
-    //
-    //  int value = clio_get_int(parser, "int1");
-    //
-    // Here we simply dump the parser to stdout.
-    clio_dump(parser);
+    // Once all our options and commands have been registered we can call the
+    // ap_parse() function with an array of argument strings. (Note that we
+    // only need to call ap_parse() on the root parser - command arguments
+    // are parsed automaically.)
+    ap_parse(parser, argc, argv);
 
-    // Calling clio_free() frees the memory associated with the parser and any
-    // associated command parsers.
-    clio_free(parser);
+    // We can now retrieve our option and argument values from the parser
+    // instance. Here we simply dump the parser to stdout.
+    ap_print(parser);
 }
