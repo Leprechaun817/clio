@@ -514,7 +514,7 @@ static double* option_get_float_list(Option *opt) {
 
 // Returns a freshly-allocated string representing an Option instance.
 static char* option_str(Option *opt) {
-    char *outstr = str_dup("");
+    char *tmpstr = str_dup("[");
 
     for (int i = 0; i < opt->len; i++) {
         char *valstr = NULL;
@@ -529,14 +529,17 @@ static char* option_str(Option *opt) {
             valstr = str("%f", opt->values[i].float_val);
         }
 
-        char *outstr_old = outstr;
+        char *tmpstr_old = tmpstr;
         char *format = (i == 0) ? "%s%s" : "%s, %s";
-        outstr = str(format, outstr_old, valstr);
+        tmpstr = str(format, tmpstr_old, valstr);
 
-        free(outstr_old);
+        free(tmpstr_old);
         free(valstr);
     }
 
+    char *outstr = str("%s%s", tmpstr, "]");
+    free(tmpstr);
+    
     return outstr;
 }
 
