@@ -41,10 +41,9 @@ void ap_free(ArgParser *parser);
 // Parsing arguments.
 // -------------------------------------------------------------------------
 
-// Parse an array of string arguments. Note that argc and argv are assumed
-// to be the application's command line arguments as supplied to main(), i.e.
-// the first element of the array is assumed to be the program name and will
-// be ignored.
+// Parse an array of string arguments. Note that the function's parameters
+// are assumed to be argc and argv as supplied to main(), i.e. the first
+// element of the array is assumed to be the program name and ignored.
 void ap_parse(ArgParser *parser, int argc, char *argv[]);
 
 

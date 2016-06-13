@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 
 // -------------------------------------------------------------------------
@@ -69,7 +70,32 @@ static double try_str_to_double(char *str) {
 }
 
 
-// Duplicate a string.
+// Print to an automatically-allocated string. Returns NULL if an encoding
+// error occurs or if sufficient memory cannot be allocated.
+char* str(char *fmt, ...) {
+    va_list args;
+
+    va_start(args, fmt);
+    int len = vsnprintf(NULL, 0, fmt, args);
+    if (len < 1) {
+        return NULL;
+    }
+    va_end(args);
+
+    char *string = malloc(len + 1);
+    if (string == NULL) {
+        return NULL;
+    }
+
+    va_start(args, fmt);
+    vsnprintf(string, len + 1, fmt, args);
+    va_end(args);
+
+    return string;
+}
+
+
+// Duplicate a string, automatically allocating memory for the copy.
 static char* str_dup(char *str) {
     size_t len = strlen(str) + 1;
     char *copy = malloc(len);
@@ -209,6 +235,18 @@ static void* map_get(Map *map, char *key) {
 }
 
 
+// Returns the key at the specified index.
+static char* map_key_at_index(Map *map, int i) {
+    return map->entries[i].key;
+}
+
+
+// Returns the value at the specified index.
+static void* map_value_at_index(Map *map, int i) {
+    return map->entries[i].value;
+}
+
+
 // -------------------------------------------------------------------------
 // Option Elements
 // -------------------------------------------------------------------------
@@ -331,7 +369,7 @@ static Option* option_new() {
 static Option* option_new_flag() {
     Option *opt = option_new();
     opt->type = FLAG;
-    option_set_flag(opt, true);
+    option_set_flag(opt, false);
     return opt;
 }
 
@@ -471,6 +509,35 @@ static double* option_get_float_list(Option *opt) {
         list[i] = opt->values[i].float_val;
     }
     return list;
+}
+
+
+// Returns a freshly-allocated string representing an Option instance.
+static char* option_str(Option *opt) {
+    char *outstr = str_dup("");
+
+    for (int i = 0; i < opt->len; i++) {
+        char *valstr = NULL;
+
+        if (opt->type == FLAG) {
+            valstr = str_dup(opt->values[i].bool_val ? "true" : "false");
+        } else if (opt->type == STRING) {
+            valstr = str_dup(opt->values[i].str_val);
+        } else if (opt->type == INTEGER) {
+            valstr = str("%i", opt->values[i].int_val);
+        } else if (opt->type == FLOAT) {
+            valstr = str("%f", opt->values[i].float_val);
+        }
+
+        char *outstr_old = outstr;
+        char *format = (i == 0) ? "%s%s" : "%s, %s";
+        outstr = str(format, outstr_old, valstr);
+
+        free(outstr_old);
+        free(valstr);
+    }
+
+    return outstr;
 }
 
 
@@ -1182,9 +1249,28 @@ static void argparser_parse(ArgParser *parser, int len, char *args[]) {
 
 // Print a parser instance to stdout.
 static void argparser_print(ArgParser *parser) {
-    puts("parser!");
+    puts("Options:");
+    if (parser->options->len > 0) {
+        for (int i = 0; i < parser->options->len; i++) {
+            char *name = map_key_at_index(parser->options, i);
+            Option *opt = map_value_at_index(parser->options, i);
+            char *optstr = option_str(opt);
+            printf("  %s: %s\n", name, optstr);
+            free(optstr);
+        }
+    } else {
+        puts("  [none]");
+    }
+    puts("");
 
     arglist_print(parser->arguments);
+
+    puts("\nCommand:");
+    if (argparser_has_cmd(parser)) {
+        printf("  %s\n", argparser_get_cmd_name(parser));
+    } else {
+        puts("  [none]");
+    }
 }
 
 
