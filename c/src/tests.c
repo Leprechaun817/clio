@@ -16,41 +16,41 @@
 
 
 void test_bool_option_empty() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool", NULL);
-    clio_parse(parser, 1, (char *[]){""});
-    assert(clio_get_flag(parser, "bool") == false);
-    clio_free(parser);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool");
+    ap_parse(parser, 1, (char *[]){""});
+    assert(ap_get_flag(parser, "bool") == false);
+    ap_free(parser);
     printf(".");
 }
 
 
 void test_bool_option_missing() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool", NULL);
-    clio_parse(parser, 3, (char *[]){"", "foo", "bar"});
-    assert(clio_get_flag(parser, "bool") == false);
-    clio_free(parser);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool");
+    ap_parse(parser, 3, (char *[]){"", "foo", "bar"});
+    assert(ap_get_flag(parser, "bool") == false);
+    ap_free(parser);
     printf(".");
 }
 
 
 void test_bool_option_longform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool", NULL);
-    clio_parse(parser, 2, (char *[]){"", "--bool"});
-    assert(clio_get_flag(parser, "bool") == true);
-    clio_free(parser);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool");
+    ap_parse(parser, 2, (char *[]){"", "--bool"});
+    assert(ap_get_flag(parser, "bool") == true);
+    ap_free(parser);
     printf(".");
 }
 
 
 void test_bool_option_shortform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool", "b");
-    clio_parse(parser, 2, (char *[]){"", "-b"});
-    assert(clio_get_flag(parser, "bool") == true);
-    clio_free(parser);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool b");
+    ap_parse(parser, 2, (char *[]){"", "-b"});
+    assert(ap_get_flag(parser, "bool") == true);
+    ap_free(parser);
     printf(".");
 }
 
@@ -61,37 +61,37 @@ void test_bool_option_shortform() {
 
 
 void test_string_option_empty() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_str(parser, "string", "default", NULL);
-    clio_parse(parser, 1, (char *[]){""});
-    assert(strcmp(clio_get_str(parser, "string"), "default") == 0);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_str(parser, "string", "default");
+    ap_parse(parser, 1, (char *[]){""});
+    assert(strcmp(ap_get_str(parser, "string"), "default") == 0);
     printf(".");
 }
 
 
 void test_string_option_missing() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_str(parser, "string", "default", NULL);
-    clio_parse(parser, 3, (char *[]){"", "foo", "bar"});
-    assert(strcmp(clio_get_str(parser, "string"), "default") == 0);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_str(parser, "string", "default");
+    ap_parse(parser, 3, (char *[]){"", "foo", "bar"});
+    assert(strcmp(ap_get_str(parser, "string"), "default") == 0);
     printf(".");
 }
 
 
 void test_string_option_longform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_str(parser, "string", "default", NULL);
-    clio_parse(parser, 3, (char *[]){"", "--string", "value"});
-    assert(strcmp(clio_get_str(parser, "string"), "value") == 0);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_str(parser, "string", "default");
+    ap_parse(parser, 3, (char *[]){"", "--string", "value"});
+    assert(strcmp(ap_get_str(parser, "string"), "value") == 0);
     printf(".");
 }
 
 
 void test_string_option_shortform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_str(parser, "string", "default", "s");
-    clio_parse(parser, 3, (char *[]){"", "-s", "value"});
-    assert(strcmp(clio_get_str(parser, "string"), "value") == 0);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_str(parser, "string s", "default");
+    ap_parse(parser, 3, (char *[]){"", "-s", "value"});
+    assert(strcmp(ap_get_str(parser, "string"), "value") == 0);
     printf(".");
 }
 
@@ -102,37 +102,37 @@ void test_string_option_shortform() {
 
 
 void test_int_option_empty() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_int(parser, "int", 101, NULL);
-    clio_parse(parser, 1, (char *[]){""});
-    assert(clio_get_int(parser, "int") == 101);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_int(parser, "int", 101);
+    ap_parse(parser, 1, (char *[]){""});
+    assert(ap_get_int(parser, "int") == 101);
     printf(".");
 }
 
 
 void test_int_option_missing() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_int(parser, "int", 101, NULL);
-    clio_parse(parser, 3, (char *[]){"", "foo", "bar"});
-    assert(clio_get_int(parser, "int") == 101);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_int(parser, "int", 101);
+    ap_parse(parser, 3, (char *[]){"", "foo", "bar"});
+    assert(ap_get_int(parser, "int") == 101);
     printf(".");
 }
 
 
 void test_int_option_longform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_int(parser, "int", 101, NULL);
-    clio_parse(parser, 3, (char *[]){"", "--int", "202"});
-    assert(clio_get_int(parser, "int") == 202);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_int(parser, "int", 101);
+    ap_parse(parser, 3, (char *[]){"", "--int", "202"});
+    assert(ap_get_int(parser, "int") == 202);
     printf(".");
 }
 
 
 void test_int_option_shortform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_int(parser, "int", 101, "i");
-    clio_parse(parser, 3, (char *[]){"", "-i", "202"});
-    assert(clio_get_int(parser, "int") == 202);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_int(parser, "int i", 101);
+    ap_parse(parser, 3, (char *[]){"", "-i", "202"});
+    assert(ap_get_int(parser, "int") == 202);
     printf(".");
 }
 
@@ -143,37 +143,37 @@ void test_int_option_shortform() {
 
 
 void test_float_option_empty() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_float(parser, "float", 1.1, NULL);
-    clio_parse(parser, 1, (char *[]){""});
-    assert(clio_get_float(parser, "float") == 1.1);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_float(parser, "float", 1.1);
+    ap_parse(parser, 1, (char *[]){""});
+    assert(ap_get_float(parser, "float") == 1.1);
     printf(".");
 }
 
 
 void test_float_option_missing() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_float(parser, "float", 1.1, NULL);
-    clio_parse(parser, 3, (char *[]){"", "foo", "bar"});
-    assert(clio_get_float(parser, "float") == 1.1);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_float(parser, "float", 1.1);
+    ap_parse(parser, 3, (char *[]){"", "foo", "bar"});
+    assert(ap_get_float(parser, "float") == 1.1);
     printf(".");
 }
 
 
 void test_float_option_longform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_float(parser, "float", 1.1, NULL);
-    clio_parse(parser, 3, (char *[]){"", "--float", "2.2"});
-    assert(clio_get_float(parser, "float") == 2.2);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_float(parser, "float", 1.1);
+    ap_parse(parser, 3, (char *[]){"", "--float", "2.2"});
+    assert(ap_get_float(parser, "float") == 2.2);
     printf(".");
 }
 
 
 void test_float_option_shortform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_float(parser, "float", 1.1, "f");
-    clio_parse(parser, 3, (char *[]){"", "-f", "2.2"});
-    assert(clio_get_float(parser, "float") == 2.2);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_float(parser, "float f", 1.1);
+    ap_parse(parser, 3, (char *[]){"", "-f", "2.2"});
+    assert(ap_get_float(parser, "float") == 2.2);
     printf(".");
 }
 
@@ -184,39 +184,39 @@ void test_float_option_shortform() {
 
 
 void test_multi_options_empty() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool1", NULL);
-    clio_add_flag(parser, "bool2", "b");
-    clio_add_str(parser, "string1", "default1", NULL);
-    clio_add_str(parser, "string2", "default2", "s");
-    clio_add_int(parser, "int1", 101, NULL);
-    clio_add_int(parser, "int2", 202, "i");
-    clio_add_float(parser, "float1", 1.1, NULL);
-    clio_add_float(parser, "float2", 2.2, "f");
-    clio_parse(parser, 1, (char *[]){""});
-    assert(clio_get_flag(parser, "bool1") == false);
-    assert(clio_get_flag(parser, "bool2") == false);
-    assert(strcmp(clio_get_str(parser, "string1"), "default1") == 0);
-    assert(strcmp(clio_get_str(parser, "string2"), "default2") == 0);
-    assert(clio_get_int(parser, "int1") == 101);
-    assert(clio_get_int(parser, "int2") == 202);
-    assert(clio_get_float(parser, "float1") == 1.1);
-    assert(clio_get_float(parser, "float2") == 2.2);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool1");
+    ap_add_flag(parser, "bool2 b");
+    ap_add_str(parser, "string1", "default1");
+    ap_add_str(parser, "string2 s", "default2");
+    ap_add_int(parser, "int1", 101);
+    ap_add_int(parser, "int2 i", 202);
+    ap_add_float(parser, "float1", 1.1);
+    ap_add_float(parser, "float2 f", 2.2);
+    ap_parse(parser, 1, (char *[]){""});
+    assert(ap_get_flag(parser, "bool1") == false);
+    assert(ap_get_flag(parser, "bool2") == false);
+    assert(strcmp(ap_get_str(parser, "string1"), "default1") == 0);
+    assert(strcmp(ap_get_str(parser, "string2"), "default2") == 0);
+    assert(ap_get_int(parser, "int1") == 101);
+    assert(ap_get_int(parser, "int2") == 202);
+    assert(ap_get_float(parser, "float1") == 1.1);
+    assert(ap_get_float(parser, "float2") == 2.2);
     printf(".");
 }
 
 
 void test_multi_options_longform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool1", NULL);
-    clio_add_flag(parser, "bool2", "b");
-    clio_add_str(parser, "string1", "default1", NULL);
-    clio_add_str(parser, "string2", "default2", "s");
-    clio_add_int(parser, "int1", 101, NULL);
-    clio_add_int(parser, "int2", 202, "i");
-    clio_add_float(parser, "float1", 1.1, NULL);
-    clio_add_float(parser, "float2", 2.2, "f");
-    clio_parse(parser, 15, (char *[]){
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool1");
+    ap_add_flag(parser, "bool2 b");
+    ap_add_str(parser, "string1", "default1");
+    ap_add_str(parser, "string2 s", "default2");
+    ap_add_int(parser, "int1", 101);
+    ap_add_int(parser, "int2 i", 202);
+    ap_add_float(parser, "float1", 1.1);
+    ap_add_float(parser, "float2 f", 2.2);
+    ap_parse(parser, 15, (char *[]){
         "",
         "--bool1",
         "--bool2",
@@ -227,29 +227,29 @@ void test_multi_options_longform() {
         "--float1", "3.3",
         "--float2", "4.4",
     });
-    assert(clio_get_flag(parser, "bool1") == true);
-    assert(clio_get_flag(parser, "bool2") == true);
-    assert(strcmp(clio_get_str(parser, "string1"), "value1") == 0);
-    assert(strcmp(clio_get_str(parser, "string2"), "value2") == 0);
-    assert(clio_get_int(parser, "int1") == 303);
-    assert(clio_get_int(parser, "int2") == 404);
-    assert(clio_get_float(parser, "float1") == 3.3);
-    assert(clio_get_float(parser, "float2") == 4.4);
+    assert(ap_get_flag(parser, "bool1") == true);
+    assert(ap_get_flag(parser, "bool2") == true);
+    assert(strcmp(ap_get_str(parser, "string1"), "value1") == 0);
+    assert(strcmp(ap_get_str(parser, "string2"), "value2") == 0);
+    assert(ap_get_int(parser, "int1") == 303);
+    assert(ap_get_int(parser, "int2") == 404);
+    assert(ap_get_float(parser, "float1") == 3.3);
+    assert(ap_get_float(parser, "float2") == 4.4);
     printf(".");
 }
 
 
 void test_multi_options_shortform() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool1", NULL);
-    clio_add_flag(parser, "bool2", "b");
-    clio_add_str(parser, "string1", "default1", NULL);
-    clio_add_str(parser, "string2", "default2", "s");
-    clio_add_int(parser, "int1", 101, NULL);
-    clio_add_int(parser, "int2", 202, "i");
-    clio_add_float(parser, "float1", 1.1, NULL);
-    clio_add_float(parser, "float2", 2.2, "f");
-    clio_parse(parser, 15, (char *[]){
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool1");
+    ap_add_flag(parser, "bool2 b");
+    ap_add_str(parser, "string1", "default1");
+    ap_add_str(parser, "string2 s", "default2");
+    ap_add_int(parser, "int1", 101);
+    ap_add_int(parser, "int2 i", 202);
+    ap_add_float(parser, "float1", 1.1);
+    ap_add_float(parser, "float2 f", 2.2);
+    ap_parse(parser, 15, (char *[]){
         "",
         "--bool1",
         "-b",
@@ -260,14 +260,14 @@ void test_multi_options_shortform() {
         "--float1", "3.3",
         "-f", "4.4",
     });
-    assert(clio_get_flag(parser, "bool1") == true);
-    assert(clio_get_flag(parser, "bool2") == true);
-    assert(strcmp(clio_get_str(parser, "string1"), "value1") == 0);
-    assert(strcmp(clio_get_str(parser, "string2"), "value2") == 0);
-    assert(clio_get_int(parser, "int1") == 303);
-    assert(clio_get_int(parser, "int2") == 404);
-    assert(clio_get_float(parser, "float1") == 3.3);
-    assert(clio_get_float(parser, "float2") == 4.4);
+    assert(ap_get_flag(parser, "bool1") == true);
+    assert(ap_get_flag(parser, "bool2") == true);
+    assert(strcmp(ap_get_str(parser, "string1"), "value1") == 0);
+    assert(strcmp(ap_get_str(parser, "string2"), "value2") == 0);
+    assert(ap_get_int(parser, "int1") == 303);
+    assert(ap_get_int(parser, "int2") == 404);
+    assert(ap_get_float(parser, "float1") == 3.3);
+    assert(ap_get_float(parser, "float2") == 4.4);
     printf(".");
 }
 
@@ -278,16 +278,16 @@ void test_multi_options_shortform() {
 
 
 void test_condensed_options() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_flag(parser, "bool", "b");
-    clio_add_str(parser, "string", "default", "s");
-    clio_add_int(parser, "int", 101, "i");
-    clio_add_float(parser, "float", 1.1, "f");
-    clio_parse(parser, 5, (char *[]){"", "-bsif", "value", "202", "2.2"});
-    assert(clio_get_flag(parser, "bool") == true);
-    assert(strcmp(clio_get_str(parser, "string"), "value") == 0);
-    assert(clio_get_int(parser, "int") == 202);
-    assert(clio_get_float(parser, "float") == 2.2);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_flag(parser, "bool b");
+    ap_add_str(parser, "string s", "default");
+    ap_add_int(parser, "int i", 101);
+    ap_add_float(parser, "float f", 1.1);
+    ap_parse(parser, 5, (char *[]){"", "-bsif", "value", "202", "2.2"});
+    assert(ap_get_flag(parser, "bool") == true);
+    assert(strcmp(ap_get_str(parser, "string"), "value") == 0);
+    assert(ap_get_int(parser, "int") == 202);
+    assert(ap_get_float(parser, "float") == 2.2);
     printf(".");
 }
 
@@ -298,38 +298,38 @@ void test_condensed_options() {
 
 
 void test_positional_args_empty() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_parse(parser, 1, (char *[]){""});
-    assert(clio_has_args(parser) == false);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_parse(parser, 1, (char *[]){""});
+    assert(ap_has_args(parser) == false);
     printf(".");
 }
 
 
 void test_positional_args() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_parse(parser, 3, (char *[]){"", "foo", "bar"});
-    assert(clio_has_args(parser) == true);
-    assert(clio_num_args(parser) == 2);
-    assert(strcmp(clio_get_args(parser)[0], "foo") == 0);
-    assert(strcmp(clio_get_args(parser)[1], "bar") == 0);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_parse(parser, 3, (char *[]){"", "foo", "bar"});
+    assert(ap_has_args(parser) == true);
+    assert(ap_len_args(parser) == 2);
+    assert(strcmp(ap_get_args(parser)[0], "foo") == 0);
+    assert(strcmp(ap_get_args(parser)[1], "bar") == 0);
     printf(".");
 }
 
 
 void test_positional_args_as_ints() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_parse(parser, 3, (char *[]){"", "1", "11"});
-    assert(clio_get_args_as_ints(parser)[0] == 1);
-    assert(clio_get_args_as_ints(parser)[1] == 11);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_parse(parser, 3, (char *[]){"", "1", "11"});
+    assert(ap_get_args_as_ints(parser)[0] == 1);
+    assert(ap_get_args_as_ints(parser)[1] == 11);
     printf(".");
 }
 
 
 void test_positional_args_as_floats() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_parse(parser, 3, (char *[]){"", "1.1", "11.1"});
-    assert(clio_get_args_as_floats(parser)[0] == 1.1);
-    assert(clio_get_args_as_floats(parser)[1] == 11.1);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_parse(parser, 3, (char *[]){"", "1.1", "11.1"});
+    assert(ap_get_args_as_floats(parser)[0] == 1.1);
+    assert(ap_get_args_as_floats(parser)[1] == 11.1);
     printf(".");
 }
 
@@ -340,9 +340,9 @@ void test_positional_args_as_floats() {
 
 
 void test_option_parsing_switch() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_parse(parser, 5, (char *[]){"", "foo", "--", "--bar", "--baz"});
-    assert(clio_num_args(parser) == 3);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_parse(parser, 5, (char *[]){"", "foo", "--", "--bar", "--baz"});
+    assert(ap_len_args(parser) == 3);
     printf(".");
 }
 
@@ -356,33 +356,33 @@ void callback(ArgParser *parser) {}
 
 
 void test_command_absent() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    clio_add_cmd(parser, "cmd", callback, "helptext");
-    clio_parse(parser, 1, (char *[]){""});
-    assert(clio_has_cmd(parser) == false);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ap_add_cmd(parser, "cmd", callback, "helptext");
+    ap_parse(parser, 1, (char *[]){""});
+    assert(ap_has_cmd(parser) == false);
     printf(".");
 }
 
 
 void test_command_present() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    ArgParser *cmd_parser = clio_add_cmd(parser, "cmd", callback, "helptext");
-    clio_parse(parser, 2, (char *[]){"", "cmd"});
-    assert(clio_has_cmd(parser) == true);
-    assert(strcmp(clio_get_cmd(parser), "cmd") == 0);
-    assert(clio_get_cmd_parser(parser) == cmd_parser);
+    ArgParser *parser = ap_new(NULL, NULL);
+    ArgParser *cmd_parser = ap_add_cmd(parser, "cmd", callback, "helptext");
+    ap_parse(parser, 2, (char *[]){"", "cmd"});
+    assert(ap_has_cmd(parser) == true);
+    assert(strcmp(ap_get_cmd_name(parser), "cmd") == 0);
+    assert(ap_get_cmd_parser(parser) == cmd_parser);
     printf(".");
 }
 
 
 void test_command_with_options() {
-    ArgParser *parser = clio_new(NULL, NULL);
-    ArgParser *cmd_parser = clio_add_cmd(parser, "cmd", callback, "helptext");
-    clio_add_flag(cmd_parser, "bool", NULL);
-    clio_add_str(cmd_parser, "string", "default", NULL);
-    clio_add_int(cmd_parser, "int", 101, NULL);
-    clio_add_float(cmd_parser, "float", 1.1, NULL);
-    clio_parse(parser, 10, (char *[]){
+    ArgParser *parser = ap_new(NULL, NULL);
+    ArgParser *cmd_parser = ap_add_cmd(parser, "cmd", callback, "helptext");
+    ap_add_flag(cmd_parser, "bool");
+    ap_add_str(cmd_parser, "string", "default");
+    ap_add_int(cmd_parser, "int", 101);
+    ap_add_float(cmd_parser, "float", 1.1);
+    ap_parse(parser, 10, (char *[]){
         "",
         "cmd",
         "foo", "bar",
@@ -390,14 +390,14 @@ void test_command_with_options() {
         "--int", "202",
         "--float", "2.2",
     });
-    assert(clio_has_cmd(parser) == true);
-    assert(strcmp(clio_get_cmd(parser), "cmd") == 0);
-    assert(clio_get_cmd_parser(parser) == cmd_parser);
-    assert(clio_has_args(cmd_parser) == true);
-    assert(clio_num_args(cmd_parser) == 2);
-    assert(strcmp(clio_get_str(cmd_parser, "string"), "value") == 0);
-    assert(clio_get_int(cmd_parser, "int") == 202);
-    assert(clio_get_float(cmd_parser, "float") == 2.2);
+    assert(ap_has_cmd(parser) == true);
+    assert(strcmp(ap_get_cmd_name(parser), "cmd") == 0);
+    assert(ap_get_cmd_parser(parser) == cmd_parser);
+    assert(ap_has_args(cmd_parser) == true);
+    assert(ap_len_args(cmd_parser) == 2);
+    assert(strcmp(ap_get_str(cmd_parser, "string"), "value") == 0);
+    assert(ap_get_int(cmd_parser, "int") == 202);
+    assert(ap_get_float(cmd_parser, "float") == 2.2);
     printf(".");
 }
 
@@ -407,8 +407,9 @@ void test_command_with_options() {
 // -------------------------------------------------------------------------
 
 
-int main(int argc, char **argv) {
+int main() {
     setbuf(stdout, NULL);
+    printf("Tests: ");
 
     test_bool_option_empty();
     test_bool_option_missing();
