@@ -25,31 +25,31 @@ int main(int argc, char **argv) {
     // We can pass NULL for either parameter.
     ArgParser *parser = ap_new("Help!", "Version!");
 
-    // Register a flag, --bool, with a single-character alias, -b. A flag is a
+    // Register a flag, --bopt, with a single-character alias, -b. A flag is a
     // boolean option - it's either present (true) or absent (false).
-    ap_add_flag(parser, "bool b");
+    ap_add_flag(parser, "bopt b");
 
-    // Register a string option, --str <arg>, with a single-character alias,
+    // Register a string option, --sopt <arg>, with a single-character alias,
     // -s <arg>. A string argument requires a default value, here 'defval'.
-    ap_add_str(parser, "str s", "defval");
+    ap_add_str(parser, "sopt s", "defval");
 
-    // Register an integer option, --int <arg>. An integer option requires a
+    // Register an integer option, --iopt <arg>. An integer option requires a
     // default value, here 123.
-    ap_add_int(parser, "int", 123);
+    ap_add_int(parser, "iopt", 123);
 
-    // Register a float option, --float <arg>. A float option requires a
-    // default value, here 1.0.
-    ap_add_float(parser, "float", 1.0);
+    // Register a float option, --fopt <arg>. A float option requires a default
+    // value, here 1.0.
+    ap_add_float(parser, "fopt", 1.0);
 
-    // Register an integer list, --intlist <arg>, with a single character
-    // alias, -i <arg>. A list option accepts multiple values. The final
-    // parameter specifies that the option is not 'greedy'.
-    ap_add_int_list(parser, "intlist i", false);
+    // Register an integer list, --ilist <arg>, with a single-character alias,
+    // -i <arg>. A list option accepts multiple values. The final parameter
+    // specifies that the option is not 'greedy'.
+    ap_add_int_list(parser, "ilist i", false);
 
-    // Register a 'greedy' float list, --floatlist <args>, with a single-
-    // character alias, -f <args>. A list option accepts multiple values; a
-    // 'greedy' list attempts to parse multiple consecutive arguments.
-    ap_add_float_list(parser, "floatlist f", true);
+    // Register a 'greedy' float list, --flist <args>, with a single-character
+    // alias, -f <args>. A list option accepts multiple values; a 'greedy' list
+    // attempts to parse multiple consecutive arguments.
+    ap_add_float_list(parser, "flist f", true);
 
     // Register a command 'foo', with an alias 'bar'. We need to supply the
     // command's help text and callback method.
@@ -59,8 +59,8 @@ int main(int argc, char **argv) {
     // parsing the command's arguments. We can register as many flags and
     // options as we like on this sub-parser. Note that the sub-parser can
     // reuse the parent's option names without interference.
-    ap_add_flag(cmd_parser, "bool b");
-    ap_add_int(cmd_parser, "int i", 123);
+    ap_add_flag(cmd_parser, "bopt b");
+    ap_add_int(cmd_parser, "iopt i", 123);
 
     // Once all our options and commands have been registered we can call the
     // ap_parse() function with an array of argument strings. (Note that we
