@@ -99,19 +99,19 @@ double ap_get_float(ArgParser *parser, char *name);
 int ap_len_list(ArgParser *parser, char *name);
 
 // Returns a list-option's values as a freshly-allocated array of booleans.
-// The array's memory is not affected by calls to argparser_free().
+// The array's memory is not affected by calls to ap_free().
 bool* ap_get_flag_list(ArgParser *parser, char *name);
 
 // Returns a list-option's values as a freshly-allocated array of string
-// pointers. The array's memory is not affected by calls to argparser_free().
+// pointers. The array's memory is not affected by calls to ap_free().
 char** ap_get_str_list(ArgParser *parser, char *name);
 
 // Returns a list-option's values as a freshly-allocated array of integers.
-// The array's memory is not affected by calls to argparser_free().
+// The array's memory is not affected by calls to ap_free().
 int* ap_get_int_list(ArgParser *parser, char *name);
 
 // Returns a list-option's values as a freshly-allocated array of doubles.
-// The array's memory is not affected by calls to argparser_free().
+// The array's memory is not affected by calls to ap_free().
 double* ap_get_float_list(ArgParser *parser, char *name);
 
 
@@ -147,17 +147,17 @@ int ap_len_args(ArgParser *parser);
 
 // Returns the positional arguments as a freshly-allocated array of string
 // pointers. The memory occupied by the returned array is not affected by
-// calls to argparser_free().
+// calls to ap_free().
 char** ap_get_args(ArgParser *parser);
 
 // Attempts to parse and return the positional arguments as a freshly-allocated
 // array of integers. Exits with an error message on failure. The memory
-// occupied by the returned array is not affected by calls to argparser_free().
+// occupied by the returned array is not affected by calls to ap_free().
 int* ap_get_args_as_ints(ArgParser *parser);
 
 // Attempts to parse and return the positional arguments as a freshly-allocated
 // array of doubles. Exits with an error message on failure. The memory
-// occupied by the returned array is not affected by calls to argparser_free().
+// occupied by the returned array is not affected by calls to ap_free().
 double* ap_get_args_as_floats(ArgParser *parser);
 
 
@@ -165,7 +165,8 @@ double* ap_get_args_as_floats(ArgParser *parser);
 // Commands.
 // -------------------------------------------------------------------------
 
-// Register a command with its associated callback and helptext.
+// Register a command with its associated callback and helptext. The callback
+// should accept an ArgParser instance as its sole parameter and return void.
 ArgParser* ap_add_cmd(
     ArgParser *parser, char *name, void (*cb)(ArgParser *parser), char *help
 );
