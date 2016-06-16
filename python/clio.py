@@ -67,13 +67,6 @@ class ArgStream:
     def peek(self):
         return self.args[self.index]
 
-    # Returns a list containing all the remaining arguments from the stream.
-    # This exhausts the stream.
-    def remainder(self):
-        remainder = self.args[self.index:]
-        self.index = self.length
-        return remainder
-
     # Returns true if the stream contains at least one more element.
     def has_next(self):
         return self.index < self.length
@@ -377,17 +370,18 @@ class ArgParser:
     # Parsing arguments.
     # ----------------------------------------------------------------------
 
-    # Parse a list of strings. We default to parsing the application's
-    # command line arguments, skipping the application path.
+    # Parse a list of string arguments. We default to parsing the command
+    # line arguments, skipping the application path.
     def parse(self, args=sys.argv[1:]):
+        self.parse_stream(ArgStream(args))
 
-        # Switch to turn off option parsing if we encounter a double dash, '--'.
-        # Everything following the '--' will be treated as a positional
+    # Parse a stream of string arguments.
+    def parse_stream(self, stream):
+
+        # Switch to turn off option parsing if we encounter a double dash,
+        # '--'. Everything following the '--' will be treated as a positional
         # argument.
         parsing = True
-
-        # Convert the input list into a stream.
-        stream = ArgStream(args)
 
         # Loop while we have arguments to process.
         while stream.has_next():
@@ -422,7 +416,7 @@ class ArgParser:
             elif arg in self.commands:
                 cmd_parser = self.commands[arg]
                 cmd_callback = self.callbacks[arg]
-                cmd_parser.parse(stream.remainder())
+                cmd_parser.parse_stream(stream)
                 cmd_callback(cmd_parser)
                 self.cmd_name = arg
                 self.cmd_parser = cmd_parser
