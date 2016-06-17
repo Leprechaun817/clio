@@ -1,6 +1,6 @@
 /*
-    Package clio is a minimalist argument-parsing library for creating elegant
-    command-line interfaces.
+    Package clio is a minimalist argument-parsing library designed for
+    building elegant command-line interfaces.
 */
 package clio
 
@@ -16,23 +16,34 @@ import (
 
 
 // Package version number.
-const Version = "1.0.0"
+const Version = "2.0.0.dev"
+
+
+// Print a message to stderr and exit with an error code.
+func exit(msg string) {
+    fmt.Fprintf(os.Stderr, "Error: %v.\n", msg)
+    os.Exit(1)
+}
+
+
+// -------------------------------------------------------------------------
+// Options
+// -------------------------------------------------------------------------
 
 
 // Enum for classifying option types. We use 'flag' as a synonym for boolean
 // options, i.e. options that are either present (true) or absent (false). All
 // other option types require an argument.
 const (
-    flagType = iota
-    strType
-    intType
-    floatType
+    flagOpt = iota
+    strOpt
+    intOpt
+    floatOpt
 )
 
 
-// An option can have a boolean, string, integer, or floating point value.
-type option struct {
-    optType int
+// Union combining all four valid types of option value.
+type optionValue struct {
     boolVal bool
     strVal string
     intVal int
@@ -40,25 +51,216 @@ type option struct {
 }
 
 
-// String returns a string representation of the option's value.
-func (opt *option) String() string {
-    var str string
-    switch opt.optType {
-    case flagType:
-        str = fmt.Sprintf("%v", opt.boolVal)
-    case strType:
-        str = opt.strVal
-    case intType:
-        str = fmt.Sprintf("%v", opt.intVal)
-    case floatType:
-        str = fmt.Sprintf("%v", opt.floatVal)
-    }
-    return str
+// Internal type for storing option data.
+type option struct {
+    optType int
+    found bool
+    greedy bool
+    values []optionValue
 }
 
 
-// Callback function for processing commands.
-type Callback func(*ArgParser)
+// Clear an option's internal list of values.
+func (opt *option) clear() {
+    opt.values = nil
+}
+
+
+// Append a value to a boolean option's internal list.
+func (opt *option) setFlag(value bool) {
+    opt.values = append(opt.values, optionValue{boolVal: value})
+}
+
+
+// Append a value to a string option's internal list.
+func (opt *option) setStr(value string) {
+    opt.values = append(opt.values, optionValue{strVal: value})
+}
+
+
+// Append a value to an integer option's internal list.
+func (opt *option) setInt(value int) {
+    opt.values = append(opt.values, optionValue{intVal: value})
+}
+
+
+// Append a value to a floating-point option's internal list.
+func (opt *option) setFloat(value float64) {
+    opt.values = append(opt.values, optionValue{floatVal: value})
+}
+
+
+// Try setting an option by parsing the value of a string argument. Exit
+// with an error message on failure.
+func (opt *option) trySet(arg string) {
+    switch opt.optType {
+
+    case strOpt:
+        opt.setStr(arg)
+
+    case intOpt:
+        intVal, err := strconv.ParseInt(arg, 0, 0)
+        if err != nil {
+            exit(fmt.Sprintf("cannot parse '%v' as an integer", arg))
+        }
+        opt.setInt(int(intVal))
+
+    case floatOpt:
+        floatVal, err := strconv.ParseFloat(arg, 64)
+        if err != nil {
+            exit(fmt.Sprintf("cannot parse '%v' as a float", arg))
+        }
+        opt.setFloat(floatVal)
+    }
+}
+
+
+// Initialize a boolean option with a default value.
+func newFlag(value bool) *option {
+    opt := &option{
+        optType: flagOpt,
+    }
+    opt.setFlag(value)
+    return opt
+}
+
+
+// Initialize a string option with a default value.
+func newStr(value string) *option {
+    opt := &option{
+        optType: strOpt,
+    }
+    opt.setStr(value)
+    return opt
+}
+
+
+// Initialize an integer option with a default value.
+func newInt(value int) *option {
+    opt := &option{
+        optType: intOpt,
+    }
+    opt.setInt(value)
+    return opt
+}
+
+
+// Initialize a floating-point option with a default value.
+func newFloat(value float64) *option {
+    opt := &option{
+        optType: floatOpt,
+    }
+    opt.setFloat(value)
+    return opt
+}
+
+
+// Initialize a boolean list option.
+func newFlagList() *option {
+    opt := &option{
+        optType: flagOpt,
+    }
+    return opt
+}
+
+
+// Initialize a string list option.
+func newStrList(greedy bool) *option {
+    opt := &option{
+        optType: strOpt,
+    }
+    opt.greedy = greedy
+    return opt
+}
+
+
+// Initialize an integer list option.
+func newIntList(greedy bool) *option {
+    opt := &option{
+        optType: intOpt,
+    }
+    opt.greedy = greedy
+    return opt
+}
+
+
+// Initialize a floating-point list option.
+func newFloatList(greedy bool) *option {
+    opt := &option{
+        optType: floatOpt,
+    }
+    opt.greedy = greedy
+    return opt
+}
+
+
+// Returns the value of a boolean option.
+func (opt *option) getFlag() bool {
+    return opt.values[len(opt.values) - 1].boolVal
+}
+
+
+// Returns the value of a string option.
+func (opt *option) getStr() string {
+    return opt.values[len(opt.values) - 1].strVal
+}
+
+
+// Returns the value of an integer option.
+func (opt *option) getInt() int {
+    return opt.values[len(opt.values) - 1].intVal
+}
+
+
+// Returns the value of a floating-point option.
+func (opt *option) getFloat() float64 {
+    return opt.values[len(opt.values) - 1].floatVal
+}
+
+
+// Returns a list option's values as a slice of booleans.
+func (opt *option) getFlagList() []bool {
+    values := make([]bool, 0, len(opt.values))
+    for _, optVal := range opt.values {
+        values = append(values, optVal.boolVal)
+    }
+    return values
+}
+
+
+// Returns a list option's values as a slice of strings.
+func (opt *option) getStrList() []string {
+    values := make([]string, 0, len(opt.values))
+    for _, optVal := range opt.values {
+        values = append(values, optVal.strVal)
+    }
+    return values
+}
+
+
+// Returns a list option's values as a slice of integers.
+func (opt *option) getIntList() []int {
+    values := make([]int, 0, len(opt.values))
+    for _, optVal := range opt.values {
+        values = append(values, optVal.intVal)
+    }
+    return values
+}
+
+
+// Returns a list option's values as a slice of floats.
+func (opt *option) getFloatList() []float64 {
+    values := make([]float64, 0, len(opt.values))
+    for _, optVal := range opt.values {
+        values = append(values, optVal.floatVal)
+    }
+    return values
+}
+
+
+// -------------------------------------------------------------------------
+// ArgStream
+// -------------------------------------------------------------------------
 
 
 // Makes a slice of string arguments available as a stream.
@@ -69,19 +271,13 @@ type argStream struct {
 }
 
 
-// Initializes a new argStream instance.
+// Initialize a new argStream instance.
 func newArgStream(args []string) *argStream {
     return &argStream{
         args: args,
         index: 0,
         length: len(args),
     }
-}
-
-
-// Returns true if the stream contains at least one more argument.
-func (stream *argStream) hasNext() bool {
-    return stream.index < stream.length
 }
 
 
@@ -98,18 +294,44 @@ func (stream *argStream) peek() string {
 }
 
 
-// Returns a slice containing all the remaining arguments from the stream.
-func (stream *argStream) remainder() []string {
-    return stream.args[stream.index:]
+// Returns true if the stream contains at least one more element.
+func (stream *argStream) hasNext() bool {
+    return stream.index < stream.length
 }
 
 
-// An ArgParser instance stores registered options and parsed command line
-// arguments.
-//
-// Note that every registered command recursively receives an ArgParser instance
-// of its own. In theory commands can be stacked to any depth, although in
-// practice even two levels is confusing for users and best avoided.
+// Returns true if the stream contains at least one more element and that
+// element has the form of an option value.
+func (stream *argStream) hasNextValue() bool {
+    if stream.hasNext() {
+        next := stream.peek()
+        if strings.HasPrefix(next, "-") {
+            if next == "-" || unicode.IsDigit([]rune(next)[1]) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true
+        }
+    }
+    return false
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser
+// -------------------------------------------------------------------------
+
+
+// Command callback.
+type cmdCallback func(*ArgParser)
+
+
+// An ArgParser instance is responsible for storing registered options and
+// commands. Note that every registered command recursively receives an
+// ArgParser instance of its own. In theory commands can be stacked to any
+// depth, although in practice even two levels is confusing for users.
 type ArgParser struct {
 
     // Help text for the application or command.
@@ -121,23 +343,20 @@ type ArgParser struct {
     // Stores option objects indexed by option name.
     options map[string]*option
 
-    // Stores option objects indexed by single-letter shortcut.
-    shortcuts map[rune]*option
-
-    // Stores command sub-parser instances indexed by command.
+    // Stores command sub-parser instances indexed by command name.
     commands map[string]*ArgParser
 
     // Stores command callbacks indexed by command.
-    callbacks map[string]Callback
+    callbacks map[string]cmdCallback
 
     // Stores positional arguments parsed from the input array.
     arguments []string
 
-    // Stores the command string, if a command is found.
-    command string
+    // Stores the command name, if a command is found while parsing.
+    cmdName string
 
     // Stores the command's parser instance, if a command is found.
-    commandParser *ArgParser
+    cmdParser *ArgParser
 }
 
 
@@ -147,95 +366,298 @@ func NewParser(helptext string, version string) *ArgParser {
         helptext: strings.TrimSpace(helptext),
         version: strings.TrimSpace(version),
         options: make(map[string]*option),
-        shortcuts: make(map[rune]*option),
         commands: make(map[string]*ArgParser),
-        callbacks: make(map[string]Callback),
-        arguments: make([]string, 0, 10),
+        callbacks: make(map[string]cmdCallback),
+        arguments: make([]string, 0),
     }
 }
 
 
-// AddFlag registers a flag (a boolean option) on a parser instance.
-// The caller can optionally specify a single-letter shortcut alias.
-func (parser *ArgParser) AddFlag(name string, alias ...rune) {
-    opt := option{
-        optType: flagType,
-        boolVal: false,
-    }
-    parser.options[name] = &opt
-    for _, c := range alias {
-        parser.shortcuts[c] = &opt
-    }
-}
+// -------------------------------------------------------------------------
+// ArgParser: registering options.
+// -------------------------------------------------------------------------
 
 
-// AddStrOpt registers a string option on a parser instance.
-// The caller can optionally specify a single-letter shortcut alias.
-func (parser *ArgParser) AddStrOpt(name string, defVal string, alias ...rune) {
-    opt := option{
-        optType: strType,
-        strVal: defVal,
-    }
-    parser.options[name] = &opt
-    for _, c := range alias {
-        parser.shortcuts[c] = &opt
+// AddFlag registers a boolean option.
+func (parser *ArgParser) AddFlag(name string) {
+    opt := newFlag(false)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
     }
 }
 
 
-// AddIntOpt registers an integer option on a parser instance.
-// The caller can optionally specify a single-letter shortcut alias.
-func (parser *ArgParser) AddIntOpt(name string, defVal int, alias ...rune) {
-    opt := option{
-        optType: intType,
-        intVal: defVal,
-    }
-    parser.options[name] = &opt
-    for _, c := range alias {
-        parser.shortcuts[c] = &opt
+// AddStr registers a string option with a default value.
+func (parser *ArgParser) AddStr(name string, value string) {
+    opt := newStr(value)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
     }
 }
 
 
-// AddFloatOpt registers a float option on a parser instance.
-// The caller can optionally specify a single-letter shortcut alias.
-func (parser *ArgParser) AddFloatOpt(name string, defVal float64, alias ...rune) {
-    opt := option{
-        optType: floatType,
-        floatVal: defVal,
-    }
-    parser.options[name] = &opt
-    for _, c := range alias {
-        parser.shortcuts[c] = &opt
+// AddInt registers an integer option with a default value.
+func (parser *ArgParser) AddInt(name string, value int) {
+    opt := newInt(value)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
     }
 }
 
 
-// AddCmd registers a command on a parser instance.
-func (parser *ArgParser) AddCmd(command string, callback Callback, helptext string) *ArgParser {
-    cmdParser := NewParser(helptext, "")
-    parser.commands[command] = cmdParser
-    parser.callbacks[command] = callback
+// AddFloat registers a floating-point option with a default value.
+func (parser *ArgParser) AddFloat(name string, value float64) {
+    opt := newFloat(value)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
+    }
+}
+
+
+// AddFlagList registers a boolean list option.
+func (parser *ArgParser) AddFlagList(name string) {
+    opt := newFlagList()
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
+    }
+}
+
+
+// AddStrList registers a string list option.
+func (parser *ArgParser) AddStrList(name string, greedy bool) {
+    opt := newStrList(greedy)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
+    }
+}
+
+
+// AddIntList registers an integer list option.
+func (parser *ArgParser) AddIntList(name string, greedy bool) {
+    opt := newIntList(greedy)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
+    }
+}
+
+
+// AddFloatList registers a floating-point list option.
+func (parser *ArgParser) AddFloatList(name string, greedy bool) {
+    opt := newFloatList(greedy)
+    for _, element := range strings.Split(name, " ") {
+        parser.options[element] = opt
+    }
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser: retrieving options.
+// -------------------------------------------------------------------------
+
+
+// Found returns true if the specified option was found while parsing.
+func (parser *ArgParser) Found(name string) bool {
+    return parser.options[name].found
+}
+
+
+// GetFlag returns the value of the specified boolean option.
+func (parser *ArgParser) GetFlag(name string) bool {
+    return parser.options[name].getFlag()
+}
+
+
+// GetStr returns the value of the specified string option.
+func (parser *ArgParser) GetStr(name string) string {
+    return parser.options[name].getStr()
+}
+
+
+// GetInt returns the value of the specified integer option.
+func (parser *ArgParser) GetInt(name string) int {
+    return parser.options[name].getInt()
+}
+
+
+// GetFloat returns the value of the specified floating-point option.
+func (parser *ArgParser) GetFloat(name string) float64 {
+    return parser.options[name].getFloat()
+}
+
+
+// LenList returns the length of the named option's internal list of values.
+func (parser *ArgParser) LenList(name string) int {
+    return len(parser.options[name].values)
+}
+
+
+// GetFlagList returns the named option's values as a slice of booleans.
+func (parser *ArgParser) GetFlagList(name string) []bool {
+    return parser.options[name].getFlagList()
+}
+
+
+// GetStrList returns the named option's values as a slice of strings.
+func (parser *ArgParser) GetStrList(name string) []string {
+    return parser.options[name].getStrList()
+}
+
+
+// GetIntList returns the named option's values as a slice of integers
+func (parser *ArgParser) GetIntList(name string) []int {
+    return parser.options[name].getIntList()
+}
+
+
+// GetFloatList returns the named option's values as a slice of floats.
+func (parser *ArgParser) GetFloatList(name string) []float64 {
+    return parser.options[name].getFloatList()
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser: setting options.
+// -------------------------------------------------------------------------
+
+
+// Clear clears the named option's internal list of values.
+func (parser *ArgParser) ClearList(name string) {
+    parser.options[name].clear()
+}
+
+
+// SetFlag appends a value to a boolean option's internal list.
+func (parser *ArgParser) SetFlag(name string, value bool) {
+    parser.options[name].setFlag(value)
+}
+
+
+// SetStr appends a value to a string option's internal list.
+func (parser *ArgParser) SetStr(name string, value string) {
+    parser.options[name].setStr(value)
+}
+
+
+// SetInt appends a value to an integer option's internal list.
+func (parser *ArgParser) SetInt(name string, value int) {
+    parser.options[name].setInt(value)
+}
+
+
+// SetFloat appends a value to a floating-point option's internal list.
+func (parser *ArgParser) SetFloat(name string, value float64) {
+    parser.options[name].setFloat(value)
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser: positional arguments.
+// -------------------------------------------------------------------------
+
+
+// HasArgs returns true if the parser has found one or more positional
+// arguments.
+func (parser *ArgParser) HasArgs() bool {
+    return len(parser.arguments) > 0
+}
+
+
+// LenArgs returns the number of positional arguments.
+func (parser *ArgParser) LenArgs() int {
+    return len(parser.arguments)
+}
+
+
+// GetArg returns the positional argument at the specified index.
+func (parser *ArgParser) GetArg(index int) string {
+    return parser.arguments[index]
+}
+
+
+// GetArgs returns the positional arguments as a slice of strings.
+func (parser *ArgParser) GetArgs() []string {
+    return parser.arguments
+}
+
+
+// GetArgsAsInts attempts to parse and return the positional arguments as a
+// slice of integers. The application will exit with an error message if any
+// of the arguments cannot be parsed as an integer.
+func (parser *ArgParser) GetArgsAsInts() []int {
+    ints := make([]int, 0)
+    for _, strArg := range parser.arguments {
+        intArg, err := strconv.ParseInt(strArg, 0, 0)
+        if err != nil {
+            exit(fmt.Sprintf("cannot parse '%v' as an integer", strArg))
+        }
+        ints = append(ints, int(intArg))
+    }
+    return ints
+}
+
+
+// GetArgsAsFloats attempts to parse and return the positional arguments as a
+// slice of floats. The application will exit with an error message if any
+// of the arguments cannot be parsed as a float.
+func (parser *ArgParser) GetArgsAsFloats() []float64 {
+    floats := make([]float64, 0)
+    for _, strArg := range parser.arguments {
+        floatArg, err := strconv.ParseFloat(strArg, 64)
+        if err != nil {
+            exit(fmt.Sprintf("cannot parse '%v' as a float", strArg))
+        }
+        floats = append(floats, floatArg)
+    }
+    return floats
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser: commands.
+// -------------------------------------------------------------------------
+
+
+// AddCmd registers a command, its help text, and its associated callback.
+func (parser *ArgParser) AddCmd(name string, cb func(*ArgParser), help string) *ArgParser {
+    cmdParser := NewParser(help, "")
+    for _, element := range strings.Split(name, " ") {
+        parser.commands[element] = cmdParser
+        parser.callbacks[element] = cb
+    }
     return cmdParser
 }
 
 
-// Help prints the parser's help text, then exits.
-func (parser *ArgParser) Help() {
-    fmt.Println(parser.helptext)
-    os.Exit(0)
+// HasCmd returns true if the parser has found a command.
+func (parser *ArgParser) HasCmd() bool {
+    return parser.cmdName != ""
 }
 
 
-// ParseArgs parses the specified slice of string arguments.
-func (parser *ArgParser) ParseArgs(args []string) {
+// GetCmd returns the command name, if the parser has found a command.
+func (parser *ArgParser) GetCmdName() string {
+    return parser.cmdName
+}
 
-    // Switch to turn off parsing if we encounter a -- argument.
-    // Everything following the -- will be treated as a positional argument.
+
+// GetCmdParser returns the command's parser instance, if a command was found.
+func (parser *ArgParser) GetCmdParser() *ArgParser {
+    return parser.cmdParser
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser: parsing arguments.
+// -------------------------------------------------------------------------
+
+
+// Parses a stream of string arguments.
+func (parser *ArgParser) parseStream(stream *argStream) {
+
+    // Switch to turn off option parsing if we encounter a double dash.
+    // Everything following the '--' will be treated as a positional
+    // argument.
     parsing := true
-
-    // Convert the input slice into a stream.
-    stream := newArgStream(args)
 
     // Loop while we have arguments to process.
     for stream.hasNext() {
@@ -250,7 +672,7 @@ func (parser *ArgParser) ParseArgs(args []string) {
             continue
         }
 
-        // If we encounter a -- argument, turn off parsing.
+        // If we encounter a -- argument, turn off option-parsing.
         if arg == "--" {
             parsing = false
             continue
@@ -258,168 +680,48 @@ func (parser *ArgParser) ParseArgs(args []string) {
 
         // Is the argument a long-form option or flag?
         if strings.HasPrefix(arg, "--") {
-
-            // Strip the -- prefix.
-            arg = arg[2:]
-
-            // Is the argument a registered option name?
-            if opt, ok := parser.options[arg]; ok {
-
-                // If the option is a flag, store the boolean true.
-                if opt.optType == flagType {
-                    opt.boolVal = true
-                    continue
-                }
-
-                // Not a flag, so check for a following argument.
-                if !stream.hasNext() {
-                    fmt.Fprintf(os.Stderr, "Error: missing argument for the --%v option.\n", arg)
-                    os.Exit(1)
-                }
-
-                // Fetch the argument from the stream and attempt to parse it.
-                nextarg := stream.next()
-
-                switch opt.optType {
-
-                case strType:
-                    opt.strVal = nextarg
-
-                case intType:
-                    intVal, err := strconv.ParseInt(nextarg, 0, 0)
-                    if err != nil {
-                        fmt.Fprintf(os.Stderr, "Error: cannot parse '%v' as an integer.\n", nextarg)
-                        os.Exit(1)
-                    }
-                    opt.intVal = int(intVal)
-
-                case floatType:
-                    floatVal, err := strconv.ParseFloat(nextarg, 64)
-                    if err != nil {
-                        fmt.Fprintf(os.Stderr, "Error: cannot parse '%v' as a float.\n", nextarg)
-                        os.Exit(1)
-                    }
-                    opt.floatVal = floatVal
-                }
-
-                // We have successfully parsed a long-form option with an
-                // argument. Move on to the next argument in the stream.
-                continue
-            }
-
-            // Is the argument the automatic --help command?
-            if arg == "help" && parser.helptext != "" {
-                fmt.Println(parser.helptext)
-                os.Exit(0)
-            }
-
-            // Is the argument the automatic --version command.
-            if arg == "version" && parser.version != "" {
-                fmt.Println(parser.version)
-                os.Exit(0)
-            }
-
-            // The argument is not a registered or automatic option.
-            // Print an error message and exit.
-            fmt.Fprintf(os.Stderr, "Error: --%v is not a recognised option.\n", arg)
-            os.Exit(1)
+            parser.parseLongOption(arg[2:], stream)
+            continue
         }
 
-        // Is the argument a short-form option or flag?
-        if strings.HasPrefix(arg, "-"){
-
-            // If the argument consists of a sigle dash or a dash followed by
-            // a digit, treat it as a positional argument.
+        // Is the argument a short-form option or flag? If the argument
+        // consists of a single dash or a dash followed by a digit, we treat
+        // it as a positional argument.
+        if strings.HasPrefix(arg, "-") {
             if arg == "-" || unicode.IsDigit([]rune(arg)[1]) {
                 parser.arguments = append(parser.arguments, arg)
-                continue
+            } else {
+                parser.parseShortOption(arg[1:], stream)
             }
-
-            // Examine each character individually to allow for condensed
-            // short-form arguments, i.e.
-            //     -a -b foo -c bar
-            // is equivalent to:
-            //     -abc foo bar
-            for _, c := range arg[1:] {
-
-                // Is the character a registered shortcut?
-                if opt, ok := parser.shortcuts[c]; ok {
-
-                    // If the option is a flag, store the boolean true.
-                    if opt.optType == flagType {
-                        opt.boolVal = true
-                        continue
-                    }
-
-                    // Not a flag, so check for a following argument.
-                    if !stream.hasNext() {
-                        fmt.Fprintf(os.Stderr, "Error: missing argument for the -%c option.\n", c)
-                        os.Exit(1)
-                    }
-
-                    // Fetch the argument from the stream and attempt to parse it.
-                    nextarg := stream.next()
-
-                    switch opt.optType {
-
-                    case strType:
-                        opt.strVal = nextarg
-
-                    case intType:
-                        intVal, err := strconv.ParseInt(nextarg, 0, 0)
-                        if err != nil {
-                            fmt.Fprintf(os.Stderr, "Error: cannot parse '%v' as an integer.\n", nextarg)
-                            os.Exit(1)
-                        }
-                        opt.intVal = int(intVal)
-
-                    case floatType:
-                        floatVal, err := strconv.ParseFloat(nextarg, 64)
-                        if err != nil {
-                            fmt.Fprintf(os.Stderr, "Error: cannot parse '%v' as a float.\n", nextarg)
-                            os.Exit(1)
-                        }
-                        opt.floatVal = floatVal
-                    }
-
-                    // We have successfully parsed a single short-form option.
-                    // Move on to the next short-form option in the block.
-                    continue
-                }
-
-                // Not a registered shortcut. Print an error and exit.
-                fmt.Fprintf(os.Stderr, "Error: -%c is not a recognised option.\n", c)
-                os.Exit(1)
-            }
-
-            // We have successfully parsed a block of short-form options.
-            // Move on to the next argument in the stream.
             continue
         }
 
         // Is the argument a registered command?
         if cmdParser, ok := parser.commands[arg]; ok {
-            cmdParser.ParseArgs(stream.remainder())
+            cmdParser.parseStream(stream)
             parser.callbacks[arg](cmdParser)
-            parser.command = arg
-            parser.commandParser = cmdParser
-            break
+            parser.cmdName = arg
+            parser.cmdParser = cmdParser
+            continue
         }
 
-        // Is the argument the automatic 'help' command?
+        // Is the argument the automatic 'help' command? The commands
+        //     $ app cmd --help
+        // and
+        //     $ app help cmd
+        // are functionally equivalent. Both will print the help text
+        // associated with the command.
         if arg == "help"{
             if stream.hasNext() {
-                command := stream.next()
-                if cmdParser, ok := parser.commands[command]; ok {
+                name := stream.next()
+                if cmdParser, ok := parser.commands[name]; ok {
                     fmt.Println(cmdParser.helptext)
                     os.Exit(0)
                 } else {
-                    fmt.Fprintf(os.Stderr, "Error: '%v' is not a recognised command.\n", command)
-                    os.Exit(1)
+                    exit(fmt.Sprintf("'%v' is not a recognised command", name))
                 }
             } else {
-                fmt.Fprintf(os.Stderr, "Error: the help command requires an argument.\n")
-                os.Exit(1)
+                exit("the help command requires an argument")
             }
         }
 
@@ -429,116 +731,166 @@ func (parser *ArgParser) ParseArgs(args []string) {
 }
 
 
+// ParseArgs parses a slice of string arguments.
+func (parser *ArgParser) ParseArgs(args []string) {
+    parser.parseStream(newArgStream(args))
+}
+
+
 // Parse parses the application's command line arguments.
 func (parser *ArgParser) Parse() {
     parser.ParseArgs(os.Args[1:])
 }
 
 
-// GetFlag returns true if the named flag was found.
-func (parser *ArgParser) GetFlag(name string) bool {
-    return parser.options[name].boolVal
-}
+// Parse a long-form option, i.e. an option beginning with a double dash.
+func (parser *ArgParser) parseLongOption(arg string, stream *argStream) {
 
-
-// GetStrOpt returns the value of the named option.
-func (parser *ArgParser) GetStrOpt(name string) string {
-    return parser.options[name].strVal
-}
-
-
-// GetIntOpt returns the value of the named option.
-func (parser *ArgParser) GetIntOpt(name string) int {
-    return parser.options[name].intVal
-}
-
-
-// GetFloatOpt returns the value of the named option.
-func (parser *ArgParser) GetFloatOpt(name string) float64 {
-    return parser.options[name].floatVal
-}
-
-
-// HasArgs returns true if the parser has identified one or more positional
-// arguments.
-func (parser *ArgParser) HasArgs() bool {
-    return len(parser.arguments) > 0
-}
-
-
-// NumArgs returns the number of positional arguments.
-func (parser *ArgParser) NumArgs() int {
-    return len(parser.arguments)
-}
-
-
-// GetArg returns the positional argument at the specified index.
-func (parser *ArgParser) GetArg(index int) string {
-    return parser.arguments[index]
-}
-
-
-// GetArgs returns the parser's positional arguments as a slice of strings.
-func (parser *ArgParser) GetArgs() []string {
-    return parser.arguments
-}
-
-
-// GetArgsAsInts attempts to parse and return the positional arguments as a
-// slice of integers. The application will exit with an error message if any
-// of the arguments cannot be parsed as an integer.
-func (parser *ArgParser) GetArgsAsInts() []int {
-    intList := make([]int, 0, 10)
-    for _, strArg := range parser.arguments {
-        intArg, err := strconv.ParseInt(strArg, 0, 0)
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Error: cannot parse '%v' as an integer.\n", strArg)
-            os.Exit(1)
-        }
-        intList = append(intList, int(intArg))
+    // Do we have an option of the form --name=value?
+    if strings.Contains(arg, "=") {
+        parser.parseEqualsOption("--", arg)
+        return
     }
-    return intList
-}
 
+    // Is the argument a registered option name?
+    if opt, ok := parser.options[arg]; ok {
+        opt.found = true
 
-// GetArgsAsFloats attempts to parse and return the positional arguments as a
-// slice of floats. The application will exit with an error message if any
-// of the arguments cannot be parsed as a float.
-func (parser *ArgParser) GetArgsAsFloats() []float64 {
-    floatList := make([]float64, 0, 10)
-    for _, strArg := range parser.arguments {
-        floatArg, err := strconv.ParseFloat(strArg, 64)
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "Error: cannot parse '%v' as a float.\n", strArg)
-            os.Exit(1)
+        // If the option is a flag, store the boolean true.
+        if opt.optType == flagOpt {
+            opt.setFlag(true)
+            return
         }
-        floatList = append(floatList, floatArg)
+
+        // Not a flag, so check for a following option value.
+        if !stream.hasNextValue() {
+            exit(fmt.Sprintf("missing argument for the --%v option", arg))
+        }
+
+        // Try to parse the argument as a value of the appropriate type.
+        opt.trySet(stream.next())
+
+        // If the option is a greedy list, keep trying to parse values
+        // until we run out of arguments.
+        if opt.greedy {
+            for stream.hasNextValue() {
+                opt.trySet(stream.next())
+            }
+        }
+        return
     }
-    return floatList
+
+    // Is the argument the automatic --help flag?
+    if arg == "help" && parser.helptext != "" {
+        fmt.Println(parser.helptext)
+        os.Exit(0)
+    }
+
+    // Is the argument the automatic --version flag?
+    if arg == "version" && parser.version != "" {
+        fmt.Println(parser.version)
+        os.Exit(0)
+    }
+
+    // The argument is not a registered or automatic option name.
+    // Print an error message and exit.
+    exit(fmt.Sprintf("--%v is not a recognised option", arg))
 }
 
 
-// HasCmd returns true if the parser has identified a command.
-func (parser *ArgParser) HasCmd() bool {
-    return parser.command != ""
+// Parse a short-form option, i.e. an option beginning with a single dash.
+func (parser *ArgParser) parseShortOption(arg string, stream *argStream) {
+
+    // Do we have an option of the form -n=value?
+    if strings.Contains(arg, "=") {
+        parser.parseEqualsOption("-", arg)
+        return
+    }
+
+    // We handle each character individually to support condensed options:
+    //    -abc foo bar
+    // is equivalent to:
+    //    -a foo -b bar -c
+    for _, char := range arg {
+        name := string(char)
+
+        // Do we have the name of a registered option?
+        if opt, ok := parser.options[name]; ok {
+            opt.found = true
+
+            // If the option is a flag, store the boolean true.
+            if opt.optType == flagOpt {
+                opt.setFlag(true)
+                continue
+            }
+
+            // Not a flag, so check for a following option value.
+            if !stream.hasNextValue() {
+                exit(fmt.Sprintf("missing argument for the -%v option", name))
+            }
+
+            // Try to parse the argument as a value of the appropriate type.
+            opt.trySet(stream.next())
+
+            // If the option is a greedy list, keep trying to parse values
+            // until we run out of arguments.
+            if opt.greedy {
+                for stream.hasNextValue() {
+                    opt.trySet(stream.next())
+                }
+            }
+
+        // Not a registered option. Print a error message and exit.
+        } else {
+            exit(fmt.Sprintf("-%v is not a recognised option", name))
+        }
+    }
 }
 
 
-// GetCmd returns the command string, if a command was found.
-func (parser *ArgParser) GetCmd() string {
-    return parser.command
+// Parse an option of the form --name=value or -n=value.
+func (parser *ArgParser) parseEqualsOption(prefix string, arg string) {
+    split := strings.SplitN(arg, "=", 2)
+    name := split[0]
+    value := split[1]
+
+    // Do we have the name of a registered option?
+    opt, ok := parser.options[name]
+    if !ok {
+        exit(fmt.Sprintf("%s%s is not a recognised option", prefix, name))
+    }
+    opt.found = true
+
+    // Boolean flags can never contain an equals sign.
+    if opt.optType == flagOpt {
+        exit(fmt.Sprintf("invalid format for boolean flag %s%s", prefix, name))
+    }
+
+    // Check that a value has been supplied.
+    if value == "" {
+        exit(fmt.Sprintf("missing argument for the %s%s option", prefix, name))
+    }
+
+    // Try to parse the argument as a value of the appropriate type.
+    opt.trySet(value)
 }
 
 
-// GetCmdParser returns the command's parser instance, if a command was found.
-func (parser *ArgParser) GetCmdParser() *ArgParser {
-    return parser.commandParser
+// -------------------------------------------------------------------------
+// ArgParser: utilities.
+// -------------------------------------------------------------------------
+
+
+// Help prints the parser's help text, then exits.
+func (parser *ArgParser) Help() {
+    fmt.Println(parser.helptext)
+    os.Exit(0)
 }
 
 
 // String returns a string representation of the parser instance.
 func (parser *ArgParser) String() string {
-    lines := make([]string, 0, 10)
+    lines := make([]string, 0)
 
     lines = append(lines, "Options:")
     if len(parser.options) > 0 {
@@ -548,7 +900,21 @@ func (parser *ArgParser) String() string {
         }
         sort.Strings(names)
         for _, name := range names {
-            lines = append(lines, fmt.Sprintf("  %v: %v", name, parser.options[name]))
+            var valstr string
+            opt := parser.options[name]
+
+            switch opt.optType {
+            case flagOpt:
+                valstr = fmt.Sprintf("%v", opt.getFlagList())
+            case strOpt:
+                valstr = fmt.Sprintf("%v", opt.getStrList())
+            case intOpt:
+                valstr = fmt.Sprintf("%v", opt.getIntList())
+            case floatOpt:
+                valstr = fmt.Sprintf("%v", opt.getFloatList())
+            }
+
+            lines = append(lines, fmt.Sprintf("  %v: %v", name, valstr))
         }
     } else {
         lines = append(lines, "  [none]")
@@ -565,7 +931,7 @@ func (parser *ArgParser) String() string {
 
     lines = append(lines, "\nCommand:")
     if parser.HasCmd() {
-        lines = append(lines, fmt.Sprintf("  %v", parser.GetCmd()))
+        lines = append(lines, fmt.Sprintf("  %v", parser.GetCmdName()))
     } else {
         lines = append(lines, "  [none]")
     }
