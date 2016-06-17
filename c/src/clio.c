@@ -196,8 +196,8 @@ static void map_add(Map *map, char *key, void *value) {
 }
 
 
-// Split the specified keystring into multiple keys and add a separate key-value
-// pair to the map for each key.
+// Split the specified keystring into multiple keys and add a separate
+// key-value pair to the map for each key.
 static void map_add_splitkey(Map *map, char *keystr, void *value) {
     char *key;
     char *saveptr;
@@ -248,7 +248,7 @@ static void* map_value_at_index(Map *map, int i) {
 
 
 // -------------------------------------------------------------------------
-// Option Elements
+// Options
 // -------------------------------------------------------------------------
 
 
@@ -418,7 +418,7 @@ static Option* option_new_str_list(bool greedy) {
 }
 
 
-// Initialize a integer list option.
+// Initialize an integer list option.
 static Option* option_new_int_list(bool greedy) {
     Option *opt = option_new();
     opt->type = INTEGER;
@@ -539,7 +539,7 @@ static char* option_str(Option *opt) {
 
     char *outstr = str("%s%s", tmpstr, "]");
     free(tmpstr);
-    
+
     return outstr;
 }
 
