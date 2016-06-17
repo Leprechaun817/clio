@@ -930,6 +930,12 @@ static int argparser_len_args(ArgParser *parser) {
 }
 
 
+// Returns the positional argument at the specified index.
+static char* argparser_get_arg(ArgParser *parser, int index) {
+    return parser->arguments->args[index];
+}
+
+
 // Returns the positional arguments as a freshly-allocated array of string
 // pointers. The memory occupied by the returned array is not affected by
 // calls to argparser_free().
@@ -1418,6 +1424,11 @@ bool ap_has_args(ArgParser *parser) {
 
 int ap_len_args(ArgParser *parser) {
     return argparser_len_args(parser);
+}
+
+
+char* ap_get_arg(ArgParser *parser, int index) {
+    return argparser_get_arg(parser, index);
 }
 
 

@@ -19,8 +19,7 @@
 
 // An ArgParser instance is responsible for storing registered options and
 // commands. Note that every registered command recursively receives an
-// ArgParser instance of its own. In theory commands can be stacked to any
-// depth, although in practice even two levels is confusing for users.
+// ArgParser instance of its own. 
 typedef struct ArgParser ArgParser;
 
 
@@ -144,6 +143,9 @@ bool ap_has_args(ArgParser *parser);
 
 // Returns the number of positional arguments.
 int ap_len_args(ArgParser *parser);
+
+// Returns the positional argument at the specified index.
+char* ap_get_arg(ArgParser *parser, int index);
 
 // Returns the positional arguments as a freshly-allocated array of string
 // pointers. The memory occupied by the returned array is not affected by
