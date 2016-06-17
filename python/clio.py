@@ -459,17 +459,21 @@ class ArgParser:
     def _parse_equals_option(self, prefix, arg):
         name, value = arg.split("=", maxsplit=1)
 
+        # Is the argument a registered option name?
         option = self.options.get(name)
         if not option:
             err("%s%s is not a recognised option" % (prefix, name))
         option.found = True
 
+        # Invalid format for a boolean flag.
         if option.type == "bool":
             err("invalid format for boolean flag %s%s" % (prefix, name))
 
+        # Make sure we have a value after the equals sign.
         if not value:
             err("missing argument for the %s%s option" % (prefix, name))
 
+        # Try to parse the argument as a value of the appropriate type.
         self._set_opt(name, self._try_parse_arg(option.type, value))
 
     # Parse a long-form option, i.e. an option beginning with a double dash.
