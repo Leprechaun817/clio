@@ -30,43 +30,10 @@ typedef void (*CmdCB)(ArgParser *parser);
 // -------------------------------------------------------------------------
 
 
-// Attempt to parse a string as an integer value, exiting on failure.
-static int try_str_to_int(char *str) {
-    char *endptr;
-    errno = 0;
-    long result = strtol(str, &endptr, 0);
-
-    if (errno == ERANGE || result > INT_MAX || result < INT_MIN) {
-        fprintf(stderr, "Error: '%s' is out of range.\n", str);
-        exit(1);
-    }
-
-    if (*endptr != '\0') {
-        fprintf(stderr, "Error: cannot parse '%s' as an integer.\n", str);
-        exit(1);
-    }
-
-    return (int) result;
-}
-
-
-// Attempt to parse a string as a double value, exiting on failure.
-static double try_str_to_double(char *str) {
-    char *endptr;
-    errno = 0;
-    double result = strtod(str, &endptr);
-
-    if (errno == ERANGE) {
-        fprintf(stderr, "Error: '%s' is out of range.\n", str);
-        exit(1);
-    }
-
-    if (*endptr != '\0') {
-        fprintf(stderr, "Error: cannot parse '%s' as a float.\n", str);
-        exit(1);
-    }
-
-    return result;
+// Print a message to stderr and exit with a non-zero error code.
+static void err(char *msg) {
+    fprintf(stderr, "Error: %s.\n", msg);
+    exit(1);
 }
 
 
@@ -96,10 +63,46 @@ char* str(char *fmt, ...) {
 
 
 // Duplicate a string, automatically allocating memory for the copy.
-static char* str_dup(char *str) {
-    size_t len = strlen(str) + 1;
+static char* str_dup(char *arg) {
+    size_t len = strlen(arg) + 1;
     char *copy = malloc(len);
-    return copy ? memcpy(copy, str, len) : NULL;
+    return copy ? memcpy(copy, arg, len) : NULL;
+}
+
+
+// Attempt to parse a string as an integer value, exiting on failure.
+static int try_str_to_int(char *arg) {
+    char *endptr;
+    errno = 0;
+    long result = strtol(arg, &endptr, 0);
+
+    if (errno == ERANGE || result > INT_MAX || result < INT_MIN) {
+        err(str("'%s' is out of range", arg));
+    }
+
+    if (*endptr != '\0') {
+        err(str("cannot parse '%s' as an integer", arg));
+    }
+
+    return (int) result;
+}
+
+
+// Attempt to parse a string as a double value, exiting on failure.
+static double try_str_to_double(char *arg) {
+    char *endptr;
+    errno = 0;
+    double result = strtod(arg, &endptr);
+
+    if (errno == ERANGE) {
+        err(str("'%s' is out of range", arg));
+    }
+
+    if (*endptr != '\0') {
+        err(str("cannot parse '%s' as a float", arg));
+    }
+
+    return result;
 }
 
 
@@ -1011,21 +1014,18 @@ static void argparser_parse_equals_option(
     // Do we have the name of a registered option?
     Option *opt = map_get(parser->options, name);
     if (opt == NULL) {
-        fprintf(stderr, "Error: %s%s is not a recognised option.\n", prefix, name);
-        exit(1);
+        err(str("%s%s is not a recognised option", prefix, name));
     }
     opt->found = true;
 
     // Boolean flags can never contain an equals sign.
     if (opt->type == FLAG) {
-        fprintf(stderr, "Error: invalid format for boolean flag %s%s.\n", prefix, name);
-        exit(1);
+        err(str("invalid format for boolean flag %s%s", prefix, name));
     }
 
     // Check that a value has been supplied.
     if (strlen(value) == 0) {
-        fprintf(stderr, "Error: missing argument for the %s%s option.\n", prefix, name);
-        exit(1);
+        err(str("missing argument for the %s%s option", prefix, name));
     }
 
     option_try_set(opt, value);
@@ -1072,8 +1072,7 @@ static void argparser_parse_long_option(
 
         // We're missing a required option value.
         else {
-            fprintf(stderr, "Error: missing argument for the --%s option.\n", arg);
-            exit(1);
+            err(str("missing argument for the --%s option", arg));
         }
     }
 
@@ -1092,8 +1091,7 @@ static void argparser_parse_long_option(
     // The argument is not a registered or automatic option name.
     // Print an error message and exit.
     else {
-        fprintf(stderr, "Error: --%s is not a recognised option.\n", arg);
-        exit(1);
+        err(str("--%s is not a recognised option", arg));
     }
 }
 
@@ -1118,8 +1116,7 @@ static void argparser_parse_short_option(
         char key[] = {arg[i], 0};
         Option *opt = map_get(parser->options, key);
         if (opt == NULL) {
-            fprintf(stderr, "Error: -%s is not a recognised option.\n", key);
-            exit(1);
+            err(str("-%s is not a recognised option", key));
         }
         opt->found = true;
 
@@ -1145,8 +1142,7 @@ static void argparser_parse_short_option(
 
         // We're missing a required option value.
         else {
-            fprintf(stderr, "Error: missing argument for the -%s option.\n", key);
-            exit(1);
+            err(str("missing argument for the -%s option", key));
         }
     }
 }
@@ -1220,12 +1216,10 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
                     puts(cmd_parser->helptext);
                     exit(0);
                 } else {
-                    fprintf(stderr, "Error: '%s' is not a recognised command.\n", name);
-                    exit(1);
+                    err(str("'%s' is not a recognised command", name));
                 }
             } else {
-                fprintf(stderr, "Error: the help command requires an argument.\n");
-                exit(1);
+                err(str("the help command requires an argument"));
             }
         }
 
