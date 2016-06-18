@@ -52,6 +52,41 @@ func TestBoolOptionShortform(t *testing.T) {
 
 
 // -------------------------------------------------------------------------
+// Boolean lists.
+// -------------------------------------------------------------------------
+
+
+func TestBoolListEmpty(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFlagList("bool")
+    parser.ParseArgs([]string{})
+    if parser.LenList("bool") != 0 {
+        t.Fail()
+    }
+}
+
+
+func TestBoolListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFlagList("bool")
+    parser.ParseArgs([]string{"--bool", "--bool", "--bool"})
+    if parser.LenList("bool") != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestBoolListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFlagList("bool b")
+    parser.ParseArgs([]string{"-b", "-b", "-b"})
+    if parser.LenList("bool") != 3 {
+        t.Fail()
+    }
+}
+
+
+// -------------------------------------------------------------------------
 // String options.
 // -------------------------------------------------------------------------
 
@@ -91,6 +126,91 @@ func TestStringOptionShortform(t *testing.T) {
     parser.AddStr("string s", "default")
     parser.ParseArgs([]string{"-s", "value"})
     if parser.GetStr("string") != "value" {
+        t.Fail()
+    }
+}
+
+
+// -------------------------------------------------------------------------
+// String lists.
+// -------------------------------------------------------------------------
+
+
+func TestStringListEmpty(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddStrList("str", false)
+    parser.ParseArgs([]string{})
+    if parser.LenList("str") != 0 {
+        t.Fail()
+    }
+}
+
+
+func TestStringListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddStrList("str", false)
+    parser.ParseArgs([]string{"--str", "a", "b", "--str", "c"})
+    if parser.LenList("str") != 2 {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[0] != "a" {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[1] != "c" {
+        t.Fail()
+    }
+}
+
+
+func TestStringListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddStrList("str s", false)
+    parser.ParseArgs([]string{"-s", "a", "b", "-s", "c"})
+    if parser.LenList("str") != 2 {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[0] != "a" {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[1] != "c" {
+        t.Fail()
+    }
+}
+
+
+func TestStringGreedyListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddStrList("str", true)
+    parser.ParseArgs([]string{"--str", "a", "b", "--str", "c"})
+    if parser.LenList("str") != 3 {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[0] != "a" {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[1] != "b" {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[2] != "c" {
+        t.Fail()
+    }
+}
+
+
+func TestStringGreedyListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddStrList("str s", true)
+    parser.ParseArgs([]string{"-s", "a", "b", "-s", "c"})
+    if parser.LenList("str") != 3 {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[0] != "a" {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[1] != "b" {
+        t.Fail()
+    }
+    if parser.GetStrList("str")[2] != "c" {
         t.Fail()
     }
 }
@@ -152,6 +272,91 @@ func TestIntOptionNegative(t *testing.T) {
 
 
 // -------------------------------------------------------------------------
+// Integer lists.
+// -------------------------------------------------------------------------
+
+
+func TestIntListEmpty(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddIntList("int", false)
+    parser.ParseArgs([]string{})
+    if parser.LenList("int") != 0 {
+        t.Fail()
+    }
+}
+
+
+func TestIntListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddIntList("int", false)
+    parser.ParseArgs([]string{"--int", "1", "2", "--int", "3"})
+    if parser.LenList("int") != 2 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[1] != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestIntListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddIntList("int i", false)
+    parser.ParseArgs([]string{"-i", "1", "2", "-i", "3"})
+    if parser.LenList("int") != 2 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[1] != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestIntGreedyListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddIntList("int", true)
+    parser.ParseArgs([]string{"--int", "1", "2", "--int", "3"})
+    if parser.LenList("int") != 3 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[1] != 2 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[2] != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestIntGreedyListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddIntList("int i", true)
+    parser.ParseArgs([]string{"-i", "1", "2", "-i", "3"})
+    if parser.LenList("int") != 3 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[1] != 2 {
+        t.Fail()
+    }
+    if parser.GetIntList("int")[2] != 3 {
+        t.Fail()
+    }
+}
+
+
+// -------------------------------------------------------------------------
 // Float options.
 // -------------------------------------------------------------------------
 
@@ -201,6 +406,91 @@ func TestFloatOptionNegative(t *testing.T) {
     parser.AddFloat("float", 1.1)
     parser.ParseArgs([]string{"--float", "-2.2"})
     if parser.GetFloat("float") != -2.2 {
+        t.Fail()
+    }
+}
+
+
+// -------------------------------------------------------------------------
+// Float lists.
+// -------------------------------------------------------------------------
+
+
+func TestFloatListEmpty(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFloatList("flt", false)
+    parser.ParseArgs([]string{})
+    if parser.LenList("flt") != 0 {
+        t.Fail()
+    }
+}
+
+
+func TestFloatListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFloatList("flt", false)
+    parser.ParseArgs([]string{"--flt", "1", "2", "--flt", "3"})
+    if parser.LenList("flt") != 2 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[1] != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestFloatListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFloatList("flt f", false)
+    parser.ParseArgs([]string{"-f", "1", "2", "-f", "3"})
+    if parser.LenList("flt") != 2 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[1] != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestFloatGreedyListLongform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFloatList("flt", true)
+    parser.ParseArgs([]string{"--flt", "1", "2", "--flt", "3"})
+    if parser.LenList("flt") != 3 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[1] != 2 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[2] != 3 {
+        t.Fail()
+    }
+}
+
+
+func TestFloatGreedyListShortform(t *testing.T) {
+    parser := NewParser("", "")
+    parser.AddFloatList("flt f", true)
+    parser.ParseArgs([]string{"-f", "1", "2", "-f", "3"})
+    if parser.LenList("flt") != 3 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[0] != 1 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[1] != 2 {
+        t.Fail()
+    }
+    if parser.GetFloatList("flt")[2] != 3 {
         t.Fail()
     }
 }
