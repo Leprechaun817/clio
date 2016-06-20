@@ -1,74 +1,75 @@
-/*
-    A simple application demonstrating Clio in action.
-
-    Author: Darren Mulholland <darren@mulholland.xyz>
-    License: Public Domain
-*/
+// -------------------------------------------------------------------------
+// A simple application demonstrating Clio in action.
+// -------------------------------------------------------------------------
 
 class Example {
 
-    // Application entry point.
+    // The sample application will parse its own command-line arguments.
     public static void main(String[] args) {
 
         // We instantiate an argument parser, optionally supplying help text
         // and a version string. Supplying help text activates the automatic
         // --help flag, supplying a version string activates the automatic
-        // --version flag.
-        ArgParser parser = new ArgParser("Usage: example...", "1.0.0");
+        // --version flag. We can pass null for either parameter.
+        ArgParser parser = new ArgParser("Help!", "Version!");
 
-        // Register two flags, --bool1 and --bool2.
-        // The second flag has a single-character alias, -b.
-        // A flag is a boolean option - it is either present (true) or
-        // absent (false).
-        parser.addFlag("bool1");
-        parser.addFlag("bool2", 'b');
+        // Register a flag, --bopt, with a single-character alias, -b. A flag
+        // is a boolean option - it's either present (true) or absent (false).
+        parser.addFlag("bopt b");
 
-        // Register two string options, --str1 <arg> and --str2 <arg>.
-        // The second option has a single-character alias, -s <arg>.
-        // Options require default values, here 'alice' and 'bob'.
-        parser.addStrOpt("str1", "alice");
-        parser.addStrOpt("str2", "bob", 's');
+        // Register a string option, --sopt <arg>, with a single-character
+        // alias, -s <arg>. A string argument requires a default value, here
+        // 'defval'.
+        parser.addStr("sopt s", "defval");
 
-        // Register two integer options, --int1 <arg> and --int2 <arg>.
-        // The second option has a single-character alias, -i <arg>.
-        // Options require default values, here 123 and 456.
-        parser.addIntOpt("int1", 123);
-        parser.addIntOpt("int2", 456, 'i');
+        // Register an integer option, --iopt <arg>. An integer option
+        // requires a default value, here 123.
+        parser.addInt("iopt", 123);
 
-        // Register two floating point options, --float1 <arg> and --float2 <arg>.
-        // The second option has a single-character alias, -f <arg>.
-        // Options require default values, here 1.0 and 2.0.
-        parser.addFloatOpt("float1", 1.0);
-        parser.addFloatOpt("float2", 2.0, 'f');
+        // Register a float option, --fopt <arg>. A float option requires a
+        // default value, here 1.0.
+        parser.addFloat("fopt", 1.0);
 
-        // Register a command, 'cmd'. We need to specify the command's help text and callback method.
-        ArgParser cmdParser = parser.addCmd("cmd", Example::callback, "Usage: example cmd...");
+        // Register an integer list, --ilist <arg>, with a single-character
+        // alias,-i <arg>. A list option accepts multiple values.
+        parser.addIntList("ilist i");
 
-        // Registering a command returns a new ArgParser instance dedicated to parsing the command's
-        // arguments. We can register as many flags and options as we like on this sub-parser.
-        cmdParser.addFlag("foo");
+        // Register a 'greedy' float list, --flist <args>, with a single-
+        // character alias, -f <args>. A list option accepts multiple values;
+        // a 'greedy' list attempts to parse multiple consecutive arguments.
+        parser.addFloatList("flist f", true);
 
-        // The command parser can reuse the parent parser's option names without interference.
-        cmdParser.addStrOpt("str1", "ciara");
-        cmdParser.addStrOpt("str2", "dave", 's');
+        // Register a command, 'foo' with an alias 'bar'. We need to specify
+        // the command's help text and callback method.
+        ArgParser cmdParser = parser.addCmd(
+            "foo bar", Example::callback, "Command!"
+        );
 
-        // Once all our options and commands have been registered we call the parser's
-        // parse() method with a list or array of argument strings. Only the root parser's
-        // parse() method should be called - command arguments will be parsed automatically.
+        // Registering a command returns a new ArgParser instance dedicated to
+        // parsing the command's arguments. We can register as many flags and
+        // options as we like on this sub-parser. Note that the sub-parser can
+        // reuse the parent's option names without interference.
+        cmdParser.addFlag("bopt b");
+        cmdParser.addInt("iopt i", 123);
+
+        // Once all our options and commands have been registered we can call
+        // the parse() method with an array of argument strings. (Note that we
+        // only need to call parse() on the root parser - command arguments
+        // are parsed automatically.)
         parser.parse(args);
 
-        // We can now retrieve our option and argument values from the parser instance.
-        // Here we simply dump it to stdout.
+        // We can now retrieve our option and argument values from the parser
+        // instance. Here we simply dump it to stdout.
         System.out.println(parser);
     }
 
-    // Callback method for the 'cmd' command.
-    // This method will be called if the 'cmd' command is present.
-    // The method receives an ArgParser instance containing the command's
-    // parsed arguments. Here we simply dump it to stdout.
+
+    // Callback method for the 'foo' command. This method will be called if the
+    // command is found. The method receives an ArgParser instance containing
+    // the command's parsed arguments. Here we simply dump it to stdout.
     public static void callback(ArgParser parser) {
-        System.out.println("---------- callback() ----------");
+        System.out.println("----------------- callback() -----------------");
         System.out.println(parser);
-        System.out.println("...................................\n");
+        System.out.println("..............................................\n");
     }
 }
