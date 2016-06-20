@@ -1,8 +1,10 @@
 /*
-    Clio: A toolkit for creating elegant command line interfaces.
+    Clio: a minimalist argument-parsing library designed for building elegant
+    command-line interfaces.
 
     Author: Darren Mulholland <darren@mulholland.xyz>
     License: Public Domain
+    Version: 2.0.0.dev
 */
 
 import java.util.Map;
@@ -15,23 +17,18 @@ import java.util.function.Consumer;
 
 
 // ArgParser is the sole class exported by the library. An ArgParser instance
-// is responsible for registering options and parsing the input array of raw
-// arguments.
+// is responsible for registering options and commands and parsing the input
+// array of raw arguments.
 //
 // Note that every registered command recursively receives an ArgParser
 // instance of its own. In theory commands can be stacked to any depth,
-// although in practice even two levels is confusing and best avoided.
+// although in practice even two levels is confusing for users.
 class ArgParser {
 
 
-    // Library version number.
-    String libVersion = "1.0.0";
-
-
-    // Internal enum for classifying option types.
-    // We use 'flag' as a synonym for boolean options, i.e. options that are
-    // either present (true) or absent (false). All other option types require
-    // an argument.
+    // Internal enum for classifying option types. We use 'flag' as a synonym
+    // for boolean options, i.e. options that are either present (true) or
+    // absent (false). All other option types require an argument.
     private enum OptionType {
         Flag, String, Int, Float
     }
@@ -40,45 +37,83 @@ class ArgParser {
     // Internal class for storing option data.
     private static class Option {
         OptionType type;
-        Object value;
+        boolean found;
+        boolean greedy;
+        List<Object> values = new ArrayList<Object>();
 
-        Option(OptionType type, Object value) {
+        Option(OptionType type) {
             this.type = type;
-            this.value = value;
+        }
+
+        // Returns the last value from the option's internal list.
+        Object get() {
+            return values.get(values.size() - 1);
+        }
+
+        // Append a value to the option's internal list.
+        void set(Object value) {
+            values.add(value);
+        }
+
+        // Clear the option's internal list of values.
+        void clear() {
+            values.clear();
+        }
+
+        // Returns a string representation of the option's values.
+        public String toString() {
+            return values.toString();
         }
     }
 
 
     // Internal class for making a list of arguments available as a stream.
     private static class ArgStream {
-        List<String> arguments;
+        List<String> args;
         int length;
         int index;
 
-        ArgStream(List<String> arguments) {
-            this.arguments = arguments;
-            this.length = arguments.size();
+        ArgStream(List<String> args) {
+            this.args = args;
+            this.length = args.size();
             this.index = 0;
         }
 
-        // Returns true if the stream contains another argument.
-        boolean hasNext() {
-            return index < length;
+        ArgStream(String[] args) {
+            this(Arrays.asList(args));
         }
 
         // Returns the next argument from the stream.
         String next() {
-            return arguments.get(index++);
+            return args.get(index++);
         }
 
         // Returns the next argument from the stream without consuming it.
         String peek() {
-            return arguments.get(index);
+            return args.get(index);
         }
 
-        // Returns a list containing all the remaining arguments in the stream.
-        List<String> remainder() {
-            return arguments.subList(index, length);
+        // Returns true if the stream contains at least one more element.
+        boolean hasNext() {
+            return index < length;
+        }
+
+        // Returns true if the stream contains at least one more element and
+        // that element has the form of an option value.
+        boolean hasNextValue() {
+            if (hasNext()) {
+                String arg = peek();
+                if (arg.startsWith("-")) {
+                    if (arg.equals("-") || Character.isDigit(arg.charAt(1))) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -86,371 +121,307 @@ class ArgParser {
     // Help text for the application or command.
     private String helptext;
 
+
     // Application version number.
     private String version;
 
-    // Stores option objects indexed by option name.
-    private Map<String, Option> options = new HashMap<String, Option>();
 
-    // Stores option objects indexed by single-letter alias.
-    private Map<Character, Option> shortcuts = new HashMap<Character, Option>();
-
-    // Stores command sub-parser instances indexed by command.
-    private Map<String, ArgParser> commands = new HashMap<String, ArgParser>();
-
-    // Stores command callbacks indexed by command.
-    private Map<String, Consumer<ArgParser>> callbacks = new HashMap<String, Consumer<ArgParser>>();
-
-    // Stores positional arguments parsed from the input array.
-    private List<String> arguments = new ArrayList<String>();
-
-    // Stores the command string, if a command is found while parsing.
-    private String command;
-
-    // Stores the command's parser instance, if a command is found.
-    private ArgParser commandParser;
+    // Stores options indexed by name.
+    private Map<String, Option> options;
 
 
-    // No automatic --help or --version flags.
+    // Stores command parsers indexed by command name.
+    private Map<String, ArgParser> commands;
+
+
+    // Stores command callbacks indexed by command name.
+    private Map<String, Consumer<ArgParser>> callbacks;
+
+
+    // Stores positional arguments.
+    private List<String> arguments;
+
+
+    // Stores the command name, if a command was found while parsing.
+    private String cmdName;
+
+
+    // Stores the command's parser instance, if a command was found.
+    private ArgParser cmdParser;
+
+
+    // Initialize a parser with no automatic --help or --version flags.
     ArgParser() {
         this(null, null);
     }
 
 
-    // Supplying help text activates the automatic --help flag.
-    ArgParser(String helptext) {
-        this(helptext, null);
-    }
-
-
-    // Supplying a version string activates the automatic --version flag.
+    // Initialize a parser with automatic --help and --version flags.
     ArgParser(String helptext, String version) {
-        if (helptext != null) {
-            helptext = helptext.trim();
-        }
-        if (version != null) {
-            version = version.trim();
-        }
-        this.helptext = helptext;
-        this.version = version;
+        this.helptext = (helptext == null) ? null : helptext.trim();
+        this.version = (version == null) ? null : version.trim();
+        this.options = new HashMap<String, Option>();
+        this.commands = new HashMap<String, ArgParser>();
+        this.callbacks = new HashMap<String, Consumer<ArgParser>>();
+        this.arguments = new ArrayList<String>();
     }
 
 
-    // Register a flag, i.e. a boolean option without an argument.
+    // ---------------------------------------------------------------------
+    // Register options.
+    // ---------------------------------------------------------------------
+
+
+    // Register a boolean option with a default value of false.
     void addFlag(String name) {
-        options.put(name, new Option(OptionType.Flag, false));
-    }
-
-
-    // Register a flag, additionally specifying a single-letter alias.
-    void addFlag(String name, char shortcut) {
-        Option option = new Option(OptionType.Flag, false);
-        options.put(name, option);
-        shortcuts.put(shortcut, option);
-    }
-
-
-    // Register an option with a string argument.
-    void addStrOpt(String name, String defaultValue) {
-        options.put(name, new Option(OptionType.String, defaultValue));
-    }
-
-
-    // Register a string option, additionally specifying a single-letter alias.
-    void addStrOpt(String name, String defaultValue, char shortcut) {
-        Option option = new Option(OptionType.String, defaultValue);
-        options.put(name, option);
-        shortcuts.put(shortcut, option);
-    }
-
-
-    // Register an option with an integer argument.
-    void addIntOpt(String name, int defaultValue) {
-        options.put(name, new Option(OptionType.Int, defaultValue));
-    }
-
-
-    // Register an integer option, additionally specifying a single-letter alias.
-    void addIntOpt(String name, int defaultValue, char shortcut) {
-        Option option = new Option(OptionType.Int, defaultValue);
-        options.put(name, option);
-        shortcuts.put(shortcut, option);
-    }
-
-
-    // Register an option with a floating point argument.
-    void addFloatOpt(String name, double defaultValue) {
-        options.put(name, new Option(OptionType.Float, defaultValue));
-    }
-
-
-    // Register a float option, additionally specifying a single-letter alias.
-    void addFloatOpt(String name, double defaultValue, char shortcut) {
-        Option option = new Option(OptionType.Float, defaultValue);
-        options.put(name, option);
-        shortcuts.put(shortcut, option);
-    }
-
-
-    // Register a command and its associated callback.
-    ArgParser addCmd(String command, Consumer<ArgParser> callback, String helptext) {
-        ArgParser commandParser = new ArgParser(helptext);
-        commands.put(command, commandParser);
-        callbacks.put(command, callback);
-        return commandParser;
-    }
-
-
-    // Print the parser's help text and exit.
-    void help() {
-        System.out.println(helptext);
-        System.exit(0);
-    }
-
-
-    // Parse an array of arguments.
-    void parse(String[] argArray) {
-        parse(Arrays.asList(argArray));
-    }
-
-
-    // Parse a list of arguments.
-    void parse(List<String> argList) {
-
-        // Switch to turn off parsing if we encounter a -- argument.
-        // Everything following the -- will be treated as a positional argument.
-        boolean parsing = true;
-
-        // Convert the input list into a stream.
-        ArgStream stream = new ArgStream(argList);
-
-        // Loop while we have arguments to process.
-        while (stream.hasNext()) {
-
-            // Fetch the next argument from the stream.
-            String arg = stream.next();
-
-            // If parsing has been turned off, simply add the argument to the list of positionals.
-            if (!parsing) {
-                arguments.add(arg);
-                continue;
-            }
-
-            // If we encounter a -- argument, turn off parsing.
-            if (arg.equals("--")) {
-                parsing = false;
-                continue;
-            }
-
-            // Is the current argument a long-form option or flag?
-            if (arg.startsWith("--")) {
-
-                // Strip the -- prefix.
-                arg = arg.substring(2);
-
-                // Is the argument a registered option name?
-                if (options.containsKey(arg)) {
-                    Option option = options.get(arg);
-
-                    // If the option type is a flag, store the boolean value true.
-                    if (option.type == OptionType.Flag) {
-                        option.value = true;
-                        continue;
-                    }
-
-                    // Not a flag, so check for a following argument.
-                    if (!stream.hasNext()) {
-                        System.err.format("Error: missing argument for the --%s option.\n", arg);
-                        System.exit(1);
-                    }
-
-                    // Fetch the argument from the stream and attempt to parse it.
-                    String nextarg = stream.next();
-
-                    switch (option.type) {
-
-                        case String:
-                            option.value = nextarg;
-                            break;
-
-                        case Int:
-                            try {
-                                option.value = Integer.parseInt(nextarg);
-                            }
-                            catch (NumberFormatException e) {
-                                System.err.format("Error: cannot parse '%s' as an integer.\n", nextarg);
-                                System.exit(1);
-                            }
-                            break;
-
-                        case Float:
-                            try {
-                                option.value = Double.parseDouble(nextarg);
-                            }
-                            catch (NumberFormatException e) {
-                                System.err.format("Error: cannot parse '%s' as a float.\n", nextarg);
-                                System.exit(1);
-                            }
-                            break;
-                    }
-                }
-
-                // Automatic --help flag if help-text has been specified.
-                else if (arg.equals("help") && helptext != null) {
-                    System.out.println(helptext);
-                    System.exit(0);
-                }
-
-                // Automatic --version flag is a version string has been specified.
-                else if (arg.equals("version") && version != null) {
-                    System.out.println(version);
-                    System.exit(0);
-                }
-
-                // Not a registered or automatic option. Print an error and exit.
-                else {
-                    System.err.format("Error: --%s is not a recognised option.\n", arg);
-                    System.exit(1);
-                }
-            }
-
-            // Is the current argument a short-form option or flag.
-            else if (arg.startsWith("-")) {
-
-                // If the argument consists of a single dash or a dash followed by a digit,
-                // treat it as a positional argument. (We don't support numerical shortcuts
-                // as they can't be distinguished from negative integers.)
-                if (arg.equals("-") || Character.isDigit(arg.charAt(1))) {
-                    arguments.add(arg);
-                    continue;
-                }
-
-                // Examine each character individually to allow for condensed
-                // short-form arguments, i.e.
-                //     -a -b foo -c bar
-                // is equivalent to
-                //     -abc foo bar
-                for (char c: arg.substring(1).toCharArray()) {
-
-                    // Is the character a registered shortcut?
-                    if (shortcuts.containsKey(c)) {
-                        Option option = shortcuts.get(c);
-
-                        // If the option type is a flag, just store the boolean true.
-                        if (option.type == OptionType.Flag) {
-                            option.value = true;
-                            continue;
-                        }
-
-                        // Not a flag, so check for a following argument.
-                        if (!stream.hasNext()) {
-                            System.err.format("Error: missing argument for the -%s option.\n", c);
-                            System.exit(1);
-                        }
-
-                        // Fetch the argument from the stream and attempt to parse it.
-                        String nextarg = stream.next();
-
-                        switch (option.type) {
-
-                            case String:
-                                option.value = nextarg;
-                                break;
-
-                            case Int:
-                                try {
-                                    option.value = Integer.parseInt(nextarg);
-                                }
-                                catch (NumberFormatException e) {
-                                    System.err.format("Error: cannot parse '%s' as an integer.\n", nextarg);
-                                    System.exit(1);
-                                }
-                                break;
-
-                            case Float:
-                                try {
-                                    option.value = Double.parseDouble(nextarg);
-                                }
-                                catch (NumberFormatException e) {
-                                    System.err.format("Error: cannot parse '%s' as a float.\n", nextarg);
-                                    System.exit(1);
-                                }
-                                break;
-                        }
-                    }
-
-                    // Not a recognised shortcut. Print an error and exit.
-                    else {
-                        System.err.format("Error: -%s is not a recognised option.\n", c);
-                        System.exit(1);
-                    }
-                }
-            }
-
-            // Is the current argument a registered command? If so, we create a sub-parser
-            // instance of the ArgParser class and use it to process the remaining arguments.
-            else if (commands.containsKey(arg)) {
-                ArgParser cmdParser = commands.get(arg);
-                Consumer<ArgParser> cmdCallback = callbacks.get(arg);
-                cmdParser.parse(stream.remainder());
-                cmdCallback.accept(cmdParser);
-                this.command = arg;
-                this.commandParser = cmdParser;
-                break;
-            }
-
-            // Automatic 'help' command for registered commands. The commands
-            //     $ app cmd --help
-            // and
-            //     $ app help cmd
-            // are functionally equivalent. Both will print the help text
-            // associated with the command.
-            else if (arg.equals("help")) {
-                if (stream.hasNext()) {
-                    String command = stream.next();
-                    if (commands.containsKey(command)) {
-                        System.out.println(commands.get(command).helptext);
-                        System.exit(0);
-                    } else {
-                        System.err.format("Error: '%s' is not a recognised command.\n", command);
-                        System.exit(1);
-                    }
-                } else {
-                    System.err.println("Error: the help command requires an argument.");
-                    System.exit(1);
-                }
-            }
-
-            // Otherwise, add the argument to our list of free arguments.
-            else {
-                arguments.add(arg);
-            }
+        Option opt = new Option(OptionType.Flag);
+        opt.set(false);
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
         }
     }
 
 
-    // Returns true if the named flag was found.
+    // Register a string option with a default value.
+    void addStr(String name, String value) {
+        Option opt = new Option(OptionType.String);
+        opt.set(value);
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register an integer option with a default value.
+    void addInt(String name, int value) {
+        Option opt = new Option(OptionType.Int);
+        opt.set(value);
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register a floating-point option with a default value.
+    void addFloat(String name, double value) {
+        Option opt = new Option(OptionType.Float);
+        opt.set(value);
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register a boolean list option.
+    void addFlagList(String name) {
+        Option opt = new Option(OptionType.Flag);
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register a string list option.
+    void addStrList(String name, boolean greedy) {
+        Option opt = new Option(OptionType.String);
+        opt.greedy = greedy;
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register a non-greedy string list option.
+    void addStrList(String name) {
+        addStrList(name, false);
+    }
+
+
+    // Register an integer list option.
+    void addIntList(String name, boolean greedy) {
+        Option opt = new Option(OptionType.Int);
+        opt.greedy = greedy;
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register a non-greedy integer list option.
+    void addIntList(String name) {
+        addIntList(name, false);
+    }
+
+
+    // Register a floating-point list option.
+    void addFloatList(String name, boolean greedy) {
+        Option opt = new Option(OptionType.Float);
+        opt.greedy = greedy;
+        for (String alias: name.split("\\s+")) {
+            options.put(alias, opt);
+        }
+    }
+
+
+    // Register a non-greedy floating-point list option.
+    void addFloatList(String name) {
+        addFloatList(name, false);
+    }
+
+
+    // ---------------------------------------------------------------------
+    // Retrieve option values.
+    // ---------------------------------------------------------------------
+
+
+    // Returns true if the specified option was found while parsing.
+    boolean found(String name) {
+        return options.get(name).found;
+    }
+
+
+    // Returns the value of the specified boolean option.
     boolean getFlag(String name) {
-        return (boolean) options.get(name).value;
+        return (boolean) options.get(name).get();
     }
 
 
-    // Returns the value of the named option.
-    String getStrOpt(String name) {
-        return (String) options.get(name).value;
+    // Returns the value of the specified string option.
+    String getStr(String name) {
+        return (String) options.get(name).get();
     }
 
 
-    // Returns the value of the named option.
-    int getIntOpt(String name) {
-        return (int) options.get(name).value;
+    // Returns the value of the specified integer option.
+    int getInt(String name) {
+        return (int) options.get(name).get();
     }
 
 
-    // Returns the value of the named option.
-    double getFloatOpt(String name) {
-        return (double) options.get(name).value;
+    // Returns the value of the specified floating-point option.
+    double getFloat(String name) {
+        return (double) options.get(name).get();
     }
+
+
+    // Returns the length of the specified option's list of values.
+    int lenList(String name) {
+        return options.get(name).values.size();
+    }
+
+
+    // Returns the specified option's values as a list of booleans.
+    List<Boolean> getFlagList(String name) {
+        List<Boolean> list = new ArrayList<Boolean>();
+        for (Object value: options.get(name).values) {
+            list.add((Boolean) value);
+        }
+        return list;
+    }
+
+
+    // Returns the specified option's values as a list of strings.
+    List<String> getStrList(String name) {
+        List<String> list = new ArrayList<String>();
+        for (Object value: options.get(name).values) {
+            list.add((String) value);
+        }
+        return list;
+    }
+
+
+    // Returns the specified option's values as a list of integers.
+    List<Integer> getIntList(String name) {
+        List<Integer> list = new ArrayList<Integer>();
+        for (Object value: options.get(name).values) {
+            list.add((Integer) value);
+        }
+        return list;
+    }
+
+
+    // Returns the specified option's values as a list of floats.
+    List<Double> getFloatList(String name) {
+        List<Double> list = new ArrayList<Double>();
+        for (Object value: options.get(name).values) {
+            list.add((Double) value);
+        }
+        return list;
+    }
+
+
+    // ---------------------------------------------------------------------
+    // Set option values.
+    // ---------------------------------------------------------------------
+
+
+    // Clear the specified option's internal list of values.
+    void clearList(String name) {
+        options.get(name).clear();
+    }
+
+
+    // Append a value to the specified option's internal list.
+    void setFlag(String name, boolean value) {
+        options.get(name).set(value);
+    }
+
+
+    // Append a value to the specified option's internal list.
+    void setStr(String name, String value) {
+        options.get(name).set(value);
+    }
+
+
+    // Append a value to the specified option's internal list.
+    void setInt(String name, int value) {
+        options.get(name).set(value);
+    }
+
+
+    // Append a value to the specified option's internal list.
+    void setFloat(String name, double value) {
+        options.get(name).set(value);
+    }
+
+
+    // ---------------------------------------------------------------------
+    // Commands.
+    // ---------------------------------------------------------------------
+
+
+    // Register a command with its associated callback and help text.
+    ArgParser addCmd(String name, Consumer<ArgParser> callback, String help) {
+        ArgParser cmdParser = new ArgParser(help, null);
+        for (String alias: name.split("\\s+")) {
+            commands.put(alias, cmdParser);
+            callbacks.put(alias, callback);
+        }
+        return cmdParser;
+    }
+
+
+    // Returns true if the parser has found a command.
+    boolean hasCmd() {
+        return cmdName != null;
+    }
+
+
+    // Returns the command string, if a command was found.
+    String getCmdName() {
+        return cmdName;
+    }
+
+
+    // Returns the command's parser instance, if a command was found.
+    ArgParser getCmdParser() {
+        return cmdParser;
+    }
+
+
+    // ---------------------------------------------------------------------
+    // Positional arguments.
+    // ---------------------------------------------------------------------
 
 
     // Returns true if the parser has found one or more positional arguments.
@@ -459,8 +430,8 @@ class ArgParser {
     }
 
 
-    // Returns the number of positional arguments identified by the parser.
-    int numArgs() {
+    // Returns the length of the list of positional arguments.
+    int lenArgs() {
         return arguments.size();
     }
 
@@ -478,65 +449,357 @@ class ArgParser {
 
 
     // Convenience function: attempts to parse and return the positional
-    // arguments as a list of integers.
+    // arguments as a list of integers. Exits with an error message on
+    // failure.
     List<Integer> getArgsAsInts() {
-        List<Integer> intArgs = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<Integer>();
         for (String arg: arguments) {
             try {
-                intArgs.add(Integer.parseInt(arg));
+                list.add(Integer.parseInt(arg));
             }
             catch (NumberFormatException e) {
                 System.err.format("Error: cannot parse '%s' as an integer.\n", arg);
                 System.exit(1);
             }
         }
-        return intArgs;
+        return list;
     }
 
 
     // Convenience function: attempts to parse and return the positional
-    // arguments as a list of floats.
+    // arguments as a list of doubles. Exits with an error message on
+    // failure.
     List<Double> getArgsAsFloats() {
-        List<Double> floatArgs = new ArrayList<Double>();
+        List<Double> list = new ArrayList<Double>();
         for (String arg: arguments) {
             try {
-                floatArgs.add(Double.parseDouble(arg));
+                list.add(Double.parseDouble(arg));
             }
             catch (NumberFormatException e) {
                 System.err.format("Error: cannot parse '%s' as a float.\n", arg);
                 System.exit(1);
             }
         }
-        return floatArgs;
+        return list;
     }
 
 
-    // Returns true if the parser has found a command.
-    boolean hasCmd() {
-        return command != null;
+    // ---------------------------------------------------------------------
+    // Parse arguments.
+    // ---------------------------------------------------------------------
+
+
+    // Parse an array of string arguments.
+    void parse(String[] args) {
+        parse(new ArgStream(args));
     }
 
 
-    // Returns the command string, if a command was found.
-    String getCmd() {
-        return command;
+    // Parse a list of string arguments.
+    void parse(List<String> args) {
+        parse(new ArgStream(args));
     }
 
 
-    // Returns the command's parser instance, if a command was found.
-    ArgParser getCmdParser() {
-        return commandParser;
+    // Parse a stream of string arguments.
+    private void parse(ArgStream stream) {
+
+        // Switch to turn off option parsing if we encounter a double dash.
+        // Everything following the '--' will be treated as a positional
+        // argument.
+        boolean parsing = true;
+
+        // Loop while we have arguments to process.
+        while (stream.hasNext()) {
+
+            // Fetch the next argument from the stream.
+            String arg = stream.next();
+
+            // If parsing has been turned off, simply add the argument to the
+            // list of positionals.
+            if (!parsing) {
+                arguments.add(arg);
+                continue;
+            }
+
+            // If we encounter a -- argument, turn off option-parsing.
+            if (arg.equals("--")) {
+                parsing = false;
+                continue;
+            }
+
+            // Is the argument a long-form option or flag?
+            if (arg.startsWith("--")) {
+                parseLongOption(arg.substring(2), stream);
+            }
+
+            // Is the argument a short-form option or flag? If the argument
+            // consists of a single dash or a dash followed by a digit, we
+            // treat it as a positional argument.
+            else if (arg.startsWith("-")) {
+                if (arg.equals("-") || Character.isDigit(arg.charAt(1))) {
+                    arguments.add(arg);
+                } else {
+                    parseShortOption(arg.substring(1), stream);
+                }
+            }
+
+            // Is the argument a registered command?
+            else if (commands.containsKey(arg)) {
+                ArgParser cmdParser = commands.get(arg);
+                Consumer<ArgParser> cmdCallback = callbacks.get(arg);
+                cmdParser.parse(stream);
+                cmdCallback.accept(cmdParser);
+                this.cmdName = arg;
+                this.cmdParser = cmdParser;
+            }
+
+            // Is the argument the automatic 'help' command?
+            else if (arg.equals("help")) {
+                if (stream.hasNext()) {
+                    String name = stream.next();
+                    if (commands.containsKey(name)) {
+                        System.out.println(commands.get(name).helptext);
+                        System.exit(0);
+                    } else {
+                        System.err.format(
+                            "Error: '%s' is not a recognised command.\n", name
+                        );
+                        System.exit(1);
+                    }
+                } else {
+                    System.err.println(
+                        "Error: the help command requires an argument."
+                    );
+                    System.exit(1);
+                }
+            }
+
+            // Add the argument to our list of positional arguments.
+            else {
+                arguments.add(arg);
+            }
+        }
     }
 
 
-    // List all options and arguments for debugging.
+    // Parse a long-form option, i.e. an option beginning with a double dash.
+    private void parseLongOption(String arg, ArgStream stream) {
+
+        // Do we have an option of the form --name=value?
+        if (arg.contains("=")) {
+            parseEqualsOption("--", arg);
+        }
+
+        // Is the argument a registered option name?
+        else if (options.containsKey(arg)) {
+            Option opt = options.get(arg);
+            opt.found = true;
+
+            // If the option is a flag, store the boolean true.
+            if (opt.type == OptionType.Flag) {
+                opt.set(true);
+            }
+
+            // Check for a following argument.
+            else if (stream.hasNextValue()) {
+
+                // Try to parse the argument according to the option type.
+                opt.set(tryParseArg(opt.type, stream.next()));
+
+                // If the option is a greedy list, keep trying to parse values
+                // until we run out of arguments.
+                if (opt.greedy) {
+                    while (stream.hasNextValue()) {
+                        opt.set(tryParseArg(opt.type, stream.next()));
+                    }
+                }
+            }
+
+            // We're missing a required option value.
+            else {
+                System.err.format(
+                    "Error: missing argument for the --%s option.\n", arg
+                );
+                System.exit(1);
+            }
+        }
+
+        // Is the argument the automatic --help flag?
+        else if (arg.equals("help") && this.helptext != null) {
+            System.out.println(helptext);
+            System.exit(0);
+        }
+
+        // Is the argument the automatic --version flag?
+        else if (arg.equals("version") && this.version != null) {
+            System.out.println(version);
+            System.exit(0);
+        }
+
+        // The argument is not a registered or automatic option name.
+        else {
+            System.err.format("Error: --%s is not a recognised option.\n", arg);
+            System.exit(1);
+        }
+    }
+
+
+    // Parse a short-form option, i.e. an option beginning with a single dash.
+    private void parseShortOption(String arg, ArgStream stream) {
+
+        // Do we have an option of the form -n=value?
+        if (arg.contains("=")) {
+            parseEqualsOption("-", arg);
+            return;
+        }
+
+        // We handle each character individually to support condensed options:
+        //    -abc foo bar
+        // is equivalent to:
+        //    -a foo -b bar -c
+        for (char c: arg.toCharArray()) {
+
+            // Check that we have the name of a registered option.
+            String key = String.valueOf(c);
+            if (!options.containsKey(key)) {
+                System.err.format(
+                    "Error: -%s is not a recognised option.\n", key
+                );
+                System.exit(1);
+            }
+            Option opt = options.get(key);
+            opt.found = true;
+
+            // If the option is a flag, store the boolean true.
+            if (opt.type == OptionType.Flag) {
+                opt.set(true);
+            }
+
+            // Check for a following argument.
+            else if (stream.hasNextValue()) {
+
+                // Try to parse the argument according to the option type.
+                opt.set(tryParseArg(opt.type, stream.next()));
+
+                // If the option is a greedy list, keep trying to parse values
+                // until we run out of arguments.
+                if (opt.greedy) {
+                    while (stream.hasNextValue()) {
+                        opt.set(tryParseArg(opt.type, stream.next()));
+                    }
+                }
+            }
+
+            // We're missing a required option value.
+            else {
+                System.err.format(
+                    "Error: missing argument for the -%s option.\n", key
+                );
+                System.exit(1);
+            }
+        }
+    }
+
+
+    // Parse an option of the form --name=value or -n=value.
+    private void parseEqualsOption(String prefix, String arg) {
+        String[] split = arg.split("=", 2);
+        String name = split[0];
+        String value = split[1];
+
+        // Do we have the name of a registered option?
+        if (!options.containsKey(name)) {
+            System.err.format(
+                "Error: %s%s is not a recognised option.\n", prefix, name
+            );
+            System.exit(1);
+        }
+        Option opt = options.get(name);
+        opt.found = true;
+
+        // Boolean flags should never contain an equals sign.
+        if (opt.type == OptionType.Flag) {
+            System.err.format(
+                "Error: invalid format for boolean flag %s%s.\n", prefix, name
+            );
+            System.exit(1);
+        }
+
+        // Make sure we have a value after the equals sign.
+        if (value.equals("")) {
+            System.err.format(
+                "Error: missing argument for the %s%s option.\n", prefix, name
+            );
+            System.exit(1);
+        }
+
+        // Try to parse the argument according to the option type.
+        opt.set(tryParseArg(opt.type, value));
+    }
+
+
+    // Attempt to parse a string argument as a value of the appropriate type.
+    private Object tryParseArg(OptionType type, String arg) {
+        Object value = null;
+
+        switch (type) {
+
+            case String:
+                value = arg;
+                break;
+
+            case Int:
+                try {
+                    value = Integer.parseInt(arg);
+                }
+                catch (NumberFormatException e) {
+                    System.err.format(
+                        "Error: cannot parse '%s' as an integer.\n", arg
+                    );
+                    System.exit(1);
+                }
+                break;
+
+            case Float:
+                try {
+                    value = Double.parseDouble(arg);
+                }
+                catch (NumberFormatException e) {
+                    System.err.format(
+                        "Error: cannot parse '%s' as a float.\n", arg
+                    );
+                    System.exit(1);
+                }
+                break;
+        }
+
+        return value;
+    }
+
+
+    // ---------------------------------------------------------------------
+    // Utilities.
+    // ---------------------------------------------------------------------
+
+
+    // Print the parser's help text and exit.
+    void help() {
+        System.out.println(helptext);
+        System.exit(0);
+    }
+
+
+    // Returns a string representation of the ArgParser instance.
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
         builder.append("Options:\n");
         if (options.size() > 0) {
             for (String key: new TreeMap<String, Option>(options).keySet()) {
-                builder.append(String.format("  %s: %s\n", key, options.get(key).value));
+                builder.append(
+                    String.format("  %s: %s\n", key, options.get(key).values)
+                );
             }
         } else {
             builder.append("  [none]\n");
@@ -553,7 +816,7 @@ class ArgParser {
 
         builder.append("\nCommand:\n");
         if (hasCmd()) {
-            builder.append(String.format("  %s\n", getCmd()));
+            builder.append(String.format("  %s\n", getCmdName()));
         } else {
             builder.append("  [none]\n");
         }
