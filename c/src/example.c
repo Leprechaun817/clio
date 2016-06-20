@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     // Once all our options and commands have been registered we can call the
     // ap_parse() function with an array of argument strings. (Note that we
     // only need to call ap_parse() on the root parser - command arguments
-    // are parsed automaically.)
+    // are parsed automatically.)
     ap_parse(parser, argc, argv);
 
     // We can now retrieve our option and argument values from the parser
