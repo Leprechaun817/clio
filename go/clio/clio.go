@@ -705,12 +705,7 @@ func (parser *ArgParser) parseStream(stream *argStream) {
             continue
         }
 
-        // Is the argument the automatic 'help' command? The commands
-        //     $ app cmd --help
-        // and
-        //     $ app help cmd
-        // are functionally equivalent. Both will print the help text
-        // associated with the command.
+        // Is the argument the automatic 'help' command?
         if arg == "help"{
             if stream.hasNext() {
                 name := stream.next()
@@ -861,7 +856,7 @@ func (parser *ArgParser) parseEqualsOption(prefix string, arg string) {
     }
     opt.found = true
 
-    // Boolean flags can never contain an equals sign.
+    // Boolean flags should never contain an equals sign.
     if opt.optType == flagOpt {
         exit(fmt.Sprintf("invalid format for boolean flag %s%s", prefix, name))
     }

@@ -723,11 +723,11 @@ static ArgParser* argparser_new(char *helptext, char *version) {
 
 
 // -------------------------------------------------------------------------
-// ArgParser: registering options.
+// ArgParser: register options.
 // -------------------------------------------------------------------------
 
 
-// Register a boolean option.
+// Register a boolean option with a default value of false.
 static void argparser_add_flag(ArgParser *parser, char *name) {
     Option *opt = option_new_flag();
     map_add_splitkey(parser->options, name, opt);
@@ -784,7 +784,7 @@ static void argparser_add_float_list(ArgParser *parser, char *name, bool greedy)
 
 
 // -------------------------------------------------------------------------
-// ArgParser: retrieving options.
+// ArgParser: retrieve option values.
 // -------------------------------------------------------------------------
 
 
@@ -874,7 +874,7 @@ static double* argparser_get_float_list(ArgParser *parser, char *name) {
 
 
 // -------------------------------------------------------------------------
-// ArgParser: setting options.
+// ArgParser: set option values.
 // -------------------------------------------------------------------------
 
 
@@ -1005,7 +1005,7 @@ static ArgParser* argparser_get_cmd_parser(ArgParser *parser) {
 
 
 // -------------------------------------------------------------------------
-// ArgParser: parsing arguments.
+// ArgParser: parse arguments.
 // -------------------------------------------------------------------------
 
 

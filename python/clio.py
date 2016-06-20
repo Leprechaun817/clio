@@ -270,32 +270,32 @@ class ArgParser:
     # Setting options.
     # ----------------------------------------------------------------------
 
-    # Clears the specified option's internal list of values.
+    # Clear the specified option's internal list of values.
     def clear_list(self, name):
         option = self._get_opt(name)
         option.clear()
 
-    # Appends a value to the specified option's internal list.
+    # Append a value to the specified option's internal list.
     def _set_opt(self, name, value):
         option = self._get_opt(name)
         option.append(value)
 
-    # Appends a value to the specified option's internal list.
+    # Append a value to the specified option's internal list.
     def set_flag(self, name, value):
         option = self._get_opt(name)
         option.append(value)
 
-    # Appends a value to the specified option's internal list.
+    # Append a value to the specified option's internal list.
     def set_str(self, name, value):
         option = self._get_opt(name)
         option.append(value)
 
-    # Appends a value to the specified option's internal list.
+    # Append a value to the specified option's internal list.
     def set_int(self, name, value):
         option = self._get_opt(name)
         option.append(value)
 
-    # Appends a value to the specified option's internal list.
+    # Append a value to the specified option's internal list.
     def set_float(self, name, value):
         option = self._get_opt(name)
         option.append(value)
@@ -401,7 +401,7 @@ class ArgParser:
 
             # Is the argument a long-form option?
             elif arg.startswith("--"):
-                self._parse_longform_option(arg[2:], stream)
+                self._parse_long_opt(arg[2:], stream)
 
             # Is the argument a short-form option? If the argument consists of
             # a single dash or a dash followed by a digit, we treat it as a
@@ -410,7 +410,7 @@ class ArgParser:
                 if arg == '-' or arg[1].isdigit():
                     self.arguments.append(arg)
                 else:
-                    self._parse_shortform_option(arg[1:], stream)
+                    self._parse_short_opt(arg[1:], stream)
 
             # Is the argument a registered command?
             elif arg in self.commands:
@@ -456,7 +456,7 @@ class ArgParser:
             raise ParserError("invalid option type '%s'" % argtype)
 
     # Parse an option of the form --name=value or -n=value.
-    def _parse_equals_option(self, prefix, arg):
+    def _parse_equals_opt(self, prefix, arg):
         name, value = arg.split("=", maxsplit=1)
 
         # Is the argument a registered option name?
@@ -477,11 +477,11 @@ class ArgParser:
         self._set_opt(name, self._try_parse_arg(option.type, value))
 
     # Parse a long-form option, i.e. an option beginning with a double dash.
-    def _parse_longform_option(self, arg, stream):
+    def _parse_long_opt(self, arg, stream):
 
         # Do we have an option of the form --name=value?
         if "=" in arg:
-            self._parse_equals_option("--", arg)
+            self._parse_equals_opt("--", arg)
 
         # Is the argument a registered option name?
         elif arg in self.options:
@@ -526,11 +526,11 @@ class ArgParser:
             err("--%s is not a recognised option" % arg)
 
     # Parse a short-form option, i.e. an option beginning with a single dash.
-    def _parse_shortform_option(self, arg, stream):
+    def _parse_short_opt(self, arg, stream):
 
         # Do we have an option of the form -n=value?
         if "=" in arg:
-            self._parse_equals_option("-", arg)
+            self._parse_equals_opt("-", arg)
             return
 
         # We handle each character individually to support condensed options:
