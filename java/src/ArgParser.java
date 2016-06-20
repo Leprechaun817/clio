@@ -407,7 +407,7 @@ class ArgParser {
     }
 
 
-    // Returns the command string, if a command was found.
+    // Returns the command name, if a command was found.
     String getCmdName() {
         return cmdName;
     }
