@@ -51,6 +51,38 @@ public class ArgParserTest {
 
 
     // ---------------------------------------------------------------------
+    // Boolean lists.
+    // ---------------------------------------------------------------------
+
+
+    @Test
+    public void testBoolListEmpty() {
+        ArgParser parser = new ArgParser();
+        parser.addFlagList("bool");
+        parser.parse(new String[]{});
+        assertEquals(0, parser.lenList("bool"));
+    }
+
+
+    @Test
+    public void testBoolListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addFlagList("bool");
+        parser.parse(new String[]{"--bool", "--bool", "--bool"});
+        assertEquals(3, parser.lenList("bool"));
+    }
+
+
+    @Test
+    public void testBoolListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addFlagList("bool b");
+        parser.parse(new String[]{"-bb", "-b"});
+        assertEquals(3, parser.lenList("bool"));
+    }
+
+
+    // ---------------------------------------------------------------------
     // String options.
     // ---------------------------------------------------------------------
 
@@ -88,6 +120,66 @@ public class ArgParserTest {
         parser.addStr("string s", "default");
         parser.parse(new String[]{"-s", "value"});
         assertEquals("value", parser.getStr("string"));
+    }
+
+
+    // ---------------------------------------------------------------------
+    // String lists.
+    // ---------------------------------------------------------------------
+
+
+    @Test
+    public void testStringListEmpty() {
+        ArgParser parser = new ArgParser();
+        parser.addStrList("str");
+        parser.parse(new String[]{});
+        assertEquals(0, parser.lenList("str"));
+    }
+
+
+    @Test
+    public void testStringListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addStrList("str");
+        parser.parse(new String[]{"--str", "a", "b", "--str", "c"});
+        assertEquals(2, parser.lenList("str"));
+        assertEquals("a", parser.getStrList("str").get(0));
+        assertEquals("c", parser.getStrList("str").get(1));
+    }
+
+
+    @Test
+    public void testStringListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addStrList("str s");
+        parser.parse(new String[]{"-s", "a", "b", "-s", "c"});
+        assertEquals(2, parser.lenList("str"));
+        assertEquals("a", parser.getStrList("str").get(0));
+        assertEquals("c", parser.getStrList("str").get(1));
+    }
+
+
+    @Test
+    public void testStringGreedyListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addStrList("str", true);
+        parser.parse(new String[]{"--str", "a", "b", "--str", "c"});
+        assertEquals(3, parser.lenList("str"));
+        assertEquals("a", parser.getStrList("str").get(0));
+        assertEquals("b", parser.getStrList("str").get(1));
+        assertEquals("c", parser.getStrList("str").get(2));
+    }
+
+
+    @Test
+    public void testStringGreedyListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addStrList("str s", true);
+        parser.parse(new String[]{"-s", "a", "b", "-s", "c"});
+        assertEquals(3, parser.lenList("str"));
+        assertEquals("a", parser.getStrList("str").get(0));
+        assertEquals("b", parser.getStrList("str").get(1));
+        assertEquals("c", parser.getStrList("str").get(2));
     }
 
 
@@ -142,6 +234,66 @@ public class ArgParserTest {
 
 
     // ---------------------------------------------------------------------
+    // Integer lists.
+    // ---------------------------------------------------------------------
+
+
+    @Test
+    public void testIntListEmpty() {
+        ArgParser parser = new ArgParser();
+        parser.addIntList("int");
+        parser.parse(new String[]{});
+        assertEquals(0, parser.lenList("int"));
+    }
+
+
+    @Test
+    public void testIntListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addIntList("int");
+        parser.parse(new String[]{"--int", "1", "2", "--int", "3"});
+        assertEquals(2, parser.lenList("int"));
+        assertEquals(1, (int) parser.getIntList("int").get(0));
+        assertEquals(3, (int) parser.getIntList("int").get(1));
+    }
+
+
+    @Test
+    public void testIntListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addIntList("int i");
+        parser.parse(new String[]{"-i", "1", "2", "-i", "3"});
+        assertEquals(2, parser.lenList("int"));
+        assertEquals(1, (int) parser.getIntList("int").get(0));
+        assertEquals(3, (int) parser.getIntList("int").get(1));
+    }
+
+
+    @Test
+    public void testIntGreedyListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addIntList("int", true);
+        parser.parse(new String[]{"--int", "1", "2", "--int", "3"});
+        assertEquals(3, parser.lenList("int"));
+        assertEquals(1, (int) parser.getIntList("int").get(0));
+        assertEquals(2, (int) parser.getIntList("int").get(1));
+        assertEquals(3, (int) parser.getIntList("int").get(2));
+    }
+
+
+    @Test
+    public void testIntGreedyListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addIntList("int i", true);
+        parser.parse(new String[]{"-i", "1", "2", "-i", "3"});
+        assertEquals(3, parser.lenList("int"));
+        assertEquals(1, (int) parser.getIntList("int").get(0));
+        assertEquals(2, (int) parser.getIntList("int").get(1));
+        assertEquals(3, (int) parser.getIntList("int").get(2));
+    }
+
+
+    // ---------------------------------------------------------------------
     // Float options.
     // ---------------------------------------------------------------------
 
@@ -151,7 +303,7 @@ public class ArgParserTest {
         ArgParser parser = new ArgParser();
         parser.addFloat("float", 1.1);
         parser.parse(new String[]{});
-        assertEquals(1.1, (double)parser.getFloat("float"), 0.001);
+        assertEquals(1.1, parser.getFloat("float"), 0.001);
     }
 
 
@@ -160,7 +312,7 @@ public class ArgParserTest {
         ArgParser parser = new ArgParser();
         parser.addFloat("float", 1.1);
         parser.parse(new String[]{"foo", "bar"});
-        assertEquals(1.1, (double)parser.getFloat("float"), 0.01);
+        assertEquals(1.1, parser.getFloat("float"), 0.01);
     }
 
 
@@ -169,7 +321,7 @@ public class ArgParserTest {
         ArgParser parser = new ArgParser();
         parser.addFloat("float", 1.1);
         parser.parse(new String[]{"--float", "2.2"});
-        assertEquals(2.2, (double)parser.getFloat("float"), 0.01);
+        assertEquals(2.2, parser.getFloat("float"), 0.01);
     }
 
 
@@ -178,7 +330,7 @@ public class ArgParserTest {
         ArgParser parser = new ArgParser();
         parser.addFloat("float f", 1.1);
         parser.parse(new String[]{"-f", "2.2"});
-        assertEquals(2.2, (double)parser.getFloat("float"), 0.01);
+        assertEquals(2.2, parser.getFloat("float"), 0.01);
     }
 
 
@@ -187,7 +339,67 @@ public class ArgParserTest {
         ArgParser parser = new ArgParser();
         parser.addFloat("float", 1.1);
         parser.parse(new String[]{"--float", "-2.2"});
-        assertEquals(-2.2, (double)parser.getFloat("float"), 0.01);
+        assertEquals(-2.2, parser.getFloat("float"), 0.01);
+    }
+
+
+    // ---------------------------------------------------------------------
+    // Float lists.
+    // ---------------------------------------------------------------------
+
+
+    @Test
+    public void testFloatListEmpty() {
+        ArgParser parser = new ArgParser();
+        parser.addFloatList("flt");
+        parser.parse(new String[]{});
+        assertEquals(0, parser.lenList("flt"));
+    }
+
+
+    @Test
+    public void testFloatListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addFloatList("flt");
+        parser.parse(new String[]{"--flt", "1.0", "2.0", "--flt", "3.0"});
+        assertEquals(2, parser.lenList("flt"));
+        assertEquals(1.0, (double) parser.getFloatList("flt").get(0), 0.01);
+        assertEquals(3.0, (double) parser.getFloatList("flt").get(1), 0.01);
+    }
+
+
+    @Test
+    public void testFloatListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addFloatList("flt f");
+        parser.parse(new String[]{"-f", "1.0", "2.0", "-f", "3.0"});
+        assertEquals(2, parser.lenList("flt"));
+        assertEquals(1.0, (double) parser.getFloatList("flt").get(0), 0.01);
+        assertEquals(3.0, (double) parser.getFloatList("flt").get(1), 0.01);
+    }
+
+
+    @Test
+    public void testFloatGreedyListLongform() {
+        ArgParser parser = new ArgParser();
+        parser.addFloatList("flt", true);
+        parser.parse(new String[]{"--flt", "1.0", "2.0", "--flt", "3.0"});
+        assertEquals(3, parser.lenList("flt"));
+        assertEquals(1.0, (double) parser.getFloatList("flt").get(0), 0.01);
+        assertEquals(2.0, (double) parser.getFloatList("flt").get(1), 0.01);
+        assertEquals(3.0, (double) parser.getFloatList("flt").get(2), 0.01);
+    }
+
+
+    @Test
+    public void testFloatGreedyListShortform() {
+        ArgParser parser = new ArgParser();
+        parser.addFloatList("flt f", true);
+        parser.parse(new String[]{"-f", "1.0", "2.0", "-f", "3.0"});
+        assertEquals(3, parser.lenList("flt"));
+        assertEquals(1.0, (double) parser.getFloatList("flt").get(0), 0.01);
+        assertEquals(2.0, (double) parser.getFloatList("flt").get(1), 0.01);
+        assertEquals(3.0, (double) parser.getFloatList("flt").get(2), 0.01);
     }
 
 
@@ -214,8 +426,8 @@ public class ArgParserTest {
         assertEquals("default2", parser.getStr("string2"));
         assertEquals(101, parser.getInt("int1"));
         assertEquals(202, parser.getInt("int2"));
-        assertEquals(1.1, (double)parser.getFloat("float1"), 0.01);
-        assertEquals(2.2, (double)parser.getFloat("float2"), 0.01);
+        assertEquals(1.1, parser.getFloat("float1"), 0.01);
+        assertEquals(2.2, parser.getFloat("float2"), 0.01);
     }
 
 
@@ -246,8 +458,8 @@ public class ArgParserTest {
         assertEquals("value2", parser.getStr("string2"));
         assertEquals(303, parser.getInt("int1"));
         assertEquals(404, parser.getInt("int2"));
-        assertEquals(3.3, (double)parser.getFloat("float1"), 0.01);
-        assertEquals(4.4, (double)parser.getFloat("float2"), 0.01);
+        assertEquals(3.3, parser.getFloat("float1"), 0.01);
+        assertEquals(4.4, parser.getFloat("float2"), 0.01);
     }
 
 
@@ -278,8 +490,8 @@ public class ArgParserTest {
         assertEquals("value2", parser.getStr("string2"));
         assertEquals(303, parser.getInt("int1"));
         assertEquals(404, parser.getInt("int2"));
-        assertEquals(3.3, (double)parser.getFloat("float1"), 0.01);
-        assertEquals(4.4, (double)parser.getFloat("float2"), 0.01);
+        assertEquals(3.3, parser.getFloat("float1"), 0.01);
+        assertEquals(4.4, parser.getFloat("float2"), 0.01);
     }
 
 
@@ -299,7 +511,7 @@ public class ArgParserTest {
         assertEquals(true, parser.getFlag("bool"));
         assertEquals("value", parser.getStr("string"));
         assertEquals(202, parser.getInt("int"));
-        assertEquals(2.2, (double)parser.getFloat("float"), 0.01);
+        assertEquals(2.2, parser.getFloat("float"), 0.01);
     }
 
 
@@ -333,8 +545,8 @@ public class ArgParserTest {
     public void testPositionalArgsAsInts() {
         ArgParser parser = new ArgParser();
         parser.parse(new String[]{"1", "11"});
-        assertEquals(1, (int)parser.getArgsAsInts().get(0));
-        assertEquals(11, (int)parser.getArgsAsInts().get(1));
+        assertEquals(1, (int) parser.getArgsAsInts().get(0));
+        assertEquals(11, (int) parser.getArgsAsInts().get(1));
     }
 
 
@@ -342,8 +554,8 @@ public class ArgParserTest {
     public void testPositionalArgsAsFloats() {
         ArgParser parser = new ArgParser();
         parser.parse(new String[]{"1.1", "11.1"});
-        assertEquals(1.1, (double)parser.getArgsAsFloats().get(0), 0.01);
-        assertEquals(11.1, (double)parser.getArgsAsFloats().get(1), 0.01);
+        assertEquals(1.1, parser.getArgsAsFloats().get(0), 0.01);
+        assertEquals(11.1, parser.getArgsAsFloats().get(1), 0.01);
     }
 
 
@@ -416,6 +628,6 @@ public class ArgParserTest {
         assertEquals(2, cmdParser.lenArgs());
         assertEquals("value", cmdParser.getStr("string"));
         assertEquals(202, cmdParser.getInt("int"));
-        assertEquals(2.2, (double)cmdParser.getFloat("float"), 0.01);
+        assertEquals(2.2, cmdParser.getFloat("float"), 0.01);
     }
 }
