@@ -1,2 +1,270 @@
+---
+title: Python API
+---
 
-# Python API
+Install Clio from the Python package index:
+
+    $ pip install libclio
+
+Import the Clio module:
+
+    >>> import clio
+
+Clio requires Python 3.
+
+
+## Usage
+
+Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
+
+::: python
+
+    parser = clio.ArgParser(helptext=None, version=None)
+
+Supplying help text activates an automatic `--help` flag; supplying a version string activates an automatic `--version` flag.
+
+You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the parser's `parse()` method to process the application's command line arguments:
+
+::: python
+
+    parser.parse()
+
+Parsed option values can be retrieved from the parser instance itself.
+
+
+## Register Options
+
+Clio supports long-form options (`--foo`) with single-character shortcuts (`-f`).
+
+An option can have an unlimited number of long and short-form aliases. Aliases are specified via the `name` parameter which accepts a string of space-separated alternatives, e.g. `"foo f"`.
+
+Option values can be separated on the command line by either a space (`--foo 123`) or an equals symbol (`--foo=123`).
+
+
+~   `.add_flag(name)`
+
+    Register a flag (a boolean option) with a default value of `False`. Flag options take no arguments but are either present (`True`) or absent (`False`).
+
+
+~   `.add_float(name, value)`
+
+    Register a floating-point option with a default value.
+
+
+~   `.add_int(name, value)`
+
+    Register an integer option with a default value.
+
+
+~   `.add_str(name, value)`
+
+    Register a string option with a default value.
+
+
+## Register List Options
+
+List options accept multiple values. *Greedy* list options attempt to parse multiple consecutive arguments.
+
+Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the `name` parameter.
+
+
+~   `.add_flag_list(name)`
+
+    Register a boolean list option.
+
+
+~   `.add_float_list(name, greedy=False)`
+
+    Register a floating-point list option.
+
+
+~   `.add_int_list(name, greedy=False)`
+
+    Register an integer list option.
+
+
+~   `.add_str_list(name, greedy=False)`
+
+    Register a string list option.
+
+
+## Retrieve Option Values
+
+An option's value can be retrieved from the parser instance using any of its registered aliases.
+
+
+~   `.found(name)`
+
+    Returns true if the specified option was found while parsing.
+
+
+~   `.get_flag(name)`
+
+    Returns the value of the specified boolean option.
+
+
+~   `.get_float(name)`
+
+    Returns the value of the specified floating-point option.
+
+
+~   `.get_int(name)`
+
+    Returns the value of the specified integer option.
+
+
+~   `.get_str(name)`
+
+    Returns the value of the specified string option.
+
+
+An option's value can also be retrieved using dictionary syntax:
+
+::: python
+
+    value = parser["name"]
+
+Note that dictionary syntax is read-only and should only be used for single-valued options.
+
+
+## Retrieve List Values
+
+A list-option's values can be retrieved from the parser instance using any of its registered aliases.
+
+
+~   `.get_flag_list(name)`
+
+    Returns the specified option's list of values.
+
+
+~   `.get_float_list(name)`
+
+    Returns the specified option's list of values.
+
+
+~   `.get_int_list(name)`
+
+    Returns the specified option's list of values.
+
+
+~   `.get_str_list(name)`
+
+    Returns the specified option's list of values.
+
+
+~   `.len_list(name)`
+
+    Returns the length of the specified option's list of values.
+
+
+## Set Option Values
+
+The methods below can be used to set option values manually.
+
+Note that, internally, all options are list-options. An option's 'value' is the last value in its internal list.
+
+
+~   `.clear_list(name)`
+
+    Clear the specified option's internal list of values.
+
+
+~   `.set_flag(name, value)`
+
+    Append a boolean value to the specified option's internal list.
+
+
+~   `.set_float(name, value)`
+
+    Append a floating-point value to the specified option's internal list.
+
+
+~   `.set_int(name, value)`
+
+    Append an integer value to the specified option's internal list.
+
+
+~   `.set_str(name, value)`
+
+    Append a string value to the specified option's internal list.
+
+
+## Positional Arguments
+
+
+The methods below provide access to positional arguments identified by the parser.
+
+
+~   `.get_arg(index)`
+
+    Returns the (string) positional argument at the specified index.
+
+
+~   `.get_args()`
+
+    Returns the positional arguments as a list of strings.
+
+
+~   `.get_args_as_floats()`
+
+    Attempts to parse and return the positional arguments as a list of floats.
+    Exits with an error message on failure.
+
+
+~   `.get_args_as_ints()`
+
+    Attempts to parse and return the positional arguments as a list of integers.
+    Exits with an error message on failure.
+
+
+~   `.has_args()`
+
+    Returns true if at least one positional argument has been found.
+
+
+~   `.len_args()`
+
+    Returns the length of the positional argument list.
+
+
+Positional arguments can also be accessed using list syntax:
+
+::: python
+
+    value = parser[index]
+
+Note that list syntax is read-only.
+
+
+## Commands
+
+Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the `add_cmd()` method:
+
+::: python
+
+    cmd_parser = parser.add_cmd(name, helptext, callback)
+
+This method returns a new `ArgParser` instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call `parse()` on a command parser - if a command is found, its arguments are parsed automatically.)
+
+* Like options, commands can have an unlimited number of aliases specified via the `name` string.
+
+* Commands support an automatic `--help` flag and an automatic `help <name>` command using the specified help text.
+
+* The specified callback function will be called if the command is found. The callback should accept the command's `ArgParser` instance as its sole argument and should have no return value.
+
+The following `ArgParser` methods are also available for processing commands manually:
+
+
+~   `.get_cmd_name()`
+
+    Returns the command name, if the parser has found a command.
+
+
+~   `.get_cmd_parser()`
+
+    Returns the command's parser instance, if the parser has found a command.
+
+
+~   `.has_cmd()`
+
+    Returns true if the parser has found a command.

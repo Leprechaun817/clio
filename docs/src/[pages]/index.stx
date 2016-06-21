@@ -1,16 +1,17 @@
-
-# Clio
+---
+title: Clio
+---
 
 Clio is a minimalist argument-parsing library designed for building elegant command-line interfaces.
 
 Clio supports long and short-form options and arbitrarily-nested commands. It aims to provide a consistent interface across multiple programming languages, implemented wherever possible as a simple drop-in file.
 
-Clio is currently implemented in the following languages:
+Clio is currently implemented in [C][], [Go][], [Java][], and [Python][].
 
-* [C](@root/apis/c//)
-* [Go](@root/apis/go//)
-* [Java](@root/apis/java//)
-* [Python](@root/apis/python//)
+[C]: @root/apis/c//
+[Go]: @root/apis/go//
+[Java]: @root/apis/java//
+[Python]: @root/apis/python//
 
 
 ## Features
@@ -20,11 +21,13 @@ All implementations support the same core feature set:
 * Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
 
 * Long-form string, integer, and floating-point options with
-  single-character shortcuts: `--option <arg>`, `-o <arg>`.
+  single-character shortcuts: `--opt <arg>`, `-o <arg>`.
 
 * Condensed short-form options: `-abc <arg> <arg>`.
 
 * Automatic `--help` and `--version` flags.
+
+* Support for list options with multiple values.
 
 * Support for git-style command interfaces with arbitrarily-nested commands.
 

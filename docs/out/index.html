@@ -3,9 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        
-Clio
-
+        Clio
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/theme.css">
@@ -17,7 +15,7 @@ Clio
     <script src="js/theme.js"></script>
 </head>
 
-<body class="pages single homepage">
+<body class="type-pages single homepage">
 
     <header id="head" class="head">
         <input id="togglebox" type="checkbox">
@@ -38,33 +36,18 @@ Clio
 
     <article id="main" class="main">
         
+            <h1>Clio</h1>
+        
 
-        <h1 id="clio">
-Clio
-</h1>
-<p>
+        <p>
 Clio is a minimalist argument-parsing library designed for building elegant command-line interfaces.
 </p>
 <p>
 Clio supports long and short-form options and arbitrarily-nested commands. It aims to provide a consistent interface across multiple programming languages, implemented wherever possible as a simple drop-in file.
 </p>
 <p>
-Clio is currently implemented in the following languages:
+Clio is currently implemented in <a href="apis/c.html">C</a>, <a href="apis/go.html">Go</a>, <a href="apis/java.html">Java</a>, and <a href="apis/python.html">Python</a>.
 </p>
-<ul>
-<li>
-<a href="apis/c.html">C</a>
-</li>
-<li>
-<a href="apis/go.html">Go</a>
-</li>
-<li>
-<a href="apis/java.html">Java</a>
-</li>
-<li>
-<a href="apis/python.html">Python</a>
-</li>
-</ul>
 <h2 id="features">
 Features
 </h2>
@@ -80,7 +63,7 @@ Long-form boolean flags with single-character shortcuts: <code>--flag</code>, <c
 <li>
 <p>
 Long-form string, integer, and floating-point options with
-single-character shortcuts: <code>--option &lt;arg&gt;</code>, <code>-o &lt;arg&gt;</code>.
+single-character shortcuts: <code>--opt &lt;arg&gt;</code>, <code>-o &lt;arg&gt;</code>.
 </p>
 </li>
 <li>
@@ -91,6 +74,11 @@ Condensed short-form options: <code>-abc &lt;arg&gt; &lt;arg&gt;</code>.
 <li>
 <p>
 Automatic <code>--help</code> and <code>--version</code> flags.
+</p>
+</li>
+<li>
+<p>
+Support for list options with multiple values.
 </p>
 </li>
 <li>
