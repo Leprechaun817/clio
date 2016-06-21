@@ -21,7 +21,7 @@ def err(msg):
 # Exception raised when an invalid API call is attempted. (Invalid user input
 # does not raise an exception; instead the application exits with an error
 # message.)
-class ParserError(Exception):
+class ArgParserError(Exception):
     pass
 
 
