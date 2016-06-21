@@ -3,8 +3,9 @@
 Clio
 ====
 
-Python implementation of the
-`Clio argument-parsing library <https://github.com/dmulholland/clio>`_.
+Python implementation of `Clio <https://github.com/dmulholland/clio>`_,
+a minimalist argument-parsing library designed for building elegant command
+line interfaces.
 
 Clio supports long and short-form options and arbitrarily-nested commands.
 It aims to provide a consistent interface across multiple programming languages,
@@ -12,7 +13,7 @@ implemented wherever possible as a simple drop-in file.
 
 Install::
 
-    $ pip install pyclio
+    $ pip install libclio
 
 Import::
 
@@ -37,15 +38,14 @@ with io.open(filepath, encoding='utf-8') as metafile:
 
 
 setup(
-    name = 'pyclio',
+    name = 'libclio',
     version = meta['version'],
     py_modules = ['clio'],
     author = 'Darren Mulholland',
     url = 'https://github.com/dmulholland/clio',
     license = 'Public Domain',
     description = (
-        'A minimalist argument-parsing library designed for building elegant '
-        'command-line interfaces.'
+        'A minimalist, multi-language argument-parsing library.'
     ),
     long_description = __doc__,
     classifiers = [
