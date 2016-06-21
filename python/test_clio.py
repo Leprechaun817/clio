@@ -249,6 +249,13 @@ def test_int_option_invalid_value():
         parser.parse(["--int", "foo"])
 
 
+def test_int_option_negative_value():
+    parser = clio.ArgParser()
+    parser.add_int("int", 101)
+    parser.parse(["--int", "-202"])
+    assert parser.get_int("int") == -202
+
+
 # --------------------------------------------------------------------------
 # Integer lists.
 # --------------------------------------------------------------------------
@@ -370,6 +377,13 @@ def test_float_option_invalid_value():
     parser.add_float("float", 1.1)
     with pytest.raises(SystemExit):
         parser.parse(["--float", "foo"])
+
+
+def test_float_option_negative_value():
+    parser = clio.ArgParser()
+    parser.add_float("float", 1.1)
+    parser.parse(["--float", "-2.2"])
+    assert parser.get_float("float") == -2.2
 
 
 # --------------------------------------------------------------------------
