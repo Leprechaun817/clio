@@ -127,7 +127,9 @@ class ArgParser:
             if key < len(self.arguments):
                 return self.arguments[key]
             else:
-                raise ParserError("argument index [%s] is out of bounds" % key)
+                raise ArgParserError(
+                    "positional argument index [%s] is out of bounds" % key
+                )
         else:
             option = self._get_opt(key)
             return option.value
@@ -228,7 +230,7 @@ class ArgParser:
         if option:
             return option
         else:
-            raise ParserError("'%s' is not a registered option" % name)
+            raise ArgParserError("'%s' is not a registered option" % name)
 
     # Returns the value of the specified option.
     def get_flag(self, name):
@@ -305,7 +307,7 @@ class ArgParser:
     # ----------------------------------------------------------------------
 
     # Register a command and its associated callback.
-    def add_cmd(self, name, callback, helptext):
+    def add_cmd(self, name, helptext, callback):
         parser = ArgParser(helptext)
         for alias in name.split():
             self.commands[alias] = parser
@@ -453,7 +455,7 @@ class ArgParser:
             except ValueError:
                 err("cannot parse '%s' as a float" % arg)
         else:
-            raise ParserError("invalid option type '%s'" % argtype)
+            raise ArgParserError("invalid option type '%s'" % argtype)
 
     # Parse an option of the form --name=value or -n=value.
     def _parse_equals_opt(self, prefix, arg):

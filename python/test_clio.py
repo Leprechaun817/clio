@@ -635,14 +635,14 @@ def test_option_parsing_switch():
 
 def test_command_absent():
     parser = clio.ArgParser()
-    cmd_parser = parser.add_cmd("cmd", lambda p: None, "helptext")
+    cmd_parser = parser.add_cmd("cmd", "helptext", lambda p: None)
     parser.parse([])
     assert parser.has_cmd() == False
 
 
 def test_command_present():
     parser = clio.ArgParser()
-    cmd_parser = parser.add_cmd("cmd", lambda p: None, "helptext")
+    cmd_parser = parser.add_cmd("cmd", "helptext", lambda p: None)
     parser.parse(["cmd"])
     assert parser.has_cmd() == True
     assert parser.get_cmd_name() == "cmd"
@@ -651,7 +651,7 @@ def test_command_present():
 
 def test_command_with_options():
     parser = clio.ArgParser()
-    cmd_parser = parser.add_cmd("cmd", lambda p: None, "helptext")
+    cmd_parser = parser.add_cmd("cmd", "helptext", lambda p: None)
     cmd_parser.add_flag("bool")
     cmd_parser.add_str("string", "default")
     cmd_parser.add_int("int", 101)
