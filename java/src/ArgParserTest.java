@@ -1,6 +1,6 @@
-/*
-    Unit tests for the ArgParser class.
-*/
+// -------------------------------------------------------------------------
+// Unit tests for the ArgParser class.
+// -------------------------------------------------------------------------
 
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -9,9 +9,9 @@ import org.junit.Test;
 public class ArgParserTest {
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Boolean options.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
@@ -44,178 +44,178 @@ public class ArgParserTest {
     @Test
     public void testBoolOptionShortform() {
         ArgParser parser = new ArgParser();
-        parser.addFlag("bool", 'b');
+        parser.addFlag("bool b");
         parser.parse(new String[]{"-b"});
         assertEquals(true, parser.getFlag("bool"));
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // String options.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
     public void testStringOptionEmpty() {
         ArgParser parser = new ArgParser();
-        parser.addStrOpt("string", "default");
+        parser.addStr("string", "default");
         parser.parse(new String[]{});
-        assertEquals("default", parser.getStrOpt("string"));
+        assertEquals("default", parser.getStr("string"));
     }
 
 
     @Test
     public void testStringOptionMissing() {
         ArgParser parser = new ArgParser();
-        parser.addStrOpt("string", "default");
+        parser.addStr("string", "default");
         parser.parse(new String[]{"foo", "bar"});
-        assertEquals("default", parser.getStrOpt("string"));
+        assertEquals("default", parser.getStr("string"));
     }
 
 
     @Test
     public void testStringOptionLongform() {
         ArgParser parser = new ArgParser();
-        parser.addStrOpt("string", "default");
+        parser.addStr("string", "default");
         parser.parse(new String[]{"--string", "value"});
-        assertEquals("value", parser.getStrOpt("string"));
+        assertEquals("value", parser.getStr("string"));
     }
 
 
     @Test
     public void testStringOptionShortform() {
         ArgParser parser = new ArgParser();
-        parser.addStrOpt("string", "default", 's');
+        parser.addStr("string s", "default");
         parser.parse(new String[]{"-s", "value"});
-        assertEquals("value", parser.getStrOpt("string"));
+        assertEquals("value", parser.getStr("string"));
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Integer options.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
     public void testIntOptionEmpty() {
         ArgParser parser = new ArgParser();
-        parser.addIntOpt("int", 101);
+        parser.addInt("int", 101);
         parser.parse(new String[]{});
-        assertEquals(101, parser.getIntOpt("int"));
+        assertEquals(101, parser.getInt("int"));
     }
 
 
     @Test
     public void testIntOptionMissing() {
         ArgParser parser = new ArgParser();
-        parser.addIntOpt("int", 101);
+        parser.addInt("int", 101);
         parser.parse(new String[]{"foo", "bar"});
-        assertEquals(101, parser.getIntOpt("int"));
+        assertEquals(101, parser.getInt("int"));
     }
 
 
     @Test
     public void testIntOptionLongform() {
         ArgParser parser = new ArgParser();
-        parser.addIntOpt("int", 101);
+        parser.addInt("int", 101);
         parser.parse(new String[]{"--int", "202"});
-        assertEquals(202, parser.getIntOpt("int"));
+        assertEquals(202, parser.getInt("int"));
     }
 
 
     @Test
     public void testIntOptionShortform() {
         ArgParser parser = new ArgParser();
-        parser.addIntOpt("int", 101, 'i');
+        parser.addInt("int i", 101);
         parser.parse(new String[]{"-i", "202"});
-        assertEquals(202, parser.getIntOpt("int"));
+        assertEquals(202, parser.getInt("int"));
     }
 
 
     @Test
     public void testIntOptionNegative() {
         ArgParser parser = new ArgParser();
-        parser.addIntOpt("int", 101);
+        parser.addInt("int", 101);
         parser.parse(new String[]{"--int", "-202"});
-        assertEquals(-202, parser.getIntOpt("int"));
+        assertEquals(-202, parser.getInt("int"));
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Float options.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
     public void testFloatOptionEmpty() {
         ArgParser parser = new ArgParser();
-        parser.addFloatOpt("float", 1.1);
+        parser.addFloat("float", 1.1);
         parser.parse(new String[]{});
-        assertEquals(1.1, (double)parser.getFloatOpt("float"), 0.001);
+        assertEquals(1.1, (double)parser.getFloat("float"), 0.001);
     }
 
 
     @Test
     public void testFloatOptionMissing() {
         ArgParser parser = new ArgParser();
-        parser.addFloatOpt("float", 1.1);
+        parser.addFloat("float", 1.1);
         parser.parse(new String[]{"foo", "bar"});
-        assertEquals(1.1, (double)parser.getFloatOpt("float"), 0.01);
+        assertEquals(1.1, (double)parser.getFloat("float"), 0.01);
     }
 
 
     @Test
     public void testFloatOptionLongform() {
         ArgParser parser = new ArgParser();
-        parser.addFloatOpt("float", 1.1);
+        parser.addFloat("float", 1.1);
         parser.parse(new String[]{"--float", "2.2"});
-        assertEquals(2.2, (double)parser.getFloatOpt("float"), 0.01);
+        assertEquals(2.2, (double)parser.getFloat("float"), 0.01);
     }
 
 
     @Test
     public void testFloatOptionShortform() {
         ArgParser parser = new ArgParser();
-        parser.addFloatOpt("float", 1.1, 'f');
+        parser.addFloat("float f", 1.1);
         parser.parse(new String[]{"-f", "2.2"});
-        assertEquals(2.2, (double)parser.getFloatOpt("float"), 0.01);
+        assertEquals(2.2, (double)parser.getFloat("float"), 0.01);
     }
 
 
     @Test
     public void testFloatOptionNegative() {
         ArgParser parser = new ArgParser();
-        parser.addFloatOpt("float", 1.1);
+        parser.addFloat("float", 1.1);
         parser.parse(new String[]{"--float", "-2.2"});
-        assertEquals(-2.2, (double)parser.getFloatOpt("float"), 0.01);
+        assertEquals(-2.2, (double)parser.getFloat("float"), 0.01);
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Multiple options.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
     public void testMultiOptionsEmpty() {
         ArgParser parser = new ArgParser();
         parser.addFlag("bool1");
-        parser.addFlag("bool2", 'b');
-        parser.addStrOpt("string1", "default1");
-        parser.addStrOpt("string2", "default2", 's');
-        parser.addIntOpt("int1", 101);
-        parser.addIntOpt("int2", 202, 'i');
-        parser.addFloatOpt("float1", 1.1);
-        parser.addFloatOpt("float2", 2.2, 'f');
+        parser.addFlag("bool2 b");
+        parser.addStr("string1", "default1");
+        parser.addStr("string2 s", "default2");
+        parser.addInt("int1", 101);
+        parser.addInt("int2 i", 202);
+        parser.addFloat("float1", 1.1);
+        parser.addFloat("float2 f", 2.2);
         parser.parse(new String[]{});
         assertEquals(false, parser.getFlag("bool1"));
         assertEquals(false, parser.getFlag("bool2"));
-        assertEquals("default1", parser.getStrOpt("string1"));
-        assertEquals("default2", parser.getStrOpt("string2"));
-        assertEquals(101, parser.getIntOpt("int1"));
-        assertEquals(202, parser.getIntOpt("int2"));
-        assertEquals(1.1, (double)parser.getFloatOpt("float1"), 0.01);
-        assertEquals(2.2, (double)parser.getFloatOpt("float2"), 0.01);
+        assertEquals("default1", parser.getStr("string1"));
+        assertEquals("default2", parser.getStr("string2"));
+        assertEquals(101, parser.getInt("int1"));
+        assertEquals(202, parser.getInt("int2"));
+        assertEquals(1.1, (double)parser.getFloat("float1"), 0.01);
+        assertEquals(2.2, (double)parser.getFloat("float2"), 0.01);
     }
 
 
@@ -223,13 +223,13 @@ public class ArgParserTest {
     public void testMultiOptionsLongform() {
         ArgParser parser = new ArgParser();
         parser.addFlag("bool1");
-        parser.addFlag("bool2", 'b');
-        parser.addStrOpt("string1", "default1");
-        parser.addStrOpt("string2", "default2", 's');
-        parser.addIntOpt("int1", 101);
-        parser.addIntOpt("int2", 202, 'i');
-        parser.addFloatOpt("float1", 1.1);
-        parser.addFloatOpt("float2", 2.2, 'f');
+        parser.addFlag("bool2 b");
+        parser.addStr("string1", "default1");
+        parser.addStr("string2 s", "default2");
+        parser.addInt("int1", 101);
+        parser.addInt("int2 i", 202);
+        parser.addFloat("float1", 1.1);
+        parser.addFloat("float2 f", 2.2);
         parser.parse(new String[]{
             "--bool1",
             "--bool2",
@@ -242,12 +242,12 @@ public class ArgParserTest {
         });
         assertEquals(true, parser.getFlag("bool1"));
         assertEquals(true, parser.getFlag("bool2"));
-        assertEquals("value1", parser.getStrOpt("string1"));
-        assertEquals("value2", parser.getStrOpt("string2"));
-        assertEquals(303, parser.getIntOpt("int1"));
-        assertEquals(404, parser.getIntOpt("int2"));
-        assertEquals(3.3, (double)parser.getFloatOpt("float1"), 0.01);
-        assertEquals(4.4, (double)parser.getFloatOpt("float2"), 0.01);
+        assertEquals("value1", parser.getStr("string1"));
+        assertEquals("value2", parser.getStr("string2"));
+        assertEquals(303, parser.getInt("int1"));
+        assertEquals(404, parser.getInt("int2"));
+        assertEquals(3.3, (double)parser.getFloat("float1"), 0.01);
+        assertEquals(4.4, (double)parser.getFloat("float2"), 0.01);
     }
 
 
@@ -255,13 +255,13 @@ public class ArgParserTest {
     public void testMultiOptionsShortform() {
         ArgParser parser = new ArgParser();
         parser.addFlag("bool1");
-        parser.addFlag("bool2", 'b');
-        parser.addStrOpt("string1", "default1");
-        parser.addStrOpt("string2", "default2", 's');
-        parser.addIntOpt("int1", 101);
-        parser.addIntOpt("int2", 202, 'i');
-        parser.addFloatOpt("float1", 1.1);
-        parser.addFloatOpt("float2", 2.2, 'f');
+        parser.addFlag("bool2 b");
+        parser.addStr("string1", "default1");
+        parser.addStr("string2 s", "default2");
+        parser.addInt("int1", 101);
+        parser.addInt("int2 i", 202);
+        parser.addFloat("float1", 1.1);
+        parser.addFloat("float2 f", 2.2);
         parser.parse(new String[]{
             "--bool1",
             "-b",
@@ -274,38 +274,38 @@ public class ArgParserTest {
         });
         assertEquals(true, parser.getFlag("bool1"));
         assertEquals(true, parser.getFlag("bool2"));
-        assertEquals("value1", parser.getStrOpt("string1"));
-        assertEquals("value2", parser.getStrOpt("string2"));
-        assertEquals(303, parser.getIntOpt("int1"));
-        assertEquals(404, parser.getIntOpt("int2"));
-        assertEquals(3.3, (double)parser.getFloatOpt("float1"), 0.01);
-        assertEquals(4.4, (double)parser.getFloatOpt("float2"), 0.01);
+        assertEquals("value1", parser.getStr("string1"));
+        assertEquals("value2", parser.getStr("string2"));
+        assertEquals(303, parser.getInt("int1"));
+        assertEquals(404, parser.getInt("int2"));
+        assertEquals(3.3, (double)parser.getFloat("float1"), 0.01);
+        assertEquals(4.4, (double)parser.getFloat("float2"), 0.01);
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Condensed short-form options.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
     public void testCondensedOptions() {
         ArgParser parser = new ArgParser();
-        parser.addFlag("bool", 'b');
-        parser.addStrOpt("string", "default", 's');
-        parser.addIntOpt("int", 101, 'i');
-        parser.addFloatOpt("float", 1.1, 'f');
+        parser.addFlag("bool b");
+        parser.addStr("string s", "default");
+        parser.addInt("int i", 101);
+        parser.addFloat("float f", 1.1);
         parser.parse(new String[]{"-bsif", "value", "202", "2.2"});
         assertEquals(true, parser.getFlag("bool"));
-        assertEquals("value", parser.getStrOpt("string"));
-        assertEquals(202, parser.getIntOpt("int"));
-        assertEquals(2.2, (double)parser.getFloatOpt("float"), 0.01);
+        assertEquals("value", parser.getStr("string"));
+        assertEquals(202, parser.getInt("int"));
+        assertEquals(2.2, (double)parser.getFloat("float"), 0.01);
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Positional arguments.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
@@ -321,7 +321,7 @@ public class ArgParserTest {
         ArgParser parser = new ArgParser();
         parser.parse(new String[]{"foo", "bar"});
         assertEquals(true, parser.hasArgs());
-        assertEquals(2, parser.numArgs(), 2);
+        assertEquals(2, parser.lenArgs(), 2);
         assertEquals("foo", parser.getArgs().get(0));
         assertEquals("bar", parser.getArgs().get(1));
         assertEquals("foo", parser.getArg(0));
@@ -347,22 +347,22 @@ public class ArgParserTest {
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Option-parsing switch.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     @Test
     public void testOptionParsingSwitch() {
         ArgParser parser = new ArgParser();
         parser.parse(new String[]{"foo", "--", "--bar", "--baz"});
-        assertEquals(3, parser.numArgs());
+        assertEquals(3, parser.lenArgs());
     }
 
 
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
     // Commands.
-    // --------------------------------------------------------
+    // ---------------------------------------------------------------------
 
 
     public static void callback(ArgParser parser) {}
@@ -371,7 +371,9 @@ public class ArgParserTest {
     @Test
     public void testCommandAbsent() {
         ArgParser parser = new ArgParser();
-        ArgParser cmdParser = parser.addCmd("cmd", ArgParserTest::callback, "helptext");
+        ArgParser cmdParser = parser.addCmd(
+            "cmd", ArgParserTest::callback, "helptext"
+        );
         parser.parse(new String[]{});
         assertEquals(false, parser.hasCmd());
     }
@@ -380,10 +382,12 @@ public class ArgParserTest {
     @Test
     public void testCommandPresent() {
         ArgParser parser = new ArgParser();
-        ArgParser cmdParser = parser.addCmd("cmd", ArgParserTest::callback, "helptext");
+        ArgParser cmdParser = parser.addCmd(
+            "cmd", ArgParserTest::callback, "helptext"
+        );
         parser.parse(new String[]{"cmd"});
         assertEquals(true, parser.hasCmd());
-        assertEquals("cmd", parser.getCmd());
+        assertEquals("cmd", parser.getCmdName());
         assertEquals(cmdParser, parser.getCmdParser());
     }
 
@@ -391,11 +395,13 @@ public class ArgParserTest {
     @Test
     public void testCommandWithOptions() {
         ArgParser parser = new ArgParser();
-        ArgParser cmdParser = parser.addCmd("cmd", ArgParserTest::callback, "helptext");
+        ArgParser cmdParser = parser.addCmd(
+            "cmd", ArgParserTest::callback, "helptext"
+        );
         cmdParser.addFlag("bool");
-        cmdParser.addStrOpt("string", "default");
-        cmdParser.addIntOpt("int", 101);
-        cmdParser.addFloatOpt("float", 1.1);
+        cmdParser.addStr("string", "default");
+        cmdParser.addInt("int", 101);
+        cmdParser.addFloat("float", 1.1);
         parser.parse(new String[]{
             "cmd",
             "foo", "bar",
@@ -404,12 +410,12 @@ public class ArgParserTest {
             "--float", "2.2",
         });
         assertEquals(true, parser.hasCmd());
-        assertEquals("cmd", parser.getCmd());
+        assertEquals("cmd", parser.getCmdName());
         assertEquals(cmdParser, parser.getCmdParser());
         assertEquals(true, cmdParser.hasArgs());
-        assertEquals(2, cmdParser.numArgs());
-        assertEquals("value", cmdParser.getStrOpt("string"));
-        assertEquals(202, cmdParser.getIntOpt("int"));
-        assertEquals(2.2, (double)cmdParser.getFloatOpt("float"), 0.01);
+        assertEquals(2, cmdParser.lenArgs());
+        assertEquals("value", cmdParser.getStr("string"));
+        assertEquals(202, cmdParser.getInt("int"));
+        assertEquals(2.2, (double)cmdParser.getFloat("float"), 0.01);
     }
 }
