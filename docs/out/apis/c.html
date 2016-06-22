@@ -3,9 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        
-C API
-
+        C API
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/theme.css">
@@ -38,10 +36,404 @@ C API
 
     <article id="main" class="main">
         
+            <h1>C API</h1>
+        
 
-        <h1 id="c-api">
-C API
-</h1>
+        <p>
+To use Clio in your application add the <code>clio.c</code> and <code>clio.h</code> files to your source folder and include the header file:
+</p>
+<pre class="lang-c pygments" data-lang="c">
+<span class="cp">#include</span> <span class="cpf">&quot;clio.h&quot;</span><span class="cp"></span>
+</pre>
+<p>
+The header exports an <code>ArgParser</code> type and a selection of <code>ap_*</code> prefixed functions.
+</p>
+<p>
+Clio is written in portable C99.
+</p>
+<h2 id="usage">
+Usage
+</h2>
+<p>
+Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
+</p>
+<pre class="lang-c pygments" data-lang="c">
+<span class="n">ArgParser</span><span class="o">*</span> <span class="nf">ap_new</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">helptext</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">version</span><span class="p">);</span>
+</pre>
+<p>
+Supplying help text activates an automatic <code>--help</code> flag; supplying a version string activates an automatic <code>--version</code> flag. <code>NULL</code> can be passed for either parameter.
+</p>
+<p>
+You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the <code>ap_parse()</code> function to process the application's command line arguments:
+</p>
+<pre class="lang-c pygments" data-lang="c">
+<span class="kt">void</span> <span class="nf">ap_parse</span><span class="p">(</span><span class="n">ArgParser</span> <span class="o">*</span><span class="n">parser</span><span class="p">,</span> <span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">);</span>
+</pre>
+<p>
+The arguments are assumed to be <code>argc</code> and <code>argv</code> as supplied to <code>main()</code>, i.e. the first element of the array is assumed to be the application name and will be ignored.
+</p>
+<p>
+Parsed option values can be retrieved from the parser instance itself.
+</p>
+<p>
+Call <code>ap_free()</code> to recycle the memory occupied by a parser instance:
+</p>
+<pre class="lang-c pygments" data-lang="c">
+<span class="kt">void</span> <span class="nf">ap_free</span><span class="p">(</span><span class="n">ArgParser</span> <span class="o">*</span><span class="n">parser</span><span class="p">);</span>
+</pre>
+<p>
+This will free the memory occupied by the parser instance itself and any associated command sub-parsers.
+</p>
+<h2 id="register-options">
+Register Options
+</h2>
+<p>
+Clio supports long-form options (<code>--foo</code>) with single-character shortcuts (<code>-f</code>).
+</p>
+<p>
+An option can have an unlimited number of long and short-form aliases. Aliases are specified via the <code>name</code> parameter which accepts a string of space-separated alternatives, e.g. <code>"foo f"</code>.
+</p>
+<p>
+Option values can be separated on the command line by either a space (<code>--foo 123</code>) or an equals symbol (<code>--foo=123</code>).
+</p>
+<dl>
+<dt>
+<code>void ap_add_flag(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Register a flag (a boolean option) with a default value of <code>false</code>. Flag options take no arguments but are either present (<code>true</code>) or absent (<code>false</code>).
+</p>
+</dd>
+<dt>
+<code>void ap_add_float(ArgParser *parser, char *name, double value)</code>
+</dt>
+<dd>
+<p>
+Register a floating-point option with a default value.
+</p>
+</dd>
+<dt>
+<code>void ap_add_int(ArgParser *parser, char *name, int value)</code>
+</dt>
+<dd>
+<p>
+Register an integer option with a default value.
+</p>
+</dd>
+<dt>
+<code>void ap_add_str(ArgParser *parser, char *name, char* value)</code>
+</dt>
+<dd>
+<p>
+Register a string option with a default value.
+</p>
+</dd>
+</dl>
+<h2 id="register-list-options">
+Register List Options
+</h2>
+<p>
+List options store multiple values. <em>Greedy</em> list options attempt to parse multiple consecutive arguments.
+</p>
+<p>
+Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the <code>name</code> parameter.
+</p>
+<dl>
+<dt>
+<code>void ap_add_flag_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Register a boolean list option.
+</p>
+</dd>
+<dt>
+<code>void ap_add_float_list(ArgParser *parser, char *name, bool greedy)</code>
+</dt>
+<dd>
+<p>
+Register a floating-point list option.
+</p>
+</dd>
+<dt>
+<code>void ap_add_int_list(ArgParser *parser, char *name, bool greedy)</code>
+</dt>
+<dd>
+<p>
+Register an integer list option.
+</p>
+</dd>
+<dt>
+<code>void ap_add_str_list(ArgParser *parser, char *name, bool greedy)</code>
+</dt>
+<dd>
+<p>
+Register a string list option.
+</p>
+</dd>
+</dl>
+<h2 id="retrieve-option-values">
+Retrieve Option Values
+</h2>
+<p>
+An option's value can be retrieved from the parser instance using any of its registered aliases.
+</p>
+<dl>
+<dt>
+<code>bool ap_found(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns true if the specified option was found while parsing.
+</p>
+</dd>
+<dt>
+<code>bool ap_get_flag(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the value of the specified boolean option.
+</p>
+</dd>
+<dt>
+<code>double ap_get_float(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the value of the specified floating-point option.
+</p>
+</dd>
+<dt>
+<code>int ap_get_int(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the value of the specified integer option.
+</p>
+</dd>
+<dt>
+<code>char* ap_get_str(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the value of the specified string option.
+</p>
+</dd>
+</dl>
+<h2 id="retrieve-list-values">
+Retrieve List Values
+</h2>
+<p>
+A list-option's values can be retrieved from the parser instance using any of its registered aliases.
+</p>
+<dl>
+<dt>
+<code>bool* ap_get_flag_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the specified option's list of values as a freshly-allocated array of booleans. The array's memory is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>double* ap_get_float_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the specified option's list of values as a freshly-allocated array of doubles. The array's memory is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>int* ap_get_int_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the specified option's list of values as a freshly-allocated array of integers. The array's memory is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>char** ap_get_str_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the specified option's list of values as a freshly-allocated array of strings. The array's memory is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>int ap_len_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Returns the length of the specified option's list of values.
+</p>
+</dd>
+</dl>
+<h2 id="set-option-values">
+Set Option Values
+</h2>
+<p>
+The methods below can be used to set option values manually.
+</p>
+<p>
+Note that, internally, all options are list-options. An option's 'value' is the last value in its internal list.
+</p>
+<dl>
+<dt>
+<code>void ap_clear_list(ArgParser *parser, char *name)</code>
+</dt>
+<dd>
+<p>
+Clear the specified option's internal list of values.
+</p>
+</dd>
+<dt>
+<code>void ap_set_flag(ArgParser *parser, char *name, bool value)</code>
+</dt>
+<dd>
+<p>
+Append a boolean value to the specified option's internal list.
+</p>
+</dd>
+<dt>
+<code>void ap_set_float(ArgParser *parser, char *name, double value)</code>
+</dt>
+<dd>
+<p>
+Append a floating-point value to the specified option's internal list.
+</p>
+</dd>
+<dt>
+<code>void ap_set_int(ArgParser *parser, char *name, int value)</code>
+</dt>
+<dd>
+<p>
+Append an integer value to the specified option's internal list.
+</p>
+</dd>
+<dt>
+<code>void ap_set_str(ArgParser *parser, char *name, char *value)</code>
+</dt>
+<dd>
+<p>
+Append a string value to the specified option's internal list.
+</p>
+</dd>
+</dl>
+<h2 id="positional-arguments">
+Positional Arguments
+</h2>
+<p>
+The methods below provide access to positional arguments identified by the parser.
+</p>
+<dl>
+<dt>
+<code>char* ap_get_arg(ArgParser *parser, int index)</code>
+</dt>
+<dd>
+<p>
+Returns the positional argument at the specified index.
+</p>
+</dd>
+<dt>
+<code>char** ap_get_args(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Returns the positional arguments as a freshly-allocated array of strings. The memory occupied by the array is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>double* ap_get_args_as_floats(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Attempts to parse and return the positional arguments as a freshly-allocated array of doubles. Exits with an error message on failure. The memory occupied by the array is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>int* ap_get_args_as_ints(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Attempts to parse and return the positional arguments as a freshly-allocated array of integers. Exits with an error message on failure. The memory occupied by the array is not affected by calls to <code>ap_free()</code>.
+</p>
+</dd>
+<dt>
+<code>bool ap_has_args(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Returns true if at least one positional argument has been found.
+</p>
+</dd>
+<dt>
+<code>int ap_len_args(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Returns the length of the positional argument list.
+</p>
+</dd>
+</dl>
+<h2 id="commands">
+Commands
+</h2>
+<p>
+Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the <code>ap_add_cmd()</code> function:
+</p>
+<pre class="lang-c pygments" data-lang="c">
+<span class="n">ArgParser</span><span class="o">*</span> <span class="nf">ap_add_cmd</span><span class="p">(</span><span class="n">ArgParser</span> <span class="o">*</span><span class="n">parser</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">helptext</span><span class="p">,</span> <span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">callback</span><span class="p">)(</span><span class="n">ArgParser</span> <span class="o">*</span><span class="n">parser</span><span class="p">));</span>
+</pre>
+<p>
+This method returns a new <code>ArgParser</code> instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call <code>ap_parse()</code> on a command parser - if a command is found, its arguments are parsed automatically.)
+</p>
+<ul>
+<li>
+<p>
+Like options, commands can have an unlimited number of aliases specified via the <code>name</code> string.
+</p>
+</li>
+<li>
+<p>
+Commands support an automatic <code>--help</code> flag and an automatic <code>help &lt;name&gt;</code> command using the specified help text.
+</p>
+</li>
+<li>
+<p>
+The specified callback function will be called if the command is found. The callback should accept a pointer to the command's <code>ArgParser</code> instance as its sole argument and should return <code>void</code>.
+</p>
+</li>
+</ul>
+<p>
+The following functions are also available for processing commands manually:
+</p>
+<dl>
+<dt>
+<code>char* ap_get_cmd_name(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Returns the command name, if the parser has found a command.
+</p>
+</dd>
+<dt>
+<code>ArgParser* ap_get_cmd_parser(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Returns the command's parser instance, if the parser has found a command.
+</p>
+</dd>
+<dt>
+<code>bool ap_has_cmd(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Returns true if the parser has found a command.
+</p>
+</dd>
+</dl>
 
     </article>
 

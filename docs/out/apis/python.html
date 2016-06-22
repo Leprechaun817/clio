@@ -40,11 +40,14 @@
         
 
         <p>
-Install Clio from the Python package index:
+Install Clio from the Python package index using <code>pip</code>:
 </p>
 <pre>
 $ pip install libclio
 </pre>
+<p>
+Alternatively, you can incorporate the single, public-domain <code>clio.py</code> file directly into your project. Clio has no external dependencies.
+</p>
 <p>
 Import the Clio module:
 </p>
@@ -52,7 +55,7 @@ Import the Clio module:
 &gt;&gt;&gt; import clio
 </pre>
 <p>
-Clio requires Python 3.
+Clio requires Python &gt;= 3.0.
 </p>
 <h2 id="usage">
 Usage
@@ -125,7 +128,7 @@ Register a string option with a default value.
 Register List Options
 </h2>
 <p>
-List options accept multiple values. <em>Greedy</em> list options attempt to parse multiple consecutive arguments.
+List options store multiple values. <em>Greedy</em> list options attempt to parse multiple consecutive arguments.
 </p>
 <p>
 Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the <code>name</code> parameter.
@@ -219,7 +222,7 @@ An option's value can also be retrieved using dictionary syntax:
 <span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 </pre>
 <p>
-Note that dictionary syntax is read-only and should only be used for single-valued options.
+Dictionary syntax is read-only and should only be used for single-valued options.
 </p>
 <h2 id="retrieve-list-values">
 Retrieve List Values
