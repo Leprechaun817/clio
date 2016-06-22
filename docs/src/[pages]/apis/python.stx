@@ -10,6 +10,8 @@ Alternatively, you can incorporate the single, public-domain `clio.py` file dire
 
 Import the Clio module:
 
+::: python
+
     >>> import clio
 
 Clio requires Python >= 3.0.
