@@ -8,14 +8,14 @@ To use Clio in your application add the `clio.c` and `clio.h` files to your sour
 
     #include "clio.h"
 
-The header exports an `ArgParser` type and a selection of `ap_*` prefixed functions.
+The header exports an `ArgParser` type and a collection of `ap_*` prefixed functions.
 
 Clio is written in portable C99.
 
 
 ## Usage
 
-Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
+Initialize an argument parser, optionally specifying the application's help text and version:
 
 ::: c
 

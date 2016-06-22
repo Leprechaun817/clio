@@ -46,7 +46,7 @@ To use Clio in your application add the <code>clio.c</code> and <code>clio.h</co
 <span class="cp">#include</span> <span class="cpf">&quot;clio.h&quot;</span><span class="cp"></span>
 </pre>
 <p>
-The header exports an <code>ArgParser</code> type and a selection of <code>ap_*</code> prefixed functions.
+The header exports an <code>ArgParser</code> type and a collection of <code>ap_*</code> prefixed functions.
 </p>
 <p>
 Clio is written in portable C99.
@@ -55,7 +55,7 @@ Clio is written in portable C99.
 Usage
 </h2>
 <p>
-Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
+Initialize an argument parser, optionally specifying the application's help text and version:
 </p>
 <pre class="lang-c pygments" data-lang="c">
 <span class="n">ArgParser</span><span class="o">*</span> <span class="nf">ap_new</span><span class="p">(</span><span class="kt">char</span> <span class="o">*</span><span class="n">helptext</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">version</span><span class="p">);</span>
