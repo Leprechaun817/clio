@@ -224,7 +224,7 @@ This method returns a new `ArgParser` instance associated with the command. You 
 
 * Commands support an automatic `--help` flag and an automatic `help <name>` command using the specified help text.
 
-* The specified callback function will be called if the command is found. The callback should accept the command's `ArgParser` instance as its sole argument and should have no return value.
+* The specified callback function will be called if the command is found. The callback should accept the command's `ArgParser` instance as its sole argument and should return `void`.
 
 The following `ArgParser` methods are also available for processing commands manually:
 
