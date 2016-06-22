@@ -15,10 +15,10 @@ example: src/example.c src/clio.c src/clio.h
 tests: src/tests.c src/clio.c src/clio.h
 	@mkdir -p bin
 	$(CC) $(CFLAGS) -Wno-unused-parameter -o bin/tests src/tests.c src/clio.c
-	./bin/tests
 
 test:
 	@make tests
+	./bin/tests
 
 clean:
 	rm -f ./src/*.o
