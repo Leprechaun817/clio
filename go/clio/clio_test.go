@@ -732,7 +732,7 @@ func callback(parser *ArgParser) {}
 
 func TestCommandAbsent(t *testing.T) {
     parser := NewParser("", "")
-    parser.AddCmd("cmd", callback, "helptext")
+    parser.AddCmd("cmd", "helptext", callback)
     parser.ParseArgs([]string{})
     if parser.HasCmd() != false {
         t.Fail()
@@ -742,7 +742,7 @@ func TestCommandAbsent(t *testing.T) {
 
 func TestCommandPresent(t *testing.T) {
     parser := NewParser("", "")
-    cmdParser := parser.AddCmd("cmd", callback, "helptext")
+    cmdParser := parser.AddCmd("cmd", "helptext", callback)
     parser.ParseArgs([]string{"cmd"})
     if parser.HasCmd() != true {
         t.Fail()
@@ -758,7 +758,7 @@ func TestCommandPresent(t *testing.T) {
 
 func TestCommandWithOptions(t *testing.T) {
     parser := NewParser("", "")
-    cmdParser := parser.AddCmd("cmd", callback, "helptext")
+    cmdParser := parser.AddCmd("cmd", "helptext", callback)
     cmdParser.AddFlag("bool")
     cmdParser.AddStr("string", "default")
     cmdParser.AddInt("int", 101)

@@ -618,11 +618,11 @@ func (parser *ArgParser) GetArgsAsFloats() []float64 {
 
 
 // AddCmd registers a command, its help text, and its associated callback.
-func (parser *ArgParser) AddCmd(name string, cb func(*ArgParser), help string) *ArgParser {
-    cmdParser := NewParser(help, "")
+func (parser *ArgParser) AddCmd(name, helptext string, callback func(*ArgParser)) *ArgParser {
+    cmdParser := NewParser(helptext, "")
     for _, element := range strings.Split(name, " ") {
         parser.commands[element] = cmdParser
-        parser.callbacks[element] = cb
+        parser.callbacks[element] = callback
     }
     return cmdParser
 }

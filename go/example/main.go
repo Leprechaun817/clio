@@ -43,7 +43,7 @@ func main() {
 
 	// Register a command 'foo', with an alias 'bar'. We need to supply the
     // command's help text and callback method.
-	cmdParser := parser.AddCmd("foo bar", callback, "Command!")
+	cmdParser := parser.AddCmd("foo bar", "Command!", callback)
 
 	// Registering a command returns a new ArgParser instance dedicated to
     // parsing the command's arguments. We can register as many flags and
