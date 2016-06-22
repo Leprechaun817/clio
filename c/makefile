@@ -17,6 +17,9 @@ tests: src/tests.c src/clio.c src/clio.h
 	$(CC) $(CFLAGS) -Wno-unused-parameter -o bin/tests src/tests.c src/clio.c
 	./bin/tests
 
+test:
+	@make tests
+
 clean:
 	rm -f ./src/*.o
 	rm -f ./bin/tests
