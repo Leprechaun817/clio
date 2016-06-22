@@ -38,11 +38,11 @@ Parsed option values can be retrieved from the parser instance itself.
 
 ## Register Options
 
-Clio supports long-form options (`--foo`) with single-character shortcuts (`-f`).
+Clio supports long-form options, `--foo`, with single-character shortcuts, `-f`.
 
 An option can have an unlimited number of long and short-form aliases. Aliases are specified via the `name` parameter which accepts a string of space-separated alternatives, e.g. `"foo f"`.
 
-Option values can be separated on the command line by either a space (`--foo 123`) or an equals symbol (`--foo=123`).
+Option values can be separated on the command line by either a space, `--foo 123`, or an equals symbol, `--foo=123`.
 
 
 ~   `.add_flag(name)`
