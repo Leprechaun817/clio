@@ -584,7 +584,7 @@ public class ArgParserTest {
     public void testCommandAbsent() {
         ArgParser parser = new ArgParser();
         ArgParser cmdParser = parser.addCmd(
-            "cmd", ArgParserTest::callback, "helptext"
+            "cmd", "helptext", ArgParserTest::callback
         );
         parser.parse(new String[]{});
         assertEquals(false, parser.hasCmd());
@@ -595,7 +595,7 @@ public class ArgParserTest {
     public void testCommandPresent() {
         ArgParser parser = new ArgParser();
         ArgParser cmdParser = parser.addCmd(
-            "cmd", ArgParserTest::callback, "helptext"
+            "cmd", "helptext", ArgParserTest::callback
         );
         parser.parse(new String[]{"cmd"});
         assertEquals(true, parser.hasCmd());
@@ -608,7 +608,7 @@ public class ArgParserTest {
     public void testCommandWithOptions() {
         ArgParser parser = new ArgParser();
         ArgParser cmdParser = parser.addCmd(
-            "cmd", ArgParserTest::callback, "helptext"
+            "cmd", "helptext", ArgParserTest::callback
         );
         cmdParser.addFlag("bool");
         cmdParser.addStr("string", "default");

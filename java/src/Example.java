@@ -42,7 +42,7 @@ class Example {
         // Register a command, 'foo' with an alias 'bar'. We need to specify
         // the command's help text and callback method.
         ArgParser cmdParser = parser.addCmd(
-            "foo bar", Example::callback, "Command!"
+            "foo bar", "Command!", Example::callback
         );
 
         // Registering a command returns a new ArgParser instance dedicated to

@@ -391,7 +391,7 @@ class ArgParser {
 
 
     // Register a command with its associated callback and help text.
-    ArgParser addCmd(String name, Consumer<ArgParser> callback, String help) {
+    ArgParser addCmd(String name, String help, Consumer<ArgParser> callback) {
         ArgParser cmdParser = new ArgParser(help, null);
         for (String alias: name.split("\\s+")) {
             commands.put(alias, cmdParser);
