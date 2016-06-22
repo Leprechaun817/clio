@@ -977,7 +977,7 @@ static double* argparser_get_args_as_floats(ArgParser *parser) {
 
 // Register a command and its associated callback.
 static ArgParser* argparser_add_cmd(
-    ArgParser *parser, char *name, CmdCB callback, char *helptext
+    ArgParser *parser, char *name, char *helptext, CmdCB callback
 ) {
     ArgParser *cmd_parser = argparser_new(helptext, NULL);
     map_add_splitkey(parser->commands, name, cmd_parser);
@@ -1337,8 +1337,8 @@ void ap_add_float_list(ArgParser *parser, char *name, bool greedy) {
 }
 
 
-ArgParser* ap_add_cmd(ArgParser *parser, char *name, CmdCB cb, char *help) {
-    return argparser_add_cmd(parser, name, cb, help);
+ArgParser* ap_add_cmd(ArgParser *parser, char *name, char *help, CmdCB cb) {
+    return argparser_add_cmd(parser, name, help, cb);
 }
 
 

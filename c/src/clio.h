@@ -19,7 +19,7 @@
 
 // An ArgParser instance is responsible for storing registered options and
 // commands. Note that every registered command recursively receives an
-// ArgParser instance of its own. 
+// ArgParser instance of its own.
 typedef struct ArgParser ArgParser;
 
 
@@ -43,7 +43,7 @@ void ap_free(ArgParser *parser);
 // Parse an array of string arguments. Note that the function's parameters
 // are assumed to be argc and argv as supplied to main(), i.e. the first
 // element of the array is assumed to be the program name and ignored.
-void ap_parse(ArgParser *parser, int argc, char *argv[]);
+void ap_parse(ArgParser *parser, int argc, char **argv);
 
 
 // -------------------------------------------------------------------------
@@ -170,7 +170,7 @@ double* ap_get_args_as_floats(ArgParser *parser);
 // Register a command with its associated callback and helptext. The callback
 // should accept an ArgParser instance as its sole parameter and return void.
 ArgParser* ap_add_cmd(
-    ArgParser *parser, char *name, void (*cb)(ArgParser *parser), char *help
+    ArgParser *parser, char *name, char *help, void (*cb)(ArgParser *parser)
 );
 
 // Returns true if the parser has found a command.

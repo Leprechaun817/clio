@@ -572,7 +572,7 @@ void callback(ArgParser *parser) {}
 
 void test_command_absent() {
     ArgParser *parser = ap_new(NULL, NULL);
-    ap_add_cmd(parser, "cmd", callback, "helptext");
+    ap_add_cmd(parser, "cmd", "helptext", callback);
     ap_parse(parser, 1, (char *[]){""});
     assert(ap_has_cmd(parser) == false);
     printf(".");
@@ -581,7 +581,7 @@ void test_command_absent() {
 
 void test_command_present() {
     ArgParser *parser = ap_new(NULL, NULL);
-    ArgParser *cmd_parser = ap_add_cmd(parser, "cmd", callback, "helptext");
+    ArgParser *cmd_parser = ap_add_cmd(parser, "cmd", "helptext", callback);
     ap_parse(parser, 2, (char *[]){"", "cmd"});
     assert(ap_has_cmd(parser) == true);
     assert(strcmp(ap_get_cmd_name(parser), "cmd") == 0);
@@ -592,7 +592,7 @@ void test_command_present() {
 
 void test_command_with_options() {
     ArgParser *parser = ap_new(NULL, NULL);
-    ArgParser *cmd_parser = ap_add_cmd(parser, "cmd", callback, "helptext");
+    ArgParser *cmd_parser = ap_add_cmd(parser, "cmd", "helptext", callback);
     ap_add_flag(cmd_parser, "bool");
     ap_add_str(cmd_parser, "string", "default");
     ap_add_int(cmd_parser, "int", 101);

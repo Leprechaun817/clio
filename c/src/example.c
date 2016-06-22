@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
 
     // Register a command 'foo', with an alias 'bar'. We need to supply the
     // command's help text and callback method.
-    ArgParser *cmd_parser = ap_add_cmd(parser, "foo bar", callback, "Command!");
+    ArgParser *cmd_parser = ap_add_cmd(parser, "foo bar", "Command!", callback);
 
     // Registering a command returns a new ArgParser instance dedicated to
     // parsing the command's arguments. We can register as many flags and
