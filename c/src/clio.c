@@ -275,9 +275,6 @@ typedef union OptionValue {
 
 
 // An Option instance represents an option registered on a parser.
-//  * A mono-valued option has a single value.
-//  * A poly-valued option assembles a list of values.
-//  * A 'greedy' list option attempts to parse multiple consecutive arguments.
 typedef struct Option {
     OptionType type;
     bool found;
