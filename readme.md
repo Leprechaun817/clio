@@ -9,6 +9,6 @@ Clio is a minimalist argument-parsing library designed for building elegant comm
 
 * Clio is currently implemented in C, Go, Java, and Python.
 
-See the libary's [documentation][docs] for further details.
+See the library's [documentation][docs] for further details.
 
 [docs]: http://mulholland.xyz/docs/clio/
