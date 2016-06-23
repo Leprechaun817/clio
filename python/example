@@ -66,9 +66,9 @@ def main():
 # command is found. The method receives an ArgParser instance containing the
 # command's parsed arguments. Here we simply dump it to stdout.
 def callback(parser):
-    print("------------ callback() ------------")
+    print("----------------- callback() -----------------")
     print(parser)
-    print("....................................\n")
+    print("..............................................\n")
 
 
 if __name__ == "__main__":

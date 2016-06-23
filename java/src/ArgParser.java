@@ -4,7 +4,7 @@
 
     Author: Darren Mulholland <darren@mulholland.xyz>
     License: Public Domain
-    Version: 2.0.0.dev
+    Version: 2.0.0.beta
 */
 
 import java.util.Map;

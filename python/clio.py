@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.0.dev"
+__version__ = "2.0.0.beta"
 
 
 # Print a message to stderr and exit with a non-zero error code.
@@ -103,7 +103,7 @@ class ArgParser:
         # Application version number as a string.
         self.version = version.strip() if version else None
 
-        # Stores Option instances indexed by name and alias.
+        # Stores Option instances indexed by name.
         self.options = {}
 
         # Stores command sub-parser instances indexed by command name.

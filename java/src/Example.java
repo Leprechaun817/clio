@@ -4,7 +4,7 @@
 
 class Example {
 
-    // The sample application will parse its own command-line arguments.
+    // This sample application will parse its own command-line arguments.
     public static void main(String[] args) {
 
         // We instantiate an argument parser, optionally supplying help text

@@ -16,7 +16,7 @@ import (
 
 
 // Package version number.
-const Version = "2.0.0.dev"
+const Version = "2.0.0.beta"
 
 
 // Print a message to stderr and exit with an error code.
