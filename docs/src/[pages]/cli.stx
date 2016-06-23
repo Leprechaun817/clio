@@ -1,5 +1,66 @@
+---
+title: Command Line Interface
+---
 
-# Command Line Interface
+Clio aims to support the same core feature set across all its language implementations:
+
+* Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
+
+* Long-form string, integer, and floating-point options with
+  single-character shortcuts: `--opt <arg>`, `-o <arg>`.
+
+* Git-style command interfaces with arbitrarily-nested commands.
 
 
-Mention -- option parsing switch.
+## Options
+
+Clio supports four kinds of options: boolean, string, integer, and floating-point.
+
+* Boolean options take no arguments but are either present (true) or absent (false).
+
+* String, integer, and floating-point options require arguments of the appropriate type.
+
+An option can have an unlimited number of long-form aliases and single-character shortcuts: `--opt`, `-o`.
+
+Option values can be separated by either a space, `--opt 123`, or an equals symbol, `--opt=123`. Either syntax can be used with shortcuts: `-o 123`, `-o=123`.
+
+Multiple shortcuts can be condensed into a single block, e.g. `-abc foo bar`. Arguments are processed in order, making this block equivalent to `-a foo -b  bar -c`.
+
+Options are registered with default values which are used if the option is not found. If an option is found multiple times its value is the final value encountered, i.e. the value of `-o 123 -o 456` is `456`.
+
+
+## List Options
+
+List options store multiple values. A list option can be *greedy* or *non-greedy* depending on its eagerness to consume arguments.
+
+* 	A *non-greedy* list option attempts to parse a single argument each time it
+    occurs, i.e. the value of a non-greedy option `foo` in the example below
+    would be `[123, 789]`.
+
+        $ myapp --foo 123 456 --foo 789
+
+*	A *greedy* list option attempts to parse multiple consecutive arguments
+    each time it occurs, i.e. the value of a greedy `foo` in the example above
+    would be `[123, 456, 789]`.
+
+A greedy option will attempt to consume as many arguments as it can, continuing until it meets a new option or runs out of arguments.
+
+
+## Positional Arguments
+
+Options may be preceded, followed, or interspaced with positional arguments. Clio assembles all positional arguments together into a single, undifferentiated list of strings. Convenience functions are supplied for parsing these strings as integers or floats.
+
+Clio supports the standard `--` switch for turning off option-parsing. All arguments following a `--` will be treated as positional arguments, even if they begin with a single or double dash.
+
+
+## Commands
+
+Clio supports git-style command interfaces with arbitrarily-nested commands. Commands support an automatic `--help` flag and an automatic `help <name>` command, i.e. the commands
+
+    $ myapp cmdname --help
+
+and
+
+    $ myapp help cmdname
+
+are functionally identical and will both print the help text registered with the command.

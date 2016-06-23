@@ -3,9 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        
-Command Line Interface
-
+        Command Line Interface
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/theme.css">
@@ -38,12 +36,114 @@ Command Line Interface
 
     <article id="main" class="main">
         
+            <h1>Command Line Interface</h1>
+        
 
-        <h1 id="command-line-interface">
-Command Line Interface
-</h1>
+        <p>
+Clio aims to support the same core feature set across all its language implementations:
+</p>
+<ul>
+<li>
 <p>
-Mention -- option parsing switch.
+Long-form boolean flags with single-character shortcuts: <code>--flag</code>, <code>-f</code>.
+</p>
+</li>
+<li>
+<p>
+Long-form string, integer, and floating-point options with
+single-character shortcuts: <code>--opt &lt;arg&gt;</code>, <code>-o &lt;arg&gt;</code>.
+</p>
+</li>
+<li>
+<p>
+Git-style command interfaces with arbitrarily-nested commands.
+</p>
+</li>
+</ul>
+<h2 id="options">
+Options
+</h2>
+<p>
+Clio supports four kinds of options: boolean, string, integer, and floating-point.
+</p>
+<ul>
+<li>
+<p>
+Boolean options take no arguments but are either present (true) or absent (false).
+</p>
+</li>
+<li>
+<p>
+String, integer, and floating-point options require arguments of the appropriate type.
+</p>
+</li>
+</ul>
+<p>
+An option can have an unlimited number of long-form aliases and single-character shortcuts: <code>--opt</code>, <code>-o</code>.
+</p>
+<p>
+Option values can be separated by either a space, <code>--opt 123</code>, or an equals symbol, <code>--opt=123</code>. Either syntax can be used with shortcuts: <code>-o 123</code>, <code>-o=123</code>.
+</p>
+<p>
+Multiple shortcuts can be condensed into a single block, e.g. <code>-abc foo bar</code>. Arguments are processed in order, making this block equivalent to <code>-a foo -b  bar -c</code>.
+</p>
+<p>
+Options are registered with default values which are used if the option is not found. If an option is found multiple times its value is the final value encountered, i.e. the value of <code>-o 123 -o 456</code> is <code>456</code>.
+</p>
+<h2 id="list-options">
+List Options
+</h2>
+<p>
+List options store multiple values. A list option can be <em>greedy</em> or <em>non-greedy</em> depending on its eagerness to consume arguments.
+</p>
+<ul>
+<li>
+<p>
+A <em>non-greedy</em> list option attempts to parse a single argument each time it
+occurs, i.e. the value of a non-greedy option <code>foo</code> in the example below
+would be <code>[123, 789]</code>.
+</p>
+<pre>
+$ myapp --foo 123 456 --foo 789
+</pre>
+</li>
+<li>
+<p>
+A <em>greedy</em> list option attempts to parse multiple consecutive arguments
+each time it occurs, i.e. the value of a greedy <code>foo</code> in the example above
+would be <code>[123, 456, 789]</code>.
+</p>
+</li>
+</ul>
+<p>
+A greedy option will attempt to consume as many arguments as it can, continuing until it meets a new option or runs out of arguments.
+</p>
+<h2 id="positional-arguments">
+Positional Arguments
+</h2>
+<p>
+Options may be preceded, followed, or interspaced with positional arguments. Clio assembles all positional arguments together into a single, undifferentiated list of strings. Convenience functions are supplied for parsing these strings as integers or floats.
+</p>
+<p>
+Clio supports the standard <code>--</code> switch for turning off option-parsing. All arguments following a <code>--</code> will be treated as positional arguments, even if they begin with a single or double dash.
+</p>
+<h2 id="commands">
+Commands
+</h2>
+<p>
+Clio supports git-style command interfaces with arbitrarily-nested commands. Commands support an automatic <code>--help</code> flag and an automatic <code>help &lt;name&gt;</code> command, i.e. the commands
+</p>
+<pre>
+$ myapp cmdname --help
+</pre>
+<p>
+and
+</p>
+<pre>
+$ myapp help cmdname
+</pre>
+<p>
+are functionally identical and will both print the help text registered with the command.
 </p>
 
     </article>
