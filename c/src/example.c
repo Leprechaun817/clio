@@ -17,6 +17,7 @@ void callback(ArgParser *parser) {
 }
 
 
+// This sample application will parse its own command-line arguments.
 int main(int argc, char **argv) {
 
     // We instantiate an argument parser, optionally supplying help text and a

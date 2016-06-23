@@ -7,6 +7,7 @@ import sys
 import clio
 
 
+# This sample application will parse its own command-line arguments.
 def main():
 
     # We instantiate an argument parser, optionally supplying help text and a

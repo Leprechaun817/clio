@@ -63,7 +63,6 @@ class Example {
         System.out.println(parser);
     }
 
-
     // Callback method for the 'foo' command. This method will be called if the
     // command is found. The method receives an ArgParser instance containing
     // the command's parsed arguments. Here we simply dump it to stdout.

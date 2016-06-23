@@ -7,6 +7,7 @@ import (
 )
 
 
+// This sample application will parse its own command-line arguments.
 func main() {
 
 	// We instantiate an argument parser, optionally supplying help text and
