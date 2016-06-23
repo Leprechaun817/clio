@@ -152,7 +152,7 @@ A list-option's values can be retrieved from the parser instance using any of it
 
 The methods below can be used to set option values manually.
 
-Note that, internally, all options are list-options. An option's 'value' is the last value in its internal list.
+Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 
 
 ~   `func (parser *ArgParser) ClearList(name string)`

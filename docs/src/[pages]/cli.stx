@@ -55,12 +55,12 @@ Clio supports the standard `--` switch for turning off option-parsing. All argum
 
 ## Commands
 
-Clio supports git-style command interfaces with arbitrarily-nested commands. Commands support an automatic `--help` flag and an automatic `help <name>` command, i.e. the commands
+Clio supports git-style command interfaces with arbitrarily-nested commands. Commands have builtin support for an automatic `--help` flag and an automatic `help <cmd>` command, i.e. the commands
 
-    $ myapp cmdname --help
+    $ myapp <cmd> --help
 
 and
 
-    $ myapp help cmdname
+    $ myapp help <cmd>
 
 are functionally identical and will both print the help text registered with the command.

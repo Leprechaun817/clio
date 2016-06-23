@@ -131,16 +131,16 @@ Clio supports the standard <code>--</code> switch for turning off option-parsing
 Commands
 </h2>
 <p>
-Clio supports git-style command interfaces with arbitrarily-nested commands. Commands support an automatic <code>--help</code> flag and an automatic <code>help &lt;name&gt;</code> command, i.e. the commands
+Clio supports git-style command interfaces with arbitrarily-nested commands. Commands have builtin support for an automatic <code>--help</code> flag and an automatic <code>help &lt;cmd&gt;</code> command, i.e. the commands
 </p>
 <pre>
-$ myapp cmdname --help
+$ myapp &lt;cmd&gt; --help
 </pre>
 <p>
 and
 </p>
 <pre>
-$ myapp help cmdname
+$ myapp help &lt;cmd&gt;
 </pre>
 <p>
 are functionally identical and will both print the help text registered with the command.

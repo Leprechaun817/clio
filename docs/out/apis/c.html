@@ -257,7 +257,7 @@ Returns the specified option's list of values as a freshly-allocated array of in
 </dt>
 <dd>
 <p>
-Returns the specified option's list of values as a freshly-allocated array of strings. The array's memory is not affected by calls to <code>ap_free()</code>.
+Returns the specified option's list of values as a freshly-allocated array of string pointers. The array's memory is not affected by calls to <code>ap_free()</code>.
 </p>
 </dd>
 <dt>
@@ -276,7 +276,7 @@ Set Option Values
 The methods below can be used to set option values manually.
 </p>
 <p>
-Note that, internally, all options are list-options. An option's 'value' is the last value in its internal list.
+Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 </p>
 <dl>
 <dt>
@@ -340,7 +340,7 @@ Returns the positional argument at the specified index.
 </dt>
 <dd>
 <p>
-Returns the positional arguments as a freshly-allocated array of strings. The memory occupied by the array is not affected by calls to <code>ap_free()</code>.
+Returns the positional arguments as a freshly-allocated array of string pointers. The memory occupied by the array is not affected by calls to <code>ap_free()</code>.
 </p>
 </dd>
 <dt>

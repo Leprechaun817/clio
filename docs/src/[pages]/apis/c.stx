@@ -149,7 +149,7 @@ A list-option's values can be retrieved from the parser instance using any of it
 
 ~   `char** ap_get_str_list(ArgParser *parser, char *name)`
 
-    Returns the specified option's list of values as a freshly-allocated array of strings. The array's memory is not affected by calls to `ap_free()`.
+    Returns the specified option's list of values as a freshly-allocated array of string pointers. The array's memory is not affected by calls to `ap_free()`.
 
 
 ~   `int ap_len_list(ArgParser *parser, char *name)`
@@ -161,7 +161,7 @@ A list-option's values can be retrieved from the parser instance using any of it
 
 The methods below can be used to set option values manually.
 
-Note that, internally, all options are list-options. An option's 'value' is the last value in its internal list.
+Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 
 
 ~   `void ap_clear_list(ArgParser *parser, char *name)`
@@ -202,7 +202,7 @@ The methods below provide access to positional arguments identified by the parse
 
 ~   `char** ap_get_args(ArgParser *parser)`
 
-    Returns the positional arguments as a freshly-allocated array of strings. The memory occupied by the array is not affected by calls to `ap_free()`.
+    Returns the positional arguments as a freshly-allocated array of string pointers. The memory occupied by the array is not affected by calls to `ap_free()`.
 
 
 ~   `double* ap_get_args_as_floats(ArgParser *parser)`
