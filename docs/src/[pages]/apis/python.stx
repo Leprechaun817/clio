@@ -6,7 +6,7 @@ Install Clio from the Python package index using `pip`:
 
     $ pip install libclio
 
-Alternatively, you can incorporate the single, public-domain `clio.py` file directly into your project. Clio has no external dependencies.
+Alternatively, you can incorporate the single, public-domain `clio.py` file directly into your application. Clio has no external dependencies.
 
 Import the Clio module:
 
