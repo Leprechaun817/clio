@@ -19,7 +19,7 @@ Import::
 
     >>> import clio
 
-See the project's `Github homepage <https://github.com/dmulholland/clio>`_
+See the project's `documentation <http://mulholland.xyz/docs/clio/>`_
 for further details.
 
 """
