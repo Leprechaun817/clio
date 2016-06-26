@@ -1,10 +1,10 @@
-/*
-    Clio: a minimalist argument-parsing library designed for building elegant
-    command line interfaces.
-
-    Author: Darren Mulholland <darren@mulholland.xyz>
-    License: Public Domain
-*/
+// -------------------------------------------------------------------------
+// Clio: a minimalist argument-parsing library designed for building elegant
+// command line interfaces.
+//
+// Author: Darren Mulholland <darren@mulholland.xyz>
+// License: Public Domain
+// -------------------------------------------------------------------------
 
 #include <stdbool.h>
 #include <string.h>

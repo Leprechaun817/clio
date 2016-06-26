@@ -1,13 +1,13 @@
-/*
-    Clio: a minimalist argument-parsing library designed for building elegant
-    command line interfaces.
-
-    Clio is written in portable C99.
-
-    Author: Darren Mulholland <darren@mulholland.xyz>
-    License: Public Domain
-    Version: 2.0.0.beta
-*/
+// -------------------------------------------------------------------------
+// Clio: a minimalist argument-parsing library designed for building elegant
+// command line interfaces.
+//
+// Clio is written in portable C99.
+//
+// Author: Darren Mulholland <darren@mulholland.xyz>
+// License: Public Domain
+// Version: 2.0.0.beta
+// -------------------------------------------------------------------------
 
 #pragma once
 #include <stdbool.h>
