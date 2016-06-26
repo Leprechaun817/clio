@@ -269,6 +269,11 @@ The following `ArgParser` methods are also available for processing commands man
     Returns the command's parser instance, if the parser has found a command.
 
 
+~   `.get_parent()`
+
+    Returns a command parser's parent parser.
+
+
 ~   `.has_cmd()`
 
     Returns true if the parser has found a command.

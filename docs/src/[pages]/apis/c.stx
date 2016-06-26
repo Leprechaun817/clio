@@ -254,6 +254,11 @@ The following functions are also available for processing commands manually:
     Returns the command's parser instance, if the parser has found a command.
 
 
+~   `ArgParser* ap_get_parent(ArgParser *parser)`
+
+    Returns a pointer to a command parser's parent parser.
+
+
 ~   `bool ap_has_cmd(ArgParser *parser)`
 
     Returns true if the parser has found a command.
