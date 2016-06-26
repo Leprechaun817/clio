@@ -150,6 +150,10 @@ class ArgParser {
     private ArgParser cmdParser;
 
 
+    // Stores a reference to a command parser's parent parser instance.
+    private ArgParser parent;
+
+
     // Initialize a parser with no automatic --help or --version flags.
     ArgParser() {
         this(null, null);
@@ -393,6 +397,7 @@ class ArgParser {
     // Register a command with its associated callback and help text.
     ArgParser addCmd(String name, String help, Consumer<ArgParser> callback) {
         ArgParser cmdParser = new ArgParser(help, null);
+        cmdParser.parent = this;
         for (String alias: name.split("\\s+")) {
             commands.put(alias, cmdParser);
             callbacks.put(alias, callback);
@@ -416,6 +421,12 @@ class ArgParser {
     // Returns the command's parser instance, if a command was found.
     ArgParser getCmdParser() {
         return cmdParser;
+    }
+
+
+    // Returns a command parser's parent parser.
+    ArgParser getParent() {
+        return parent;
     }
 
 
@@ -548,10 +559,10 @@ class ArgParser {
             else if (commands.containsKey(arg)) {
                 ArgParser cmdParser = commands.get(arg);
                 Consumer<ArgParser> cmdCallback = callbacks.get(arg);
+                this.cmdName = arg;
+                this.cmdParser = cmdParser;                
                 cmdParser.parse(stream);
                 cmdCallback.accept(cmdParser);
-                this.cmdName = arg;
-                this.cmdParser = cmdParser;
             }
 
             // Is the argument the automatic 'help' command?
