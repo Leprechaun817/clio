@@ -182,6 +182,9 @@ char* ap_get_cmd_name(ArgParser *parser);
 // Returns the command's parser instance, if the parser has found a command.
 ArgParser* ap_get_cmd_parser(ArgParser *parser);
 
+// Returns a command parser's parent parser.
+ArgParser* ap_get_parent(ArgParser *parser);
+
 
 // -------------------------------------------------------------------------
 // Utilities.

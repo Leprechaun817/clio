@@ -683,6 +683,7 @@ typedef struct ArgParser {
     ArgList *arguments;
     char *cmd_name;
     ArgParser *cmd_parser;
+    ArgParser *parent;
 } ArgParser;
 
 
@@ -715,6 +716,7 @@ static ArgParser* argparser_new(char *helptext, char *version) {
     parser->arguments = arglist_new();
     parser->cmd_name = NULL;
     parser->cmd_parser = NULL;
+    parser->parent = NULL;
     return parser;
 }
 
@@ -977,6 +979,7 @@ static ArgParser* argparser_add_cmd(
     ArgParser *parser, char *name, char *helptext, CmdCB callback
 ) {
     ArgParser *cmd_parser = argparser_new(helptext, NULL);
+    cmd_parser->parent = parser;
     map_add_splitkey(parser->commands, name, cmd_parser);
     map_add_splitkey(parser->callbacks, name, callback);
     return cmd_parser;
@@ -998,6 +1001,12 @@ static char* argparser_get_cmd_name(ArgParser *parser) {
 // Returns the command's parser instance, if the parser has found a command.
 static ArgParser* argparser_get_cmd_parser(ArgParser *parser) {
     return parser->cmd_parser;
+}
+
+
+// Returns a command parser's parent parser.
+static ArgParser* argparser_get_parent(ArgParser *parser) {
+    return parser->parent;
 }
 
 
@@ -1197,12 +1206,12 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
         else if (map_contains(parser->commands, arg)) {
             ArgParser *cmd_parser = map_get(parser->commands, arg);
             CmdCB cmd_callback = map_get(parser->callbacks, arg);
+            parser->cmd_name = arg;
+            parser->cmd_parser = cmd_parser;
             argparser_parse_stream(cmd_parser, stream);
             if (cmd_callback != NULL) {
                 cmd_callback(cmd_parser);
             }
-            parser->cmd_name = arg;
-            parser->cmd_parser = cmd_parser;
         }
 
         // Is the argument the automatic 'help' command? The commands
@@ -1456,6 +1465,11 @@ char* ap_get_cmd_name(ArgParser *parser) {
 
 ArgParser* ap_get_cmd_parser(ArgParser *parser) {
     return argparser_get_cmd_parser(parser);
+}
+
+
+ArgParser* ap_get_parent(ArgParser *parser) {
+    return argparser_get_parent(parser);
 }
 
 
