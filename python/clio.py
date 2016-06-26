@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.0.beta"
+__version__ = "2.0.0b1"
 
 
 # Print a message to stderr and exit with a non-zero error code.
@@ -120,6 +120,9 @@ class ArgParser:
 
         # Stores the command's parser instance, if a command was found.
         self.cmd_parser = None
+
+        # Stores a reference to a command parser's parent parser.
+        self.parent = None
 
     # Enable dictionary/list-style access to options and arguments.
     def __getitem__(self, key):
@@ -309,6 +312,7 @@ class ArgParser:
     # Register a command and its associated callback.
     def add_cmd(self, name, helptext, callback):
         parser = ArgParser(helptext)
+        parser.parent = self
         for alias in name.split():
             self.commands[alias] = parser
             self.callbacks[alias] = callback
@@ -418,10 +422,10 @@ class ArgParser:
             elif arg in self.commands:
                 cmd_parser = self.commands[arg]
                 cmd_callback = self.callbacks[arg]
+                self.cmd_name = arg
+                self.cmd_parser = cmd_parser                
                 cmd_parser.parse_stream(stream)
                 cmd_callback(cmd_parser)
-                self.cmd_name = arg
-                self.cmd_parser = cmd_parser
 
             # Is the argument the automatic 'help' command?
             elif arg == "help":
