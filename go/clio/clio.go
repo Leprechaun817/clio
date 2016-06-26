@@ -357,6 +357,9 @@ type ArgParser struct {
 
     // Stores the command's parser instance, if a command is found.
     cmdParser *ArgParser
+
+    // Stores a command parser's parent parser instance.
+    parent *ArgParser
 }
 
 
@@ -620,6 +623,7 @@ func (parser *ArgParser) GetArgsAsFloats() []float64 {
 // AddCmd registers a command, its help text, and its associated callback.
 func (parser *ArgParser) AddCmd(name, helptext string, callback func(*ArgParser)) *ArgParser {
     cmdParser := NewParser(helptext, "")
+    cmdParser.parent = parser
     for _, element := range strings.Split(name, " ") {
         parser.commands[element] = cmdParser
         parser.callbacks[element] = callback
@@ -643,6 +647,12 @@ func (parser *ArgParser) GetCmdName() string {
 // GetCmdParser returns the command's parser instance, if a command was found.
 func (parser *ArgParser) GetCmdParser() *ArgParser {
     return parser.cmdParser
+}
+
+
+// GetParent returns a command parser's parent parser instance.
+func (parser *ArgParser) GetParent() *ArgParser {
+    return parser.parent
 }
 
 
@@ -698,10 +708,10 @@ func (parser *ArgParser) parseStream(stream *argStream) {
 
         // Is the argument a registered command?
         if cmdParser, ok := parser.commands[arg]; ok {
-            cmdParser.parseStream(stream)
-            parser.callbacks[arg](cmdParser)
             parser.cmdName = arg
             parser.cmdParser = cmdParser
+            cmdParser.parseStream(stream)
+            parser.callbacks[arg](cmdParser)
             continue
         }
 
