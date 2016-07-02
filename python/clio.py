@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.0"
+__version__ = "2.0.0.beta"
 
 
 # Print a message to stderr and exit with a non-zero error code.
