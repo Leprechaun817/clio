@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.0b1"
+__version__ = "2.0.0"
 
 
 # Print a message to stderr and exit with a non-zero error code.
@@ -423,7 +423,7 @@ class ArgParser:
                 cmd_parser = self.commands[arg]
                 cmd_callback = self.callbacks[arg]
                 self.cmd_name = arg
-                self.cmd_parser = cmd_parser                
+                self.cmd_parser = cmd_parser
                 cmd_parser.parse_stream(stream)
                 cmd_callback(cmd_parser)
 
