@@ -2,7 +2,7 @@
 title: Command Line Interface
 ---
 
-Clio aims to support the same core feature set across all its language implementations:
+Clio supports the same core feature set across all its language implementations:
 
 * Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
 
@@ -48,7 +48,7 @@ A greedy option will attempt to consume as many arguments as it can, continuing 
 
 ## Positional Arguments
 
-Options may be preceded, followed, or interspaced with positional arguments. Clio assembles all positional arguments together into a single, undifferentiated list of strings. Convenience functions are supplied for parsing these strings as integers or floats.
+Options can be preceded, followed, or interspaced with positional arguments. Clio assembles all positional arguments together into a single, undifferentiated list of strings. Convenience functions are supplied for parsing these strings as integers or floats.
 
 Clio supports the standard `--` switch for turning off option-parsing. All arguments following a `--` will be treated as positional arguments, even if they begin with a single or double dash.
 
