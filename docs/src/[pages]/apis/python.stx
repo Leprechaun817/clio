@@ -122,13 +122,11 @@ An option's value can be retrieved from the parser instance using any of its reg
     Returns the value of the specified string option.
 
 
-An option's value can also be retrieved using dictionary syntax:
+An option's value can also be retrieved using read-only dictionary syntax:
 
 ::: python
 
     value = parser["name"]
-
-Dictionary syntax is read-only and should only be used for single-valued options.
 
 
 ## Retrieve List Values
@@ -231,13 +229,11 @@ The methods below provide access to positional arguments identified by the parse
     Returns the length of the positional argument list.
 
 
-Positional arguments can also be accessed using list syntax:
+Positional arguments can also be accessed using read-only list syntax:
 
 ::: python
 
     value = parser[index]
-
-Note that list syntax is read-only.
 
 
 ## Commands

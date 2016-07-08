@@ -214,14 +214,11 @@ Returns the value of the specified string option.
 </dd>
 </dl>
 <p>
-An option's value can also be retrieved using dictionary syntax:
+An option's value can also be retrieved using read-only dictionary syntax:
 </p>
 <pre class="lang-python pygments" data-lang="python">
 <span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
 </pre>
-<p>
-Dictionary syntax is read-only and should only be used for single-valued options.
-</p>
 <h2 id="retrieve-list-values">
 Retrieve List Values
 </h2>
@@ -380,14 +377,11 @@ Returns the length of the positional argument list.
 </dd>
 </dl>
 <p>
-Positional arguments can also be accessed using list syntax:
+Positional arguments can also be accessed using read-only list syntax:
 </p>
 <pre class="lang-python pygments" data-lang="python">
 <span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 </pre>
-<p>
-Note that list syntax is read-only.
-</p>
 <h2 id="commands">
 Commands
 </h2>
