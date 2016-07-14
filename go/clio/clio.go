@@ -363,9 +363,8 @@ type ArgParser struct {
 
 
 // NewParser initializes a new ArgParser instance. Supplying help text activates
-// an automatic `--help` flag, supplying a version string activates an
-// automatic `--version` flag. An empty string `""` may be passed for either
-// parameter.
+// an automatic --help flag, supplying a version string activates an automatic
+// --version flag. An empty string may be passed for either parameter.
 func NewParser(helptext string, version string) *ArgParser {
     return &ArgParser {
         helptext: strings.TrimSpace(helptext),
@@ -622,7 +621,9 @@ func (parser *ArgParser) GetArgsAsFloats() []float64 {
 // -------------------------------------------------------------------------
 
 
-// AddCmd registers a command, its help text, and its associated callback.
+// AddCmd registers a command, its help text, and its associated callback
+// function. The callback function should accept the command's ArgParser istance
+// as its sole agument and should have no return value.
 func (parser *ArgParser) AddCmd(name, helptext string, callback func(*ArgParser)) *ArgParser {
     cmdParser := NewParser(helptext, "")
     cmdParser.parent = parser
