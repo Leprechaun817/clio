@@ -330,8 +330,7 @@ type cmdCallback func(*ArgParser)
 
 // An ArgParser instance is responsible for storing registered options and
 // commands. Note that every registered command recursively receives an
-// ArgParser instance of its own. In theory commands can be stacked to any
-// depth, although in practice even two levels is confusing for users.
+// ArgParser instance of its own.
 type ArgParser struct {
 
     // Help text for the application or command.
@@ -363,7 +362,10 @@ type ArgParser struct {
 }
 
 
-// NewParser initializes a new ArgParser instance.
+// NewParser initializes a new ArgParser instance. Supplying help text activates
+// an automatic `--help` flag, supplying a version string activates an
+// automatic `--version` flag. An empty string `""` may be passed for either
+// parameter.
 func NewParser(helptext string, version string) *ArgParser {
     return &ArgParser {
         helptext: strings.TrimSpace(helptext),
@@ -523,7 +525,7 @@ func (parser *ArgParser) GetFloatList(name string) []float64 {
 // -------------------------------------------------------------------------
 
 
-// Clear clears the named option's internal list of values.
+// ClearList clears the named option's internal list of values.
 func (parser *ArgParser) ClearList(name string) {
     parser.options[name].clear()
 }
