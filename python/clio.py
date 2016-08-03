@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.0.beta"
+__version__ = "2.0.2.beta"
 
 
 # Print a message to stderr and exit with a non-zero error code.
@@ -329,6 +329,10 @@ class ArgParser:
     # Returns the command's parser instance, if the parser has found a command.
     def get_cmd_parser(self):
         return self.cmd_parser
+
+    # Returns a command parser's parent parser.
+    def get_parent(self):
+        return self.parent
 
     # ----------------------------------------------------------------------
     # Positional arguments.
