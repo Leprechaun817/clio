@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.2.beta"
+__version__ = "2.0.3"
 
 
 # Print a message to stderr and exit with a non-zero error code.
@@ -126,13 +126,8 @@ class ArgParser:
 
     # Enable dictionary/list-style access to options and arguments.
     def __getitem__(self, key):
-        if isinstance(key, int):
-            if key < len(self.arguments):
-                return self.arguments[key]
-            else:
-                raise ArgParserError(
-                    "positional argument index [%s] is out of bounds" % key
-                )
+        if isinstance(key, int) or isinstance(key, slice):
+            return self.arguments[key]
         else:
             option = self._get_opt(key)
             return option.value
