@@ -4,7 +4,7 @@
 //
 // Author: Darren Mulholland <darren@mulholland.xyz>
 // License: Public Domain
-// Version: 2.0.0.beta
+// Version: 2.0.0
 // -------------------------------------------------------------------------
 
 import java.util.Map;
@@ -18,11 +18,8 @@ import java.util.function.Consumer;
 
 // ArgParser is the sole class exported by the library. An ArgParser instance
 // is responsible for registering options and commands and parsing the input
-// array of raw arguments.
-//
-// Note that every registered command recursively receives an ArgParser
-// instance of its own. In theory commands can be stacked to any depth,
-// although in practice even two levels is confusing for users.
+// array of raw arguments. Note that every registered command recursively
+// receives an ArgParser instance of its own. 
 class ArgParser {
 
 
@@ -560,7 +557,7 @@ class ArgParser {
                 ArgParser cmdParser = commands.get(arg);
                 Consumer<ArgParser> cmdCallback = callbacks.get(arg);
                 this.cmdName = arg;
-                this.cmdParser = cmdParser;                
+                this.cmdParser = cmdParser;
                 cmdParser.parse(stream);
                 cmdCallback.accept(cmdParser);
             }
