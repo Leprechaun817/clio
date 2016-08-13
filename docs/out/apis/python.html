@@ -16,8 +16,12 @@
 <body class="type-pages single">
 
     <header id="head" class="head">
-        <input id="togglebox" type="checkbox">
-        <label id="togglelabel" for="togglebox" class="unselectable"></label>
+        <input id="menu-check" type="checkbox"/>
+        <label id="menu-label" for="menu-check" class="unselectable">
+            <span class="icon close">✕</span>
+            <span class="icon open">☰</span>
+            <span class="text">MENU</span>
+        </label>
         <ul>
 <li>
 <a href="../index.html">Clio</a>
@@ -88,40 +92,30 @@ An option can have an unlimited number of long and short-form aliases. Aliases a
 <p>
 Option values can be separated on the command line by either a space, <code>--foo 123</code>, or an equals symbol, <code>--foo=123</code>.
 </p>
-<dl>
-<dt>
-<code>.add_flag(name)</code>
-</dt>
-<dd>
 <p>
-Register a flag (a boolean option) with a default value of <code>False</code>. Flag options take no arguments but are either present (<code>True</code>) or absent (<code>False</code>).
+~   <code>.add_flag(name)</code>
 </p>
-</dd>
-<dt>
-<code>.add_float(name, value)</code>
-</dt>
-<dd>
+<pre>
+Register a flag (a boolean option) with a default value of `False`. Flag options take no arguments but are either present (`True`) or absent (`False`).
+</pre>
 <p>
+~   <code>.add_float(name, value)</code>
+</p>
+<pre>
 Register a floating-point option with a default value.
-</p>
-</dd>
-<dt>
-<code>.add_int(name, value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.add_int(name, value)</code>
+</p>
+<pre>
 Register an integer option with a default value.
-</p>
-</dd>
-<dt>
-<code>.add_str(name, value)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Register a string option with a default value.
+~   <code>.add_str(name, value)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Register a string option with a default value.
+</pre>
 <h2 id="register-list-options">
 Register List Options
 </h2>
@@ -131,88 +125,66 @@ List options store multiple values. <em>Greedy</em> list options attempt to pars
 <p>
 Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the <code>name</code> parameter.
 </p>
-<dl>
-<dt>
-<code>.add_flag_list(name)</code>
-</dt>
-<dd>
 <p>
+~   <code>.add_flag_list(name)</code>
+</p>
+<pre>
 Register a boolean list option.
-</p>
-</dd>
-<dt>
-<code>.add_float_list(name, greedy=False)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.add_float_list(name, greedy=False)</code>
+</p>
+<pre>
 Register a floating-point list option.
-</p>
-</dd>
-<dt>
-<code>.add_int_list(name, greedy=False)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.add_int_list(name, greedy=False)</code>
+</p>
+<pre>
 Register an integer list option.
-</p>
-</dd>
-<dt>
-<code>.add_str_list(name, greedy=False)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Register a string list option.
+~   <code>.add_str_list(name, greedy=False)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Register a string list option.
+</pre>
 <h2 id="retrieve-option-values">
 Retrieve Option Values
 </h2>
 <p>
 An option's value can be retrieved from the parser instance using any of its registered aliases.
 </p>
-<dl>
-<dt>
-<code>.found(name)</code>
-</dt>
-<dd>
 <p>
+~   <code>.found(name)</code>
+</p>
+<pre>
 Returns true if the specified option was found while parsing.
-</p>
-</dd>
-<dt>
-<code>.get_flag(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_flag(name)</code>
+</p>
+<pre>
 Returns the value of the specified boolean option.
-</p>
-</dd>
-<dt>
-<code>.get_float(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_float(name)</code>
+</p>
+<pre>
 Returns the value of the specified floating-point option.
-</p>
-</dd>
-<dt>
-<code>.get_int(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_int(name)</code>
+</p>
+<pre>
 Returns the value of the specified integer option.
-</p>
-</dd>
-<dt>
-<code>.get_str(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Returns the value of the specified string option.
+~   <code>.get_str(name)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Returns the value of the specified string option.
+</pre>
 <p>
 An option's value can also be retrieved using read-only dictionary syntax:
 </p>
@@ -225,48 +197,36 @@ Retrieve List Values
 <p>
 A list-option's values can be retrieved from the parser instance using any of its registered aliases.
 </p>
-<dl>
-<dt>
-<code>.get_flag_list(name)</code>
-</dt>
-<dd>
 <p>
-Returns the specified option's list of values.
+~   <code>.get_flag_list(name)</code>
 </p>
-</dd>
-<dt>
-<code>.get_float_list(name)</code>
-</dt>
-<dd>
-<p>
+<pre>
 Returns the specified option's list of values.
-</p>
-</dd>
-<dt>
-<code>.get_int_list(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_float_list(name)</code>
+</p>
+<pre>
 Returns the specified option's list of values.
-</p>
-</dd>
-<dt>
-<code>.get_str_list(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_int_list(name)</code>
+</p>
+<pre>
 Returns the specified option's list of values.
-</p>
-</dd>
-<dt>
-<code>.len_list(name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_str_list(name)</code>
+</p>
+<pre>
+Returns the specified option's list of values.
+</pre>
+<p>
+~   <code>.len_list(name)</code>
+</p>
+<pre>
 Returns the length of the specified option's list of values.
-</p>
-</dd>
-</dl>
+</pre>
 <h2 id="set-option-values">
 Set Option Values
 </h2>
@@ -276,106 +236,80 @@ The methods below can be used to set option values manually.
 <p>
 Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 </p>
-<dl>
-<dt>
-<code>.clear_list(name)</code>
-</dt>
-<dd>
 <p>
+~   <code>.clear_list(name)</code>
+</p>
+<pre>
 Clear the specified option's internal list of values.
-</p>
-</dd>
-<dt>
-<code>.set_flag(name, value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.set_flag(name, value)</code>
+</p>
+<pre>
 Append a boolean value to the specified option's internal list.
-</p>
-</dd>
-<dt>
-<code>.set_float(name, value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.set_float(name, value)</code>
+</p>
+<pre>
 Append a floating-point value to the specified option's internal list.
-</p>
-</dd>
-<dt>
-<code>.set_int(name, value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.set_int(name, value)</code>
+</p>
+<pre>
 Append an integer value to the specified option's internal list.
-</p>
-</dd>
-<dt>
-<code>.set_str(name, value)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Append a string value to the specified option's internal list.
+~   <code>.set_str(name, value)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Append a string value to the specified option's internal list.
+</pre>
 <h2 id="positional-arguments">
 Positional Arguments
 </h2>
 <p>
 The methods below provide access to positional arguments identified by the parser.
 </p>
-<dl>
-<dt>
-<code>.get_arg(index)</code>
-</dt>
-<dd>
 <p>
+~   <code>.get_arg(index)</code>
+</p>
+<pre>
 Returns the (string) positional argument at the specified index.
-</p>
-</dd>
-<dt>
-<code>.get_args()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_args()</code>
+</p>
+<pre>
 Returns the positional arguments as a list of strings.
-</p>
-</dd>
-<dt>
-<code>.get_args_as_floats()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_args_as_floats()</code>
+</p>
+<pre>
 Attempts to parse and return the positional arguments as a list of floats.
 Exits with an error message on failure.
-</p>
-</dd>
-<dt>
-<code>.get_args_as_ints()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_args_as_ints()</code>
+</p>
+<pre>
 Attempts to parse and return the positional arguments as a list of integers.
 Exits with an error message on failure.
-</p>
-</dd>
-<dt>
-<code>.has_args()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.has_args()</code>
+</p>
+<pre>
 Returns true if at least one positional argument has been found.
-</p>
-</dd>
-<dt>
-<code>.len_args()</code>
-</dt>
-<dd>
+</pre>
 <p>
-Returns the length of the positional argument list.
+~   <code>.len_args()</code>
 </p>
-</dd>
-</dl>
+<pre>
+Returns the length of the positional argument list.
+</pre>
 <p>
 Positional arguments can also be accessed using read-only list syntax:
 </p>
@@ -414,40 +348,30 @@ The specified callback function will be called if the command is found. The call
 <p>
 The following <code>ArgParser</code> methods are also available for processing commands manually:
 </p>
-<dl>
-<dt>
-<code>.get_cmd_name()</code>
-</dt>
-<dd>
 <p>
+~   <code>.get_cmd_name()</code>
+</p>
+<pre>
 Returns the command name, if the parser has found a command.
-</p>
-</dd>
-<dt>
-<code>.get_cmd_parser()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_cmd_parser()</code>
+</p>
+<pre>
 Returns the command's parser instance, if the parser has found a command.
-</p>
-</dd>
-<dt>
-<code>.get_parent()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>.get_parent()</code>
+</p>
+<pre>
 Returns a command parser's parent parser.
-</p>
-</dd>
-<dt>
-<code>.has_cmd()</code>
-</dt>
-<dd>
+</pre>
 <p>
-Returns true if the parser has found a command.
+~   <code>.has_cmd()</code>
 </p>
-</dd>
-</dl>
+<pre>
+Returns true if the parser has found a command.
+</pre>
 
     </article>
 

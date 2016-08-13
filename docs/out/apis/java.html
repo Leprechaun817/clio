@@ -16,8 +16,12 @@
 <body class="type-pages single">
 
     <header id="head" class="head">
-        <input id="togglebox" type="checkbox">
-        <label id="togglelabel" for="togglebox" class="unselectable"></label>
+        <input id="menu-check" type="checkbox"/>
+        <label id="menu-label" for="menu-check" class="unselectable">
+            <span class="icon close">✕</span>
+            <span class="icon open">☰</span>
+            <span class="text">MENU</span>
+        </label>
         <ul>
 <li>
 <a href="../index.html">Clio</a>
@@ -73,40 +77,30 @@ An option can have an unlimited number of long and short-form aliases. Aliases a
 <p>
 Option values can be separated on the command line by either a space, <code>--foo 123</code>, or an equals symbol, <code>--foo=123</code>.
 </p>
-<dl>
-<dt>
-<code>void addFlag(String name)</code>
-</dt>
-<dd>
 <p>
-Register a flag (a boolean option) with a default value of <code>false</code>. Flag options take no arguments but are either present (<code>true</code>) or absent (<code>false</code>).
+~   <code>void addFlag(String name)</code>
 </p>
-</dd>
-<dt>
-<code>void addFloat(String name, double value)</code>
-</dt>
-<dd>
+<pre>
+Register a flag (a boolean option) with a default value of `false`. Flag options take no arguments but are either present (`true`) or absent (`false`).
+</pre>
 <p>
+~   <code>void addFloat(String name, double value)</code>
+</p>
+<pre>
 Register a floating-point option with a default value.
-</p>
-</dd>
-<dt>
-<code>void addInt(String name, int value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>void addInt(String name, int value)</code>
+</p>
+<pre>
 Register an integer option with a default value.
-</p>
-</dd>
-<dt>
-<code>void addStr(String name, String value)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Register a string option with a default value.
+~   <code>void addStr(String name, String value)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Register a string option with a default value.
+</pre>
 <h2 id="register-list-options">
 Register List Options
 </h2>
@@ -116,136 +110,102 @@ List options store multiple values. <em>Greedy</em> list options attempt to pars
 <p>
 Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the <code>name</code> parameter.
 </p>
-<dl>
-<dt>
-<code>void addFlagList(String name)</code>
-</dt>
-<dd>
 <p>
+~   <code>void addFlagList(String name)</code>
+</p>
+<pre>
 Register a boolean list option.
-</p>
-</dd>
-<dt>
-<code>void addFloatList(String name, boolean greedy)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>void addFloatList(String name, boolean greedy)</code>
+</p>
+<pre>
 Register a floating-point list option.
-</p>
-</dd>
-<dt>
-<code>void addIntList(String name, boolean greedy)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>void addIntList(String name, boolean greedy)</code>
+</p>
+<pre>
 Register an integer list option.
-</p>
-</dd>
-<dt>
-<code>void addStrList(String name, boolean greedy)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Register a string list option.
+~   <code>void addStrList(String name, boolean greedy)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Register a string list option.
+</pre>
 <h2 id="retrieve-option-values">
 Retrieve Option Values
 </h2>
 <p>
 An option's value can be retrieved from the parser instance using any of its registered aliases.
 </p>
-<dl>
-<dt>
-<code>boolean found(String name)</code>
-</dt>
-<dd>
 <p>
+~   <code>boolean found(String name)</code>
+</p>
+<pre>
 Returns true if the specified option was found while parsing.
-</p>
-</dd>
-<dt>
-<code>boolean getFlag(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>boolean getFlag(String name)</code>
+</p>
+<pre>
 Returns the value of the specified boolean option.
-</p>
-</dd>
-<dt>
-<code>double getFloat(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>double getFloat(String name)</code>
+</p>
+<pre>
 Returns the value of the specified floating-point option.
-</p>
-</dd>
-<dt>
-<code>int getInt(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>int getInt(String name)</code>
+</p>
+<pre>
 Returns the value of the specified integer option.
-</p>
-</dd>
-<dt>
-<code>String getStr(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Returns the value of the specified string option.
+~   <code>String getStr(String name)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Returns the value of the specified string option.
+</pre>
 <h2 id="retrieve-list-values">
 Retrieve List Values
 </h2>
 <p>
 A list-option's values can be retrieved from the parser instance using any of its registered aliases.
 </p>
-<dl>
-<dt>
-<code>List&lt;Boolean&gt; getFlagList(String name)</code>
-</dt>
-<dd>
 <p>
-Returns the specified option's list of values.
+~   <code>List&lt;Boolean&gt; getFlagList(String name)</code>
 </p>
-</dd>
-<dt>
-<code>List&lt;Double&gt; getFloatList(String name)</code>
-</dt>
-<dd>
-<p>
+<pre>
 Returns the specified option's list of values.
-</p>
-</dd>
-<dt>
-<code>List&lt;Integer&gt; getIntList(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>List&lt;Double&gt; getFloatList(String name)</code>
+</p>
+<pre>
 Returns the specified option's list of values.
-</p>
-</dd>
-<dt>
-<code>List&lt;String&gt; getStrList(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>List&lt;Integer&gt; getIntList(String name)</code>
+</p>
+<pre>
 Returns the specified option's list of values.
-</p>
-</dd>
-<dt>
-<code>int lenList(String name)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>List&lt;String&gt; getStrList(String name)</code>
+</p>
+<pre>
+Returns the specified option's list of values.
+</pre>
+<p>
+~   <code>int lenList(String name)</code>
+</p>
+<pre>
 Returns the length of the specified option's list of values.
-</p>
-</dd>
-</dl>
+</pre>
 <h2 id="set-option-values">
 Set Option Values
 </h2>
@@ -255,106 +215,80 @@ The methods below can be used to set option values manually.
 <p>
 Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 </p>
-<dl>
-<dt>
-<code>void clearList(String name)</code>
-</dt>
-<dd>
 <p>
+~   <code>void clearList(String name)</code>
+</p>
+<pre>
 Clear the specified option's internal list of values.
-</p>
-</dd>
-<dt>
-<code>void setFlag(String name, boolean value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>void setFlag(String name, boolean value)</code>
+</p>
+<pre>
 Append a boolean value to the specified option's internal list.
-</p>
-</dd>
-<dt>
-<code>void setFloat(String name, double value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>void setFloat(String name, double value)</code>
+</p>
+<pre>
 Append a floating-point value to the specified option's internal list.
-</p>
-</dd>
-<dt>
-<code>void setInt(String name, int value)</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>void setInt(String name, int value)</code>
+</p>
+<pre>
 Append an integer value to the specified option's internal list.
-</p>
-</dd>
-<dt>
-<code>void setStr(String name, String value)</code>
-</dt>
-<dd>
+</pre>
 <p>
-Append a string value to the specified option's internal list.
+~   <code>void setStr(String name, String value)</code>
 </p>
-</dd>
-</dl>
+<pre>
+Append a string value to the specified option's internal list.
+</pre>
 <h2 id="positional-arguments">
 Positional Arguments
 </h2>
 <p>
 The methods below provide access to positional arguments identified by the parser.
 </p>
-<dl>
-<dt>
-<code>String getArg(int index)</code>
-</dt>
-<dd>
 <p>
+~   <code>String getArg(int index)</code>
+</p>
+<pre>
 Returns the positional argument at the specified index.
-</p>
-</dd>
-<dt>
-<code>List&lt;String&gt; getArgs()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>List&lt;String&gt; getArgs()</code>
+</p>
+<pre>
 Returns the positional arguments as a list of strings.
-</p>
-</dd>
-<dt>
-<code>List&lt;Double&gt; getArgsAsFloats()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>List&lt;Double&gt; getArgsAsFloats()</code>
+</p>
+<pre>
 Attempts to parse and return the positional arguments as a list of floats.
 Exits with an error message on failure.
-</p>
-</dd>
-<dt>
-<code>List&lt;Integer&gt; getArgsAsInts()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>List&lt;Integer&gt; getArgsAsInts()</code>
+</p>
+<pre>
 Attempts to parse and return the positional arguments as a list of integers.
 Exits with an error message on failure.
-</p>
-</dd>
-<dt>
-<code>boolean hasArgs()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>boolean hasArgs()</code>
+</p>
+<pre>
 Returns true if at least one positional argument has been found.
-</p>
-</dd>
-<dt>
-<code>int lenArgs()</code>
-</dt>
-<dd>
+</pre>
 <p>
-Returns the length of the positional argument list.
+~   <code>int lenArgs()</code>
 </p>
-</dd>
-</dl>
+<pre>
+Returns the length of the positional argument list.
+</pre>
 <h2 id="commands">
 Commands
 </h2>
@@ -387,40 +321,30 @@ The specified callback function will be called if the command is found. The call
 <p>
 The following <code>ArgParser</code> methods are also available for processing commands manually:
 </p>
-<dl>
-<dt>
-<code>String getCmdName()</code>
-</dt>
-<dd>
 <p>
+~   <code>String getCmdName()</code>
+</p>
+<pre>
 Returns the command name, if the parser has found a command.
-</p>
-</dd>
-<dt>
-<code>ArgParser getCmdParser()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>ArgParser getCmdParser()</code>
+</p>
+<pre>
 Returns the command's parser instance, if the parser has found a command.
-</p>
-</dd>
-<dt>
-<code>ArgParser getParent()</code>
-</dt>
-<dd>
+</pre>
 <p>
+~   <code>ArgParser getParent()</code>
+</p>
+<pre>
 Returns a command parser's parent parser.
-</p>
-</dd>
-<dt>
-<code>boolean hasCmd()</code>
-</dt>
-<dd>
+</pre>
 <p>
-Returns true if the parser has found a command.
+~   <code>boolean hasCmd()</code>
 </p>
-</dd>
-</dl>
+<pre>
+Returns true if the parser has found a command.
+</pre>
 
     </article>
 
