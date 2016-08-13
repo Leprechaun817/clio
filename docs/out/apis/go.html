@@ -86,30 +86,40 @@ An option can have an unlimited number of long and short-form aliases. Aliases a
 <p>
 Option values can be separated on the command line by either a space, <code>--foo 123</code>, or an equals symbol, <code>--foo=123</code>.
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) AddFlag(name string)</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) AddFlag(name string)</code>
+Register a flag (a boolean option) with a default value of <code>false</code>. Flag options take no arguments but are either present (<code>true</code>) or absent (<code>false</code>).
 </p>
-<pre>
-Register a flag (a boolean option) with a default value of `false`. Flag options take no arguments but are either present (`true`) or absent (`false`).
-</pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) AddFloat(name string, value float64)</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) AddFloat(name string, value float64)</code>
-</p>
-<pre>
 Register a floating-point option with a default value.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) AddInt(name string, value int)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) AddInt(name string, value int)</code>
+</dt>
+<dd>
+<p>
 Register an integer option with a default value.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) AddStr(name string, value string)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) AddStr(name string, value string)</code>
+</dt>
+<dd>
+<p>
 Register a string option with a default value.
-</pre>
+</p>
+</dd>
+</dl>
 <h2 id="register-list-options">
 Register List Options
 </h2>
@@ -119,102 +129,136 @@ List options store multiple values. <em>Greedy</em> list options attempt to pars
 <p>
 Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the <code>name</code> parameter.
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) AddFlagList(name string)</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) AddFlagList(name string)</code>
-</p>
-<pre>
 Register a boolean list option.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) AddFloatList(name string, greedy bool)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) AddFloatList(name string, greedy bool)</code>
+</dt>
+<dd>
+<p>
 Register a floating-point list option.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) AddIntList(name string, greedy bool)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) AddIntList(name string, greedy bool)</code>
+</dt>
+<dd>
+<p>
 Register an integer list option.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) AddStrList(name string, greedy bool)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) AddStrList(name string, greedy bool)</code>
+</dt>
+<dd>
+<p>
 Register a string list option.
-</pre>
+</p>
+</dd>
+</dl>
 <h2 id="retrieve-option-values">
 Retrieve Option Values
 </h2>
 <p>
 An option's value can be retrieved from the parser instance using any of its registered aliases.
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) Found(name string) bool</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) Found(name string) bool</code>
-</p>
-<pre>
 Returns true if the specified option was found while parsing.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetFlag(name string) bool</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetFlag(name string) bool</code>
+</dt>
+<dd>
+<p>
 Returns the value of the specified boolean option.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetFloat(name string) float64</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetFloat(name string) float64</code>
+</dt>
+<dd>
+<p>
 Returns the value of the specified floating-point option.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetInt(name string) int</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetInt(name string) int</code>
+</dt>
+<dd>
+<p>
 Returns the value of the specified integer option.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetStr(name string) string</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetStr(name string) string</code>
+</dt>
+<dd>
+<p>
 Returns the value of the specified string option.
-</pre>
+</p>
+</dd>
+</dl>
 <h2 id="retrieve-list-values">
 Retrieve List Values
 </h2>
 <p>
 A list-option's values can be retrieved from the parser instance using any of its registered aliases.
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) GetFlagList(name string) []bool</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) GetFlagList(name string) []bool</code>
-</p>
-<pre>
 Returns the specified option's list of values.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetFloatList(name string) []float64</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetFloatList(name string) []float64</code>
+</dt>
+<dd>
+<p>
 Returns the specified option's list of values.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetIntList(name string) []int</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetIntList(name string) []int</code>
+</dt>
+<dd>
+<p>
 Returns the specified option's list of values.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetStrList(name string) []string</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetStrList(name string) []string</code>
+</dt>
+<dd>
+<p>
 Returns the specified option's list of values.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) LenList(name string) int</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) LenList(name string) int</code>
+</dt>
+<dd>
+<p>
 Returns the length of the specified option's list of values.
-</pre>
+</p>
+</dd>
+</dl>
 <h2 id="set-option-values">
 Set Option Values
 </h2>
@@ -224,80 +268,106 @@ The methods below can be used to set option values manually.
 <p>
 Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) ClearList(name string)</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) ClearList(name string)</code>
-</p>
-<pre>
 Clear the specified option's internal list of values.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) SetFlag(name string, value bool)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) SetFlag(name string, value bool)</code>
+</dt>
+<dd>
+<p>
 Append a boolean value to the specified option's internal list.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) SetFloat(name string, value float64)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) SetFloat(name string, value float64)</code>
+</dt>
+<dd>
+<p>
 Append a floating-point value to the specified option's internal list.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) SetInt(name string, value int)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) SetInt(name string, value int)</code>
+</dt>
+<dd>
+<p>
 Append an integer value to the specified option's internal list.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) SetStr(name string, value string)</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) SetStr(name string, value string)</code>
+</dt>
+<dd>
+<p>
 Append a string value to the specified option's internal list.
-</pre>
+</p>
+</dd>
+</dl>
 <h2 id="positional-arguments">
 Positional Arguments
 </h2>
 <p>
 The methods below provide access to positional arguments identified by the parser.
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) GetArg(index int) string</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) GetArg(index int) string</code>
-</p>
-<pre>
 Returns the positional argument at the specified index.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetArgs() []string</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetArgs() []string</code>
+</dt>
+<dd>
+<p>
 Returns the positional arguments as a slice of strings.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetArgsAsFloats() []float64</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetArgsAsFloats() []float64</code>
+</dt>
+<dd>
+<p>
 Attempts to parse and return the positional arguments as a slice of floats.
 Exits with an error message on failure.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetArgsAsInts() []int</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetArgsAsInts() []int</code>
+</dt>
+<dd>
+<p>
 Attempts to parse and return the positional arguments as a slice of
 integers. Exits with an error message on failure.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) HasArgs() bool</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) HasArgs() bool</code>
+</dt>
+<dd>
+<p>
 Returns true if at least one positional argument has been found.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) LenArgs() int</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) LenArgs() int</code>
+</dt>
+<dd>
+<p>
 Returns the length of the positional argument list.
-</pre>
+</p>
+</dd>
+</dl>
 <h2 id="commands">
 Commands
 </h2>
@@ -330,30 +400,40 @@ The specified callback function will be called if the command is found. The call
 <p>
 The following <code>ArgParser</code> methods are also available for processing commands manually:
 </p>
+<dl>
+<dt>
+<code>func (parser *ArgParser) GetCmdName() string</code>
+</dt>
+<dd>
 <p>
-~   <code>func (parser *ArgParser) GetCmdName() string</code>
-</p>
-<pre>
 Returns the command name, if the parser has found a command.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetCmdParser() *ArgParser</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetCmdParser() *ArgParser</code>
+</dt>
+<dd>
+<p>
 Returns the command's parser instance, if the parser has found a command.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) GetParent() *ArgParser</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) GetParent() *ArgParser</code>
+</dt>
+<dd>
+<p>
 Returns a command parser's parent parser.
-</pre>
-<p>
-~   <code>func (parser *ArgParser) HasCmd() bool</code>
 </p>
-<pre>
+</dd>
+<dt>
+<code>func (parser *ArgParser) HasCmd() bool</code>
+</dt>
+<dd>
+<p>
 Returns true if the parser has found a command.
-</pre>
+</p>
+</dd>
+</dl>
 
     </article>
 

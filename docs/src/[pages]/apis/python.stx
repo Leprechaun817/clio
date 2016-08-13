@@ -45,22 +45,22 @@ An option can have an unlimited number of long and short-form aliases. Aliases a
 Option values can be separated on the command line by either a space, `--foo 123`, or an equals symbol, `--foo=123`.
 
 
-~   `.add_flag(name)`
+||  `.add_flag(name)`  ||
 
     Register a flag (a boolean option) with a default value of `False`. Flag options take no arguments but are either present (`True`) or absent (`False`).
 
 
-~   `.add_float(name, value)`
+||  `.add_float(name, value)`  ||
 
     Register a floating-point option with a default value.
 
 
-~   `.add_int(name, value)`
+||  `.add_int(name, value)`  ||
 
     Register an integer option with a default value.
 
 
-~   `.add_str(name, value)`
+||  `.add_str(name, value)`  ||
 
     Register a string option with a default value.
 
@@ -72,22 +72,22 @@ List options store multiple values. *Greedy* list options attempt to parse multi
 Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the `name` parameter.
 
 
-~   `.add_flag_list(name)`
+||  `.add_flag_list(name)`  ||
 
     Register a boolean list option.
 
 
-~   `.add_float_list(name, greedy=False)`
+||  `.add_float_list(name, greedy=False)`  ||
 
     Register a floating-point list option.
 
 
-~   `.add_int_list(name, greedy=False)`
+||  `.add_int_list(name, greedy=False)`  ||
 
     Register an integer list option.
 
 
-~   `.add_str_list(name, greedy=False)`
+||  `.add_str_list(name, greedy=False)`  ||
 
     Register a string list option.
 
@@ -97,27 +97,27 @@ Like single-valued options, list options can have an unlimited number of long an
 An option's value can be retrieved from the parser instance using any of its registered aliases.
 
 
-~   `.found(name)`
+||  `.found(name)`  ||
 
     Returns true if the specified option was found while parsing.
 
 
-~   `.get_flag(name)`
+||  `.get_flag(name)`  ||
 
     Returns the value of the specified boolean option.
 
 
-~   `.get_float(name)`
+||  `.get_float(name)`  ||
 
     Returns the value of the specified floating-point option.
 
 
-~   `.get_int(name)`
+||  `.get_int(name)`  ||
 
     Returns the value of the specified integer option.
 
 
-~   `.get_str(name)`
+||  `.get_str(name)`  ||
 
     Returns the value of the specified string option.
 
@@ -134,27 +134,27 @@ An option's value can also be retrieved using read-only dictionary syntax:
 A list-option's values can be retrieved from the parser instance using any of its registered aliases.
 
 
-~   `.get_flag_list(name)`
+||  `.get_flag_list(name)`  ||
 
     Returns the specified option's list of values.
 
 
-~   `.get_float_list(name)`
+||  `.get_float_list(name)`  ||
 
     Returns the specified option's list of values.
 
 
-~   `.get_int_list(name)`
+||  `.get_int_list(name)`  ||
 
     Returns the specified option's list of values.
 
 
-~   `.get_str_list(name)`
+||  `.get_str_list(name)`  ||
 
     Returns the specified option's list of values.
 
 
-~   `.len_list(name)`
+||  `.len_list(name)`  ||
 
     Returns the length of the specified option's list of values.
 
@@ -166,27 +166,27 @@ The methods below can be used to set option values manually.
 Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 
 
-~   `.clear_list(name)`
+||  `.clear_list(name)`  ||
 
     Clear the specified option's internal list of values.
 
 
-~   `.set_flag(name, value)`
+||  `.set_flag(name, value)`  ||
 
     Append a boolean value to the specified option's internal list.
 
 
-~   `.set_float(name, value)`
+||  `.set_float(name, value)`  ||
 
     Append a floating-point value to the specified option's internal list.
 
 
-~   `.set_int(name, value)`
+||  `.set_int(name, value)`  ||
 
     Append an integer value to the specified option's internal list.
 
 
-~   `.set_str(name, value)`
+||  `.set_str(name, value)`  ||
 
     Append a string value to the specified option's internal list.
 
@@ -197,34 +197,34 @@ Note that, internally, all options are list-options. An option's 'value' is simp
 The methods below provide access to positional arguments identified by the parser.
 
 
-~   `.get_arg(index)`
+||  `.get_arg(index)`  ||
 
     Returns the (string) positional argument at the specified index.
 
 
-~   `.get_args()`
+||  `.get_args()`  ||
 
     Returns the positional arguments as a list of strings.
 
 
-~   `.get_args_as_floats()`
+||  `.get_args_as_floats()`  ||
 
     Attempts to parse and return the positional arguments as a list of floats.
     Exits with an error message on failure.
 
 
-~   `.get_args_as_ints()`
+||  `.get_args_as_ints()`  ||
 
     Attempts to parse and return the positional arguments as a list of integers.
     Exits with an error message on failure.
 
 
-~   `.has_args()`
+||  `.has_args()`  ||
 
     Returns true if at least one positional argument has been found.
 
 
-~   `.len_args()`
+||  `.len_args()`  ||
 
     Returns the length of the positional argument list.
 
@@ -255,21 +255,21 @@ This method returns a new `ArgParser` instance associated with the command. You 
 The following `ArgParser` methods are also available for processing commands manually:
 
 
-~   `.get_cmd_name()`
+||  `.get_cmd_name()`  ||
 
     Returns the command name, if the parser has found a command.
 
 
-~   `.get_cmd_parser()`
+||  `.get_cmd_parser()`  ||
 
     Returns the command's parser instance, if the parser has found a command.
 
 
-~   `.get_parent()`
+||  `.get_parent()`  ||
 
     Returns a command parser's parent parser.
 
 
-~   `.has_cmd()`
+||  `.has_cmd()`  ||
 
     Returns true if the parser has found a command.
