@@ -1,5 +1,5 @@
 ---
-title: Java API
+title: Java
 ---
 
 To use Clio in your Java application add the `ArgParser.java` file directly to your application's source folder. The library exports a single `ArgParser` class.

@@ -1,8 +1,8 @@
 ---
-title: C API
+title: C
 ---
 
-To use Clio in your application add the `clio.c` and `clio.h` files to your source folder and include the header file:
+To use Clio in your C application add the `clio.c` and `clio.h` files to your source folder and include the header file:
 
 ::: c
 
