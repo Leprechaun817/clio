@@ -12,10 +12,6 @@ Clio is currently implemented in [C][], [Go][], [Java][], and [Python][].
 [Java]: http://mulholland.xyz/docs/clio/apis/java.html
 [Python]: http://mulholland.xyz/docs/clio/apis/python.html
 
-See the [documentation][docs] for further details.
-
-[docs]: http://mulholland.xyz/docs/clio/
-
 
 ## Features
 
@@ -33,6 +29,10 @@ All implementations support the same core feature set:
 * Support for list options with multiple values.
 
 * Support for git-style command interfaces with arbitrarily-nested commands.
+
+See the [documentation][docs] for further details.
+
+[docs]: http://mulholland.xyz/docs/clio/
 
 
 ## License
