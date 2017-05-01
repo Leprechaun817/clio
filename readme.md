@@ -30,7 +30,7 @@ All implementations support the same core feature set:
 
 * Support for git-style command interfaces with arbitrarily-nested commands.
 
-See the [documentation][docs] for further details.
+See the [documentation][docs] for details.
 
 [docs]: http://mulholland.xyz/docs/clio/
 
