@@ -6,7 +6,7 @@
 //
 // Author: Darren Mulholland <darren@mulholland.xyz>
 // License: Public Domain
-// Version: 2.0.0
+// Version: 2.0.1
 // -------------------------------------------------------------------------
 
 #pragma once

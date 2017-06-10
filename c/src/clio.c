@@ -17,15 +17,6 @@
 
 
 // -------------------------------------------------------------------------
-// Local Declarations
-// -------------------------------------------------------------------------
-
-
-typedef struct ArgParser ArgParser;
-typedef void (*CmdCB)(ArgParser *parser);
-
-
-// -------------------------------------------------------------------------
 // Utility Functions
 // -------------------------------------------------------------------------
 
@@ -682,8 +673,8 @@ typedef struct ArgParser {
     Map *callbacks;
     ArgList *arguments;
     char *cmd_name;
-    ArgParser *cmd_parser;
-    ArgParser *parent;
+    struct ArgParser *cmd_parser;
+    struct ArgParser *parent;
 } ArgParser;
 
 
@@ -945,9 +936,10 @@ static char** argparser_get_args(ArgParser *parser) {
 }
 
 
-// Attempts to parse and return the positional arguments as a freshly-allocated
-// array of integers. Exits with an error message on failure. The memory
-// occupied by the returned array is not affected by calls to argparser_free().
+// Attempts to parse and return the positional arguments as a freshly
+// allocated array of integers. Exits with an error message on failure. The
+// memory occupied by the returned array is not affected by calls to
+// argparser_free().
 static int* argparser_get_args_as_ints(ArgParser *parser) {
     int *args = malloc(sizeof(int) * parser->arguments->len);
     for (int i = 0; i < parser->arguments->len; i++) {
@@ -957,9 +949,10 @@ static int* argparser_get_args_as_ints(ArgParser *parser) {
 }
 
 
-// Attempts to parse and return the positional arguments as a freshly-allocated
-// array of doubles. Exits with an error message on failure. The memory
-// occupied by the returned array is not affected by calls to argparser_free().
+// Attempts to parse and return the positional arguments as a freshly
+// allocated array of doubles. Exits with an error message on failure. The
+// memory occupied by the returned array is not affected by calls to
+// argparser_free().
 static double* argparser_get_args_as_floats(ArgParser *parser) {
     double *args = malloc(sizeof(double) * parser->arguments->len);
     for (int i = 0; i < parser->arguments->len; i++) {
@@ -972,6 +965,11 @@ static double* argparser_get_args_as_floats(ArgParser *parser) {
 // -------------------------------------------------------------------------
 // ArgParser: commands.
 // -------------------------------------------------------------------------
+
+
+// A command callback should accept a pointer to an ArgParser instance and
+// return void.
+typedef void (*CmdCB)(ArgParser *parser);
 
 
 // Register a command and its associated callback.
