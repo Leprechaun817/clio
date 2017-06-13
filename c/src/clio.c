@@ -30,7 +30,7 @@ static void err(char *msg) {
 
 // Print to an automatically-allocated string. Returns NULL if an encoding
 // error occurs or if sufficient memory cannot be allocated.
-char* str(char *fmt, ...) {
+static char* str(char *fmt, ...) {
     va_list args;
 
     va_start(args, fmt);
