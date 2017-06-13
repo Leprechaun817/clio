@@ -871,7 +871,7 @@ static double* argparser_get_float_list(ArgParser *parser, char *name) {
 // Clear the specified option's internal list of values.
 static void argparser_clear_list(ArgParser *parser, char *name) {
     Option *opt = argparser_get_opt(parser, name);
-    return option_clear(opt);
+    option_clear(opt);
 }
 
 
@@ -979,7 +979,7 @@ static ArgParser* argparser_add_cmd(
     ArgParser *cmd_parser = argparser_new(helptext, NULL);
     cmd_parser->parent = parser;
     map_add_splitkey(parser->commands, name, cmd_parser);
-    map_add_splitkey(parser->callbacks, name, callback);
+    map_add_splitkey(parser->callbacks, name, (void *) callback);
     return cmd_parser;
 }
 
@@ -1203,7 +1203,7 @@ static void argparser_parse_stream(ArgParser *parser, ArgStream *stream) {
         // Is the argument a registered command?
         else if (map_contains(parser->commands, arg)) {
             ArgParser *cmd_parser = map_get(parser->commands, arg);
-            CmdCB cmd_callback = map_get(parser->callbacks, arg);
+            CmdCB cmd_callback = (CmdCB) map_get(parser->callbacks, arg);
             parser->cmd_name = arg;
             parser->cmd_parser = cmd_parser;
             argparser_parse_stream(cmd_parser, stream);
