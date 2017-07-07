@@ -18,7 +18,7 @@
 
 namespace clio {
 
-    // Callback type for registered commands.
+    // Callback type for registering commands.
     class ArgParser;
     typedef void (*callback)(ArgParser& parser);
 
@@ -58,7 +58,7 @@ namespace clio {
             void trySetValue(std::string value);
     };
 
-    // The ArgParser class provides the external interface to the library.
+    // ArgParser provides the external interface to the library.
     class ArgParser {
 
         public:
