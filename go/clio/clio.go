@@ -16,7 +16,7 @@ import (
 
 
 // Package version number.
-const Version = "2.0.0"
+const Version = "2.1.0"
 
 
 // Print a message to stderr and exit with an error code.
@@ -614,6 +614,18 @@ func (parser *ArgParser) GetArgsAsFloats() []float64 {
         floats = append(floats, floatArg)
     }
     return floats
+}
+
+
+// ClearArgs clears the list of positional arguments.
+func (parser *ArgParser) ClearArgs() {
+    parser.arguments = nil
+}
+
+
+// AppendArg appends a string to the list of positional arguments.
+func (parser *ArgParser) AppendArg(arg string) {
+    parser.arguments = append(parser.arguments, arg)
 }
 
 
