@@ -10,7 +10,7 @@ import sys
 
 
 # Library version number.
-__version__ = "2.0.3"
+__version__ = "2.1.0"
 
 
 # Print a message to stderr and exit with a non-zero error code.
@@ -370,6 +370,14 @@ class ArgParser:
             except ValueError:
                 err("cannot parse '%s' as a float" % arg)
         return args
+
+    # Clear the list of positional arguments.
+    def clear_args(self):
+        self.arguments.clear()
+
+    # Append a string to the list of positional arguments.
+    def append_arg(arg):
+        self.arguments.append(arg)
 
     # ----------------------------------------------------------------------
     # Parsing arguments.
