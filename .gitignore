@@ -11,3 +11,7 @@
 # C object and binary files.
 /c/bin/
 /c/obj/
+
+# C++ object and binary files.
+/cpp/bin/
+/cpp/obj/
