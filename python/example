@@ -20,8 +20,8 @@ def main():
     parser.add_flag("bool b")
 
     # Register a string option, --string <arg>, with a single-character alias,
-    # -s <arg>. A string option requires a default value, here 'defval'.
-    parser.add_str("string s", "defval")
+    # -s <arg>. A string option requires a default value, here 'default'.
+    parser.add_str("string s", "default")
 
     # Register an integer option, --int <arg>, without a single-character
     # alias. An integer option requires a default value, here 123.

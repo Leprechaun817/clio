@@ -22,8 +22,8 @@ func main() {
 
 	// Register a string option, --string <arg>, with a single-character
     // alias, -s <arg>. A string argument requires a default value, here
-    // 'defval'.
-    parser.AddStr("string s", "defval")
+    // 'default'.
+    parser.AddStr("string s", "default")
 
 	// Register an integer option, --int <arg>. An integer option requires a
     // default value, here 123.

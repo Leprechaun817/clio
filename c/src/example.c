@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
 
     // Register a string option, --string <arg>, with a single-character
     // alias, -s <arg>. A string option requires a default value, here
-    // 'defval'.
-    ap_add_str(parser, "string s", "defval");
+    // 'default'.
+    ap_add_str(parser, "string s", "default");
 
     // Register an integer option, --int <arg>. An integer option requires a
     // default value, here 123.

@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
 
     // Register a string option, --string <arg>, with a single-character
     // alias, -s <arg>. A string option requires a default value, here
-    // 'defval'.
-    parser.addStr("string s", "defval");
+    // 'default'.
+    parser.addStr("string s", "default");
 
     // Register an integer option, --int <arg>. An integer option requires a
     // default value, here 123.
