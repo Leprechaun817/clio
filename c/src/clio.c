@@ -1035,7 +1035,7 @@ static void argparser_parse_equals_option(
 
     // Check that a value has been supplied.
     if (strlen(value) == 0) {
-        err(str("missing argument for the %s%s option", prefix, name));
+        err(str("missing value for %s%s", prefix, name));
     }
 
     option_try_set(opt, value);
@@ -1082,7 +1082,7 @@ static void argparser_parse_long_option(
 
         // We're missing a required option value.
         else {
-            err(str("missing argument for the --%s option", arg));
+            err(str("missing argument for --%s", arg));
         }
     }
 
@@ -1152,7 +1152,7 @@ static void argparser_parse_short_option(
 
         // We're missing a required option value.
         else {
-            err(str("missing argument for the -%s option", key));
+            err(str("missing argument for -%s", key));
         }
     }
 }

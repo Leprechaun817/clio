@@ -13,32 +13,32 @@ def main():
     # We instantiate an argument parser, optionally supplying help text and a
     # version string. Supplying help text activates the automatic --help flag,
     # supplying a version string activates the automatic --version flag.
-    parser = clio.ArgParser("Help!", "Version!")
+    parser = clio.ArgParser("Help!", "Version 1.2.3")
 
-    # Register a flag, --bopt, with a single-character alias, -b. A flag is a
+    # Register a flag, --bool, with a single-character alias, -b. A flag is a
     # boolean option - it is either present (true) or absent (false).
-    parser.add_flag("bopt b")
+    parser.add_flag("bool b")
 
-    # Register a string option, --sopt <arg>, with a single-character alias,
+    # Register a string option, --string <arg>, with a single-character alias,
     # -s <arg>. A string option requires a default value, here 'defval'.
-    parser.add_str("sopt s", "defval")
+    parser.add_str("string s", "defval")
 
-    # Register an integer option, --iopt <arg>, without a single-character
+    # Register an integer option, --int <arg>, without a single-character
     # alias. An integer option requires a default value, here 123.
-    parser.add_int("iopt", 123)
+    parser.add_int("int", 123)
 
-    # Register a float option, --fopt <arg>, without a single-character alias.
-    # A float option requires a default value, here 1.0.
-    parser.add_float("fopt", 1.0)
+    # Register a float option, --float <arg>. A float option requires a
+    # default value, here 1.0.
+    parser.add_float("float", 1.0)
 
-    # Register an integer list, --ilist <arg>, with a single character alias,
-    # -i <arg>. A list option accepts multiple values.
-    parser.add_int_list("ilist i")
+    # Register an integer list, --intlist <arg>, with a single character
+    # alias, -i <arg>. A list option accepts multiple values.
+    parser.add_int_list("intlist i")
 
-    # Register a 'greedy' float list, --flist <args>, with a single-character
-    # alias, -f <args>. A list option accepts multiple values; a 'greedy' list
-    # attempts to parse multiple consecutive arguments.
-    parser.add_float_list("flist f", True)
+    # Register a 'greedy' float list, --floatlist <args>, with a single-
+    # character alias, -f <args>. A list option accepts multiple values; a
+    # 'greedy' list attempts to parse multiple consecutive arguments.
+    parser.add_float_list("floatlist f", True)
 
     # Register a command 'foo', with an alias 'bar'. We need to supply the
     # command's help text and callback method.
@@ -48,8 +48,8 @@ def main():
     # parsing the command's arguments. We can register as many flags and
     # options as we like on this sub-parser. Note that the sub-parser can
     # reuse the parent's option names without interference.
-    cmd_parser.add_flag("bopt b")
-    cmd_parser.add_int("iopt i", 123)
+    cmd_parser.add_flag("bool b")
+    cmd_parser.add_int("int i", 123)
 
     # Once all our options and commands have been registered we can call the
     # parser's parse() method with a list of argument strings. Only the root
@@ -67,9 +67,9 @@ def main():
 # command is found. The method receives an ArgParser instance containing the
 # command's parsed arguments. Here we simply dump it to stdout.
 def callback(parser):
-    print("----------------- callback() -----------------")
+    print("---------- callback ----------")
     print(parser)
-    print("..............................................\n")
+    print("------------------------------\n")
 
 
 if __name__ == "__main__":

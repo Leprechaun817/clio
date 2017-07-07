@@ -362,9 +362,10 @@ type ArgParser struct {
 }
 
 
-// NewParser initializes a new ArgParser instance. Supplying help text activates
-// an automatic --help flag, supplying a version string activates an automatic
-// --version flag. An empty string may be passed for either parameter.
+// NewParser initializes a new ArgParser instance. Supplying help text
+// activates an automatic --help flag, supplying a version string activates
+// an automatic --version flag. An empty string may be passed for either
+// parameter.
 func NewParser(helptext string, version string) *ArgParser {
     return &ArgParser {
         helptext: strings.TrimSpace(helptext),
@@ -455,7 +456,7 @@ func (parser *ArgParser) AddFloatList(name string, greedy bool) {
 
 
 // -------------------------------------------------------------------------
-// ArgParser: retrieving options.
+// ArgParser: retrieving option values.
 // -------------------------------------------------------------------------
 
 
@@ -622,8 +623,8 @@ func (parser *ArgParser) GetArgsAsFloats() []float64 {
 
 
 // AddCmd registers a command, its help text, and its associated callback
-// function. The callback function should accept the command's ArgParser istance
-// as its sole agument and should have no return value.
+// function. The callback function should accept the command's ArgParser
+// instance as its sole agument and should have no return value.
 func (parser *ArgParser) AddCmd(name, helptext string, callback func(*ArgParser)) *ArgParser {
     cmdParser := NewParser(helptext, "")
     cmdParser.parent = parser
@@ -719,7 +720,7 @@ func (parser *ArgParser) parseStream(stream *argStream) {
         }
 
         // Is the argument the automatic 'help' command?
-        if arg == "help"{
+        if arg == "help" {
             if stream.hasNext() {
                 name := stream.next()
                 if cmdParser, ok := parser.commands[name]; ok {
@@ -772,7 +773,7 @@ func (parser *ArgParser) parseLongOption(arg string, stream *argStream) {
 
         // Not a flag, so check for a following option value.
         if !stream.hasNextValue() {
-            exit(fmt.Sprintf("missing argument for the --%v option", arg))
+            exit(fmt.Sprintf("missing argument for --%v", arg))
         }
 
         // Try to parse the argument as a value of the appropriate type.
