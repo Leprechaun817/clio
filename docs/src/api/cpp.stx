@@ -75,17 +75,17 @@ Like single-valued options, list options can have an unlimited number of long an
     Register a boolean list option.
 
 
-||  `void ArgParser::addFloatList(string name, bool greedy)`  ||
+||  `void ArgParser::addFloatList(string name, bool greedy = false)`  ||
 
     Register a floating-point list option.
 
 
-||  `void ArgParser::addIntList(string name, bool greedy)`  ||
+||  `void ArgParser::addIntList(string name, bool greedy = false)`  ||
 
     Register an integer list option.
 
 
-||  `void ArgParser::addStrList(string name, bool greedy)`  ||
+||  `void ArgParser::addStrList(string name, bool greedy = false)`  ||
 
     Register a string list option.
 
