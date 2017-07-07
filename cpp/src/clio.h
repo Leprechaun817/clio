@@ -6,7 +6,7 @@
 //
 // Author: Darren Mulholland <darren@mulholland.xyz>
 // License: Public Domain
-// Version: 2.0.0a1
+// Version: 2.0.0b1
 // -------------------------------------------------------------------------
 
 #pragma once
@@ -79,9 +79,9 @@ namespace clio {
 
             // Register list options.
             void addFlagList(std::string name);
-            void addStrList(std::string name, bool greedy);
-            void addIntList(std::string name, bool greedy);
-            void addFloatList(std::string name, bool greedy);
+            void addStrList(std::string name, bool greedy = false);
+            void addIntList(std::string name, bool greedy = false);
+            void addFloatList(std::string name, bool greedy = false);
 
             // Parse command line arguments.
             void parse(int argc, char **argv);
