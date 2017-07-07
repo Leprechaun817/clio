@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        Python
+        C++
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/theme.css">
@@ -13,7 +13,7 @@
     <![endif]-->
 </head>
 
-<body class="node-apis-python node-apis node">
+<body class="node-api-cpp node-api node">
 
     <header id="head" class="head">
         <input id="menu-check" type="checkbox"/>
@@ -30,7 +30,7 @@
 <a href="../cli.html">CLI</a>
 </li>
 <li>
-<a href="../apis.html">APIs</a>
+<a href="../api.html">APIs</a>
 </li>
 </ul>
 
@@ -38,45 +38,42 @@
 
     <article id="main" class="main">
         
-            <h1>Python</h1>
+            <h1>C++</h1>
         
 
         <p>
-Install Clio from the Python package index using <code>pip</code>:
+To use Clio in your C++ application add the <code>clio.cpp</code> and <code>clio.h</code> files to your source folder and include the header file:
 </p>
-<pre>
-$ pip install libclio
+<pre class="lang-c pygments" data-lang="c">
+<span class="cp">#include</span> <span class="cpf">&quot;clio.h&quot;</span><span class="cp"></span>
 </pre>
 <p>
-Alternatively, you can incorporate the single, public-domain <code>clio.py</code> file directly into your application. Clio has no external dependencies.
+The header exports a <code>clio::ArgParser</code> class which provides the public interface to the library.
 </p>
 <p>
-Import the Clio module:
-</p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">clio</span>
-</pre>
-<p>
-Clio requires Python &gt;= 3.0.
+Clio is written in portable C++ 11.
 </p>
 <h2 id="usage">
 Usage
 </h2>
 <p>
-Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
+Initialize an argument parser, optionally specifying the application's help text and version:
 </p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="n">parser</span> <span class="o">=</span> <span class="n">clio</span><span class="o">.</span><span class="n">ArgParser</span><span class="p">(</span><span class="n">helptext</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<pre class="lang-c++ pygments" data-lang="c++">
+<span class="n">clio</span><span class="o">::</span><span class="n">ArgParser</span><span class="p">(</span><span class="n">string</span> <span class="n">helptext</span><span class="p">,</span> <span class="n">string</span> <span class="n">version</span><span class="p">)</span>
 </pre>
 <p>
-Supplying help text activates an automatic <code>--help</code> flag; supplying a version string activates an automatic <code>--version</code> flag.
+Supplying help text activates an automatic <code>--help</code> flag; supplying a version string activates an automatic <code>--version</code> flag. An empty string can be passed for either parameter.
 </p>
 <p>
 You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the parser's <code>parse()</code> method to process the application's command line arguments:
 </p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">()</span>
+<pre class="lang-c++ pygments" data-lang="c++">
+<span class="kt">void</span> <span class="n">ArgParser</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">)</span>
 </pre>
+<p>
+The arguments are assumed to be <code>argc</code> and <code>argv</code> as supplied to <code>main()</code>, i.e. the first element of the array is assumed to be the application name and will be ignored.
+</p>
 <p>
 Parsed option values can be retrieved from the parser instance itself.
 </p>
@@ -94,15 +91,15 @@ Option values can be separated on the command line by either a space, <code>--fo
 </p>
 <dl>
 <dt>
-<code>.add_flag(name)</code>
+<code>void ArgParser::addFlag(string name)</code>
 </dt>
 <dd>
 <p>
-Register a flag (a boolean option) with a default value of <code>False</code>. Flag options take no arguments but are either present (<code>True</code>) or absent (<code>False</code>).
+Register a flag (a boolean option) with a default value of <code>false</code>. Flag options take no arguments but are either present (<code>true</code>) or absent (<code>false</code>).
 </p>
 </dd>
 <dt>
-<code>.add_float(name, value)</code>
+<code>void ArgParser::addFloat(string name, double value)</code>
 </dt>
 <dd>
 <p>
@@ -110,7 +107,7 @@ Register a floating-point option with a default value.
 </p>
 </dd>
 <dt>
-<code>.add_int(name, value)</code>
+<code>void ArgParser::addInt(string name, int value)</code>
 </dt>
 <dd>
 <p>
@@ -118,7 +115,7 @@ Register an integer option with a default value.
 </p>
 </dd>
 <dt>
-<code>.add_str(name, value)</code>
+<code>void ArgParser::addStr(string name, string value)</code>
 </dt>
 <dd>
 <p>
@@ -137,7 +134,7 @@ Like single-valued options, list options can have an unlimited number of long an
 </p>
 <dl>
 <dt>
-<code>.add_flag_list(name)</code>
+<code>void ArgParser::addFlagList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -145,7 +142,7 @@ Register a boolean list option.
 </p>
 </dd>
 <dt>
-<code>.add_float_list(name, greedy=False)</code>
+<code>void ArgParser::addFloatList(string name, bool greedy)</code>
 </dt>
 <dd>
 <p>
@@ -153,7 +150,7 @@ Register a floating-point list option.
 </p>
 </dd>
 <dt>
-<code>.add_int_list(name, greedy=False)</code>
+<code>void ArgParser::addIntList(string name, bool greedy)</code>
 </dt>
 <dd>
 <p>
@@ -161,7 +158,7 @@ Register an integer list option.
 </p>
 </dd>
 <dt>
-<code>.add_str_list(name, greedy=False)</code>
+<code>void ArgParser::addStrList(string name, bool greedy)</code>
 </dt>
 <dd>
 <p>
@@ -177,7 +174,7 @@ An option's value can be retrieved from the parser instance using any of its reg
 </p>
 <dl>
 <dt>
-<code>.found(name)</code>
+<code>bool ArgParser::found(string name)</code>
 </dt>
 <dd>
 <p>
@@ -185,7 +182,7 @@ Returns true if the specified option was found while parsing.
 </p>
 </dd>
 <dt>
-<code>.get_flag(name)</code>
+<code>bool ArgParser::getFlag(string name)</code>
 </dt>
 <dd>
 <p>
@@ -193,7 +190,7 @@ Returns the value of the specified boolean option.
 </p>
 </dd>
 <dt>
-<code>.get_float(name)</code>
+<code>double ArgParser::getFloat(string name)</code>
 </dt>
 <dd>
 <p>
@@ -201,7 +198,7 @@ Returns the value of the specified floating-point option.
 </p>
 </dd>
 <dt>
-<code>.get_int(name)</code>
+<code>int ArgParser::getInt(string name)</code>
 </dt>
 <dd>
 <p>
@@ -209,7 +206,7 @@ Returns the value of the specified integer option.
 </p>
 </dd>
 <dt>
-<code>.get_str(name)</code>
+<code>string ArgParser::getStr(string name)</code>
 </dt>
 <dd>
 <p>
@@ -217,12 +214,6 @@ Returns the value of the specified string option.
 </p>
 </dd>
 </dl>
-<p>
-An option's value can also be retrieved using read-only dictionary syntax:
-</p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-</pre>
 <h2 id="retrieve-list-values">
 Retrieve List Values
 </h2>
@@ -231,7 +222,7 @@ A list-option's values can be retrieved from the parser instance using any of it
 </p>
 <dl>
 <dt>
-<code>.get_flag_list(name)</code>
+<code>vector&lt;bool&gt; ArgParser::getFlagList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -239,7 +230,7 @@ Returns the specified option's list of values.
 </p>
 </dd>
 <dt>
-<code>.get_float_list(name)</code>
+<code>vector&lt;double&gt; ArgParser::getFloatList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -247,7 +238,7 @@ Returns the specified option's list of values.
 </p>
 </dd>
 <dt>
-<code>.get_int_list(name)</code>
+<code>vector&lt;int&gt; ArgParser::getIntList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -255,7 +246,7 @@ Returns the specified option's list of values.
 </p>
 </dd>
 <dt>
-<code>.get_str_list(name)</code>
+<code>vector&lt;string&gt; ArgParser::getStrList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -263,7 +254,7 @@ Returns the specified option's list of values.
 </p>
 </dd>
 <dt>
-<code>.len_list(name)</code>
+<code>int ArgParser::lenList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -282,7 +273,7 @@ Note that, internally, all options are list-options. An option's 'value' is simp
 </p>
 <dl>
 <dt>
-<code>.clear_list(name)</code>
+<code>void ArgParser::clearList(string name)</code>
 </dt>
 <dd>
 <p>
@@ -290,7 +281,7 @@ Clear the specified option's internal list of values.
 </p>
 </dd>
 <dt>
-<code>.set_flag(name, value)</code>
+<code>void ArgParser::setFlag(string name, bool value)</code>
 </dt>
 <dd>
 <p>
@@ -298,7 +289,7 @@ Append a boolean value to the specified option's internal list.
 </p>
 </dd>
 <dt>
-<code>.set_float(name, value)</code>
+<code>void ArgParser::setFloat(string name, double value)</code>
 </dt>
 <dd>
 <p>
@@ -306,7 +297,7 @@ Append a floating-point value to the specified option's internal list.
 </p>
 </dd>
 <dt>
-<code>.set_int(name, value)</code>
+<code>void ArgParser::setInt(string name, int value)</code>
 </dt>
 <dd>
 <p>
@@ -314,7 +305,7 @@ Append an integer value to the specified option's internal list.
 </p>
 </dd>
 <dt>
-<code>.set_str(name, value)</code>
+<code>void ArgParser::setStr(string name, string value)</code>
 </dt>
 <dd>
 <p>
@@ -330,15 +321,15 @@ The methods below provide access to positional arguments identified by the parse
 </p>
 <dl>
 <dt>
-<code>.get_arg(index)</code>
+<code>string ArgParser::getArg(int index)</code>
 </dt>
 <dd>
 <p>
-Returns the (string) positional argument at the specified index.
+Returns the positional argument at the specified index.
 </p>
 </dd>
 <dt>
-<code>.get_args()</code>
+<code>vector&lt;string&gt; ArgParser::getArgs()</code>
 </dt>
 <dd>
 <p>
@@ -346,7 +337,7 @@ Returns the positional arguments as a list of strings.
 </p>
 </dd>
 <dt>
-<code>.get_args_as_floats()</code>
+<code>vector&lt;double&gt; ArgParser::getArgsAsFloats()</code>
 </dt>
 <dd>
 <p>
@@ -355,16 +346,16 @@ Exits with an error message on failure.
 </p>
 </dd>
 <dt>
-<code>.get_args_as_ints()</code>
+<code>vector&lt;int&gt; ArgParser::getArgsAsInts()</code>
 </dt>
 <dd>
 <p>
-Attempts to parse and return the positional arguments as a list of integers.
-Exits with an error message on failure.
+Attempts to parse and return the positional arguments as a list of
+integers. Exits with an error message on failure.
 </p>
 </dd>
 <dt>
-<code>.has_args()</code>
+<code>bool ArgParser::hasArgs()</code>
 </dt>
 <dd>
 <p>
@@ -372,31 +363,41 @@ Returns true if at least one positional argument has been found.
 </p>
 </dd>
 <dt>
-<code>.len_args()</code>
+<code>int ArgParser::lenArgs()</code>
 </dt>
 <dd>
 <p>
 Returns the length of the positional argument list.
 </p>
 </dd>
-</dl>
+<dt>
+<code>void ArgParser::clearArgs()</code>
+</dt>
+<dd>
 <p>
-Positional arguments can also be accessed using read-only list syntax:
+Clears the list of positional arguments.
 </p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-</pre>
+</dd>
+<dt>
+<code>void ArgParser::appendArg(string arg)</code>
+</dt>
+<dd>
+<p>
+Appends a string to the list of positional arguments.
+</p>
+</dd>
+</dl>
 <h2 id="commands">
 Commands
 </h2>
 <p>
-Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the <code>add_cmd()</code> method:
+Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the <code>addCmd()</code> method:
 </p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="n">cmd_parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_cmd</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">helptext</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+<pre class="lang-c++ pygments" data-lang="c++">
+<span class="n">ArgParser</span><span class="o">&amp;</span> <span class="n">ArgParser</span><span class="o">::</span><span class="n">addCmd</span><span class="p">(</span><span class="n">string</span> <span class="n">name</span><span class="p">,</span> <span class="n">string</span> <span class="n">helptext</span><span class="p">,</span> <span class="n">clio</span><span class="o">::</span><span class="n">callback</span> <span class="n">cb</span><span class="p">)</span>
 </pre>
 <p>
-This method returns a new <code>ArgParser</code> instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call <code>parse()</code> on a command parser - if a command is found, its arguments are parsed automatically.)
+This method returns a reference to a new <code>ArgParser</code> instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call <code>parse()</code> on a command parser &mdash; if a command is found, its arguments are parsed automatically.)
 </p>
 <ul>
 <li>
@@ -411,7 +412,7 @@ Commands support an automatic <code>--help</code> flag and an automatic <code>he
 </li>
 <li>
 <p>
-The specified callback function will be called if the command is found. The callback should accept the command's <code>ArgParser</code> instance as its sole argument and should have no return value.
+The specified callback function will be called if the command is found. The callback should accept a reference to the command's <code>ArgParser</code> instance as its sole argument and should return <code>void</code>.
 </p>
 </li>
 </ul>
@@ -420,7 +421,7 @@ The following <code>ArgParser</code> methods are also available for processing c
 </p>
 <dl>
 <dt>
-<code>.get_cmd_name()</code>
+<code>string ArgParser::getCmdName()</code>
 </dt>
 <dd>
 <p>
@@ -428,7 +429,7 @@ Returns the command name, if the parser has found a command.
 </p>
 </dd>
 <dt>
-<code>.get_cmd_parser()</code>
+<code>ArgParser&amp; ArgParser::getCmdParser()</code>
 </dt>
 <dd>
 <p>
@@ -436,7 +437,7 @@ Returns the command's parser instance, if the parser has found a command.
 </p>
 </dd>
 <dt>
-<code>.get_parent()</code>
+<code>ArgParser&amp; ArgParser::getParent()</code>
 </dt>
 <dd>
 <p>
@@ -444,7 +445,7 @@ Returns a command parser's parent parser.
 </p>
 </dd>
 <dt>
-<code>.has_cmd()</code>
+<code>bool ArgParser::hasCmd()</code>
 </dt>
 <dd>
 <p>

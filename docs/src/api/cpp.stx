@@ -1,25 +1,35 @@
 ---
-title: Java
+title: C++
 ---
 
-To use Clio in your Java application add the `ArgParser.java` file directly to your application's source folder. The library exports a single `ArgParser` class.
+To use Clio in your C++ application add the `clio.cpp` and `clio.h` files to your source folder and include the header file:
+
+::: c
+
+    #include "clio.h"
+
+The header exports a `clio::ArgParser` class which provides the public interface to the library.
+
+Clio is written in portable C++ 11.
 
 
 ## Usage
 
 Initialize an argument parser, optionally specifying the application's help text and version:
 
-::: java
+::: c++
 
-    ArgParser(String helptext, String version)
+    clio::ArgParser(string helptext, string version)
 
-Supplying help text activates an automatic `--help` flag; supplying a version string activates an automatic `--version` flag.
+Supplying help text activates an automatic `--help` flag; supplying a version string activates an automatic `--version` flag. An empty string can be passed for either parameter.
 
 You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the parser's `parse()` method to process the application's command line arguments:
 
-::: java
+::: c++
 
-    void parse(String[] args)
+    void ArgParser::parse(int argc, char **argv)
+
+The arguments are assumed to be `argc` and `argv` as supplied to `main()`, i.e. the first element of the array is assumed to be the application name and will be ignored.
 
 Parsed option values can be retrieved from the parser instance itself.
 
@@ -33,22 +43,22 @@ An option can have an unlimited number of long and short-form aliases. Aliases a
 Option values can be separated on the command line by either a space, `--foo 123`, or an equals symbol, `--foo=123`.
 
 
-||  `void addFlag(String name)`  ||
+||  `void ArgParser::addFlag(string name)`  ||
 
     Register a flag (a boolean option) with a default value of `false`. Flag options take no arguments but are either present (`true`) or absent (`false`).
 
 
-||  `void addFloat(String name, double value)`  ||
+||  `void ArgParser::addFloat(string name, double value)`  ||
 
     Register a floating-point option with a default value.
 
 
-||  `void addInt(String name, int value)`  ||
+||  `void ArgParser::addInt(string name, int value)`  ||
 
     Register an integer option with a default value.
 
 
-||  `void addStr(String name, String value)`  ||
+||  `void ArgParser::addStr(string name, string value)`  ||
 
     Register a string option with a default value.
 
@@ -60,22 +70,22 @@ List options store multiple values. *Greedy* list options attempt to parse multi
 Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the `name` parameter.
 
 
-||  `void addFlagList(String name)`  ||
+||  `void ArgParser::addFlagList(string name)`  ||
 
     Register a boolean list option.
 
 
-||  `void addFloatList(String name, boolean greedy)`  ||
+||  `void ArgParser::addFloatList(string name, bool greedy)`  ||
 
     Register a floating-point list option.
 
 
-||  `void addIntList(String name, boolean greedy)`  ||
+||  `void ArgParser::addIntList(string name, bool greedy)`  ||
 
     Register an integer list option.
 
 
-||  `void addStrList(String name, boolean greedy)`  ||
+||  `void ArgParser::addStrList(string name, bool greedy)`  ||
 
     Register a string list option.
 
@@ -85,27 +95,27 @@ Like single-valued options, list options can have an unlimited number of long an
 An option's value can be retrieved from the parser instance using any of its registered aliases.
 
 
-||  `boolean found(String name)`  ||
+||  `bool ArgParser::found(string name)`  ||
 
     Returns true if the specified option was found while parsing.
 
 
-||  `boolean getFlag(String name)`  ||
+||  `bool ArgParser::getFlag(string name)`  ||
 
     Returns the value of the specified boolean option.
 
 
-||  `double getFloat(String name)`  ||
+||  `double ArgParser::getFloat(string name)`  ||
 
     Returns the value of the specified floating-point option.
 
 
-||  `int getInt(String name)`  ||
+||  `int ArgParser::getInt(string name)`  ||
 
     Returns the value of the specified integer option.
 
 
-||  `String getStr(String name)`  ||
+||  `string ArgParser::getStr(string name)`  ||
 
     Returns the value of the specified string option.
 
@@ -115,27 +125,27 @@ An option's value can be retrieved from the parser instance using any of its reg
 A list-option's values can be retrieved from the parser instance using any of its registered aliases.
 
 
-||  `List<Boolean> getFlagList(String name)`  ||
+||  `vector<bool> ArgParser::getFlagList(string name)`  ||
 
     Returns the specified option's list of values.
 
 
-||  `List<Double> getFloatList(String name)`  ||
+||  `vector<double> ArgParser::getFloatList(string name)`  ||
 
     Returns the specified option's list of values.
 
 
-||  `List<Integer> getIntList(String name)`  ||
+||  `vector<int> ArgParser::getIntList(string name)`  ||
 
     Returns the specified option's list of values.
 
 
-||  `List<String> getStrList(String name)`  ||
+||  `vector<string> ArgParser::getStrList(string name)`  ||
 
     Returns the specified option's list of values.
 
 
-||  `int lenList(String name)`  ||
+||  `int ArgParser::lenList(string name)`  ||
 
     Returns the length of the specified option's list of values.
 
@@ -147,27 +157,27 @@ The methods below can be used to set option values manually.
 Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
 
 
-||  `void clearList(String name)`  ||
+||  `void ArgParser::clearList(string name)`  ||
 
     Clear the specified option's internal list of values.
 
 
-||  `void setFlag(String name, boolean value)`  ||
+||  `void ArgParser::setFlag(string name, bool value)`  ||
 
     Append a boolean value to the specified option's internal list.
 
 
-||  `void setFloat(String name, double value)`  ||
+||  `void ArgParser::setFloat(string name, double value)`  ||
 
     Append a floating-point value to the specified option's internal list.
 
 
-||  `void setInt(String name, int value)`  ||
+||  `void ArgParser::setInt(string name, int value)`  ||
 
     Append an integer value to the specified option's internal list.
 
 
-||  `void setStr(String name, String value)`  ||
+||  `void ArgParser::setStr(string name, string value)`  ||
 
     Append a string value to the specified option's internal list.
 
@@ -178,72 +188,82 @@ Note that, internally, all options are list-options. An option's 'value' is simp
 The methods below provide access to positional arguments identified by the parser.
 
 
-||  `String getArg(int index)`  ||
+||  `string ArgParser::getArg(int index)`  ||
 
     Returns the positional argument at the specified index.
 
 
-||  `List<String> getArgs()`  ||
+||  `vector<string> ArgParser::getArgs()`  ||
 
     Returns the positional arguments as a list of strings.
 
 
-||  `List<Double> getArgsAsFloats()`  ||
+||  `vector<double> ArgParser::getArgsAsFloats()`  ||
 
     Attempts to parse and return the positional arguments as a list of floats.
     Exits with an error message on failure.
 
 
-||  `List<Integer> getArgsAsInts()`  ||
+||  `vector<int> ArgParser::getArgsAsInts()`  ||
 
-    Attempts to parse and return the positional arguments as a list of integers.
-    Exits with an error message on failure.
+    Attempts to parse and return the positional arguments as a list of
+    integers. Exits with an error message on failure.
 
 
-||  `boolean hasArgs()`  ||
+||  `bool ArgParser::hasArgs()`  ||
 
     Returns true if at least one positional argument has been found.
 
 
-||  `int lenArgs()`  ||
+||  `int ArgParser::lenArgs()`  ||
 
     Returns the length of the positional argument list.
+
+
+||  `void ArgParser::clearArgs()`  ||
+
+    Clears the list of positional arguments.
+
+
+||  `void ArgParser::appendArg(string arg)`  ||
+
+    Appends a string to the list of positional arguments.
 
 
 ## Commands
 
 Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the `addCmd()` method:
 
-::: java
+::: c++
 
-    ArgParser addCmd(String name, String helptext, Consumer<ArgParser> callback)
+    ArgParser& ArgParser::addCmd(string name, string helptext, clio::callback cb)
 
-This method returns a new `ArgParser` instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call `parse()` on a command parser - if a command is found, its arguments are parsed automatically.)
+This method returns a reference to a new `ArgParser` instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call `parse()` on a command parser --- if a command is found, its arguments are parsed automatically.)
 
 * Like options, commands can have an unlimited number of aliases specified via the `name` string.
 
 * Commands support an automatic `--help` flag and an automatic `help <name>` command using the specified help text.
 
-* The specified callback function will be called if the command is found. The callback should accept the command's `ArgParser` instance as its sole argument and should return `void`.
+* The specified callback function will be called if the command is found. The callback should accept a reference to the command's `ArgParser` instance as its sole argument and should return `void`.
 
 The following `ArgParser` methods are also available for processing commands manually:
 
 
-||  `String getCmdName()`  ||
+||  `string ArgParser::getCmdName()`  ||
 
     Returns the command name, if the parser has found a command.
 
 
-||  `ArgParser getCmdParser()`  ||
+||  `ArgParser& ArgParser::getCmdParser()`  ||
 
     Returns the command's parser instance, if the parser has found a command.
 
 
-||  `ArgParser getParent()`  ||
+||  `ArgParser& ArgParser::getParent()`  ||
 
     Returns a command parser's parent parser.
 
 
-||  `boolean hasCmd()`  ||
+||  `bool ArgParser::hasCmd()`  ||
 
     Returns true if the parser has found a command.

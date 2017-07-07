@@ -215,8 +215,8 @@ The methods below provide access to positional arguments identified by the parse
 
 ||  `.get_args_as_ints()`  ||
 
-    Attempts to parse and return the positional arguments as a list of integers.
-    Exits with an error message on failure.
+    Attempts to parse and return the positional arguments as a list of
+    integers. Exits with an error message on failure.
 
 
 ||  `.has_args()`  ||
@@ -227,6 +227,16 @@ The methods below provide access to positional arguments identified by the parse
 ||  `.len_args()`  ||
 
     Returns the length of the positional argument list.
+
+
+||  `.clear_args()`  ||
+
+    Clears the list of positional arguments.
+
+
+||  `.append_arg(arg)`  ||
+
+    Appends a string to the list of positional arguments.
 
 
 Positional arguments can also be accessed using read-only list syntax:

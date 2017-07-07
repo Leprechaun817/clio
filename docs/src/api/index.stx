@@ -4,7 +4,8 @@ title: Language APIs
 
 Clio aims to maintain as consistent an API as possible across all its language implementations. API documentation for supported languages can be found below:
 
-* [C](@root/apis/c//)
-* [Go](@root/apis/go//)
-* [Java](@root/apis/java//)
-* [Python](@root/apis/python//)
+* [C](@root/api/c//)
+* [C++](@root/api/cpp//)
+* [Go](@root/api/go//)
+* [Java](@root/api/java//)
+* [Python](@root/api/python//)

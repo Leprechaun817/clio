@@ -218,6 +218,16 @@ The methods below provide access to positional arguments identified by the parse
     Returns the length of the positional argument list.
 
 
+||  `func (parser *ArgParser) ClearArgs()`  ||
+
+    Clears the list of positional arguments.
+
+
+||  `func (parser *ArgParser) AppendArg(arg string)`  ||
+
+    Appends a string to the list of positional arguments.
+
+
 ## Commands
 
 Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the `AddCmd()` method:

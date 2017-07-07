@@ -6,12 +6,13 @@ Clio is a minimalist argument-parsing library designed for building elegant comm
 
 Clio supports long and short-form options and arbitrarily-nested commands. It aims to provide a consistent interface across multiple programming languages, implemented wherever possible as a simple drop-in file.
 
-Clio is currently implemented in [C][], [Go][], [Java][], and [Python][].
+Clio is implemented in:
 
-[C]: @root/apis/c//
-[Go]: @root/apis/go//
-[Java]: @root/apis/java//
-[Python]: @root/apis/python//
+* [C](@root/api/c//)
+* [C++](@root/api/cpp//)
+* [Go](@root/api/go//)
+* [Java](@root/api/java//)
+* [Python](@root/api/python//)
 
 
 ## Features

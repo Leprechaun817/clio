@@ -13,7 +13,7 @@
     <![endif]-->
 </head>
 
-<body class="node-apis-c node-apis node">
+<body class="node-api-c node-api node">
 
     <header id="head" class="head">
         <input id="menu-check" type="checkbox"/>
@@ -30,7 +30,7 @@
 <a href="../cli.html">CLI</a>
 </li>
 <li>
-<a href="../apis.html">APIs</a>
+<a href="../api.html">APIs</a>
 </li>
 </ul>
 
@@ -375,6 +375,22 @@ Returns true if at least one positional argument has been found.
 <dd>
 <p>
 Returns the length of the positional argument list.
+</p>
+</dd>
+<dt>
+<code>void ap_clear_args(ArgParser *parser)</code>
+</dt>
+<dd>
+<p>
+Clears the list of positional arguments.
+</p>
+</dd>
+<dt>
+<code>void ap_append_arg(ArgParser *parser, char *arg)</code>
+</dt>
+<dd>
+<p>
+Appends a string to the list of positional arguments.
 </p>
 </dd>
 </dl>

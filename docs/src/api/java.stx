@@ -1,0 +1,261 @@
+---
+title: Java
+---
+
+To use Clio in your Java application add the `ArgParser.java` file directly to your application's source folder. The library exports a single `ArgParser` class.
+
+Clio is written in Java 8.
+
+
+## Usage
+
+Initialize an argument parser, optionally specifying the application's help text and version:
+
+::: java
+
+    ArgParser(String helptext, String version)
+
+Supplying help text activates an automatic `--help` flag; supplying a version string activates an automatic `--version` flag.
+
+You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the parser's `parse()` method to process the application's command line arguments:
+
+::: java
+
+    void parse(String[] args)
+
+Parsed option values can be retrieved from the parser instance itself.
+
+
+## Register Options
+
+Clio supports long-form options, `--foo`, with single-character shortcuts, `-f`.
+
+An option can have an unlimited number of long and short-form aliases. Aliases are specified via the `name` parameter which accepts a string of space-separated alternatives, e.g. `"foo f"`.
+
+Option values can be separated on the command line by either a space, `--foo 123`, or an equals symbol, `--foo=123`.
+
+
+||  `void addFlag(String name)`  ||
+
+    Register a flag (a boolean option) with a default value of `false`. Flag options take no arguments but are either present (`true`) or absent (`false`).
+
+
+||  `void addFloat(String name, double value)`  ||
+
+    Register a floating-point option with a default value.
+
+
+||  `void addInt(String name, int value)`  ||
+
+    Register an integer option with a default value.
+
+
+||  `void addStr(String name, String value)`  ||
+
+    Register a string option with a default value.
+
+
+## Register List Options
+
+List options store multiple values. *Greedy* list options attempt to parse multiple consecutive arguments.
+
+Like single-valued options, list options can have an unlimited number of long and short-form aliases specified via the `name` parameter.
+
+
+||  `void addFlagList(String name)`  ||
+
+    Register a boolean list option.
+
+
+||  `void addFloatList(String name, boolean greedy)`  ||
+
+    Register a floating-point list option.
+
+
+||  `void addIntList(String name, boolean greedy)`  ||
+
+    Register an integer list option.
+
+
+||  `void addStrList(String name, boolean greedy)`  ||
+
+    Register a string list option.
+
+
+## Retrieve Option Values
+
+An option's value can be retrieved from the parser instance using any of its registered aliases.
+
+
+||  `boolean found(String name)`  ||
+
+    Returns true if the specified option was found while parsing.
+
+
+||  `boolean getFlag(String name)`  ||
+
+    Returns the value of the specified boolean option.
+
+
+||  `double getFloat(String name)`  ||
+
+    Returns the value of the specified floating-point option.
+
+
+||  `int getInt(String name)`  ||
+
+    Returns the value of the specified integer option.
+
+
+||  `String getStr(String name)`  ||
+
+    Returns the value of the specified string option.
+
+
+## Retrieve List Values
+
+A list-option's values can be retrieved from the parser instance using any of its registered aliases.
+
+
+||  `List<Boolean> getFlagList(String name)`  ||
+
+    Returns the specified option's list of values.
+
+
+||  `List<Double> getFloatList(String name)`  ||
+
+    Returns the specified option's list of values.
+
+
+||  `List<Integer> getIntList(String name)`  ||
+
+    Returns the specified option's list of values.
+
+
+||  `List<String> getStrList(String name)`  ||
+
+    Returns the specified option's list of values.
+
+
+||  `int lenList(String name)`  ||
+
+    Returns the length of the specified option's list of values.
+
+
+## Set Option Values
+
+The methods below can be used to set option values manually.
+
+Note that, internally, all options are list-options. An option's 'value' is simply the last value in its internal list.
+
+
+||  `void clearList(String name)`  ||
+
+    Clear the specified option's internal list of values.
+
+
+||  `void setFlag(String name, boolean value)`  ||
+
+    Append a boolean value to the specified option's internal list.
+
+
+||  `void setFloat(String name, double value)`  ||
+
+    Append a floating-point value to the specified option's internal list.
+
+
+||  `void setInt(String name, int value)`  ||
+
+    Append an integer value to the specified option's internal list.
+
+
+||  `void setStr(String name, String value)`  ||
+
+    Append a string value to the specified option's internal list.
+
+
+## Positional Arguments
+
+
+The methods below provide access to positional arguments identified by the parser.
+
+
+||  `String getArg(int index)`  ||
+
+    Returns the positional argument at the specified index.
+
+
+||  `List<String> getArgs()`  ||
+
+    Returns the positional arguments as a list of strings.
+
+
+||  `List<Double> getArgsAsFloats()`  ||
+
+    Attempts to parse and return the positional arguments as a list of floats.
+    Exits with an error message on failure.
+
+
+||  `List<Integer> getArgsAsInts()`  ||
+
+    Attempts to parse and return the positional arguments as a list of integers.
+    Exits with an error message on failure.
+
+
+||  `boolean hasArgs()`  ||
+
+    Returns true if at least one positional argument has been found.
+
+
+||  `int lenArgs()`  ||
+
+    Returns the length of the positional argument list.
+
+
+||  `void clearArgs()`  ||
+
+    Clears the list of positional arguments.
+
+
+||  `void appendArg(String arg)`  ||
+
+    Appends a string to the list of positional arguments.
+
+
+## Commands
+
+Clio supports git-style command interfaces with arbitrarily-nested commands. Register a command on a parser instance using the `addCmd()` method:
+
+::: java
+
+    ArgParser addCmd(String name, String helptext, Consumer<ArgParser> callback)
+
+This method returns a new `ArgParser` instance associated with the command. You can register the command's flags and options on this sub-parser using the standard methods listed above. (Note that you never need to call `parse()` on a command parser - if a command is found, its arguments are parsed automatically.)
+
+* Like options, commands can have an unlimited number of aliases specified via the `name` string.
+
+* Commands support an automatic `--help` flag and an automatic `help <name>` command using the specified help text.
+
+* The specified callback function will be called if the command is found. The callback should accept the command's `ArgParser` instance as its sole argument and should return `void`.
+
+The following `ArgParser` methods are also available for processing commands manually:
+
+
+||  `String getCmdName()`  ||
+
+    Returns the command name, if the parser has found a command.
+
+
+||  `ArgParser getCmdParser()`  ||
+
+    Returns the command's parser instance, if the parser has found a command.
+
+
+||  `ArgParser getParent()`  ||
+
+    Returns a command parser's parent parser.
+
+
+||  `boolean hasCmd()`  ||
+
+    Returns true if the parser has found a command.
