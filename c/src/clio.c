@@ -246,8 +246,9 @@ static void* map_value_at_index(Map *map, int i) {
 // -------------------------------------------------------------------------
 
 
-// We use 'flag' as a synonym for boolean options, i.e. options that are either
-// present (true) or absent (false). All other option types require an argument.
+// We use 'flag' as a synonym for boolean options, i.e. options that are
+// either present (true) or absent (false). All other option types require
+// an argument.
 typedef enum OptionType {
     FLAG,
     STRING,
