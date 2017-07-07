@@ -6,7 +6,7 @@
 //
 // Author: Darren Mulholland <darren@mulholland.xyz>
 // License: Public Domain
-// Version: 2.0.2
+// Version: 2.1.0
 // -------------------------------------------------------------------------
 
 #pragma once
@@ -135,7 +135,7 @@ void ap_set_float(ArgParser *parser, char *name, double value);
 
 
 // -------------------------------------------------------------------------
-// Positional arguments.
+// Retrieving positional arguments.
 // -------------------------------------------------------------------------
 
 // Returns true if the parser has found one or more positional arguments.
@@ -163,6 +163,17 @@ int* ap_get_args_as_ints(ArgParser *parser);
 // memory occupied by the returned array is not affected by calls to
 // ap_free().
 double* ap_get_args_as_floats(ArgParser *parser);
+
+
+// -------------------------------------------------------------------------
+// Setting positional arguments.
+// -------------------------------------------------------------------------
+
+// Clear the list of positional argument values.
+void ap_clear_args(ArgParser *parser);
+
+// Append a string to the list of positional arguments.
+void ap_append_arg(ArgParser *parser, char *arg);
 
 
 // -------------------------------------------------------------------------

@@ -618,6 +618,9 @@ typedef struct ArgList {
 
 // Free the memory associated with an ArgList instance.
 static void arglist_free(ArgList *list) {
+    for (int i = 0; i < list->len; i++) {
+        free(list->args[i]);
+    }
     free(list->args);
     free(list);
 }
@@ -633,13 +636,22 @@ static ArgList* arglist_new() {
 }
 
 
+// Clear the list.
+static void arglist_clear(ArgList *list) {
+    for (int i = 0; i < list->len; i++) {
+        free(list->args[i]);
+    }
+    list->len = 0;
+}
+
+
 // Append an argument to the list.
 static void arglist_append(ArgList *list, char *arg) {
     if (list->len == list->cap) {
         list->cap *= 2;
         list->args = realloc(list->args, sizeof(char*) * list->cap);
     }
-    list->args[list->len] = arg;
+    list->args[list->len] = str_dup(arg);
     list->len++;
 }
 
@@ -905,7 +917,7 @@ static void argparser_set_float(ArgParser *parser, char *name, double value) {
 
 
 // -------------------------------------------------------------------------
-// ArgParser: positional arguments.
+// ArgParser: retrieve positional arguments.
 // -------------------------------------------------------------------------
 
 
@@ -960,6 +972,23 @@ static double* argparser_get_args_as_floats(ArgParser *parser) {
         *(args + i) = try_str_to_double(parser->arguments->args[i]);
     }
     return args;
+}
+
+
+// -------------------------------------------------------------------------
+// ArgParser: set positional arguments.
+// -------------------------------------------------------------------------
+
+
+// Clear the list of positional argument values.
+void argparser_clear_args(ArgParser *parser) {
+    arglist_clear(parser->arguments);
+}
+
+
+// Append a string to the list of positional arguments.
+void argparser_append_arg(ArgParser *parser, char *arg) {
+    arglist_append(parser->arguments, arg);
 }
 
 
@@ -1449,6 +1478,16 @@ int* ap_get_args_as_ints(ArgParser *parser) {
 
 double* ap_get_args_as_floats(ArgParser *parser) {
     return argparser_get_args_as_floats(parser);
+}
+
+
+void ap_clear_args(ArgParser *parser) {
+    argparser_clear_args(parser);
+}
+
+
+void ap_append_arg(ArgParser *parser, char *arg) {
+    argparser_append_arg(parser, arg);
 }
 
 
