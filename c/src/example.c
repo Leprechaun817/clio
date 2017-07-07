@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     ap_add_flag(parser, "bool b");
 
     // Register a string option, --string <arg>, with a single-character
-    // alias, -s <arg>. A string argument requires a default value, here
+    // alias, -s <arg>. A string option requires a default value, here
     // 'defval'.
     ap_add_str(parser, "string s", "defval");
 
