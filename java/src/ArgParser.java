@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 // ArgParser is the sole class exported by the library. An ArgParser instance
 // is responsible for registering options and commands and parsing the input
 // array of raw arguments. Note that every registered command recursively
-// receives an ArgParser instance of its own. 
+// receives an ArgParser instance of its own.
 class ArgParser {
 
 
@@ -489,6 +489,18 @@ class ArgParser {
             }
         }
         return list;
+    }
+
+
+    // Clears the list of positional arguments.
+    void clearArgs() {
+        arguments.clear();
+    }
+
+
+    // Appends a string to the list of positional arguments.
+    void appendArg(String arg) {
+        arguments.add(arg);
     }
 
 

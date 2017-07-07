@@ -7,12 +7,12 @@ example:
 	javac -d bin -cp bin src/Example.java
 	java -cp bin Example
 
-tests:
+unittests:
 	@make clio
 	javac -d bin -cp bin:lib/junit-4.12.jar src/ArgParserTest.java
 
-test:
-	@make tests
+check:
+	@make unittests
 	java -cp bin:lib/junit-4.12.jar:lib/hamcrest-core-1.3.jar \
 	  org.junit.runner.JUnitCore ArgParserTest
 
