@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
     parser.addFlag("bool b");
 
     // Register a string option, --string <arg>, with a single-character
-    // alias, -s <arg>. A string argument requires a default value, here
+    // alias, -s <arg>. A string option requires a default value, here
     // 'defval'.
     parser.addStr("string s", "defval");
 
