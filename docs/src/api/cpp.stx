@@ -2,6 +2,10 @@
 title: C++
 ---
 
+:insert toc
+
+---
+
 To use Clio in your C++ application add the `clio.cpp` and `clio.h` files to your source folder and include the header file:
 
 ::: c
@@ -13,7 +17,7 @@ The header exports a `clio::ArgParser` class which provides the public interface
 Clio is written in portable C++ 11.
 
 
-## Usage
+## Basic Usage
 
 Initialize an argument parser, optionally specifying the application's help text and version:
 
@@ -182,8 +186,7 @@ Note that, internally, all options are list-options. An option's 'value' is simp
     Append a string value to the specified option's internal list.
 
 
-## Positional Arguments
-
+## Retrieve Positional Arguments
 
 The methods below provide access to positional arguments identified by the parser.
 
@@ -218,6 +221,11 @@ The methods below provide access to positional arguments identified by the parse
 ||  `int ArgParser::lenArgs()`  ||
 
     Returns the length of the positional argument list.
+
+
+## Set Positional Arguments
+
+The methods below provide manual write access to the list of positional arguments.
 
 
 ||  `void ArgParser::clearArgs()`  ||

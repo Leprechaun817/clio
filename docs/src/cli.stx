@@ -16,7 +16,7 @@ Clio supports the same core feature set across all its language implementations:
 
 Clio supports four kinds of options: boolean, string, integer, and floating-point.
 
-* Boolean options take no arguments but are either present (true) or absent (false).
+* Boolean options take no arguments but are either present (*true*) or absent (*false*).
 
 * String, integer, and floating-point options require arguments of the appropriate type.
 
@@ -24,18 +24,18 @@ An option can have an unlimited number of long-form aliases and single-character
 
 Option values can be separated by either a space, `--opt 123`, or an equals symbol, `--opt=123`. Either syntax can be used with shortcuts: `-o 123`, `-o=123`.
 
-Multiple shortcuts can be condensed into a single block, e.g. `-abc foo bar`. Arguments are processed in order, making this block equivalent to `-a foo -b  bar -c`.
+Multiple shortcuts can be condensed into a single block, e.g. `-abc foo bar`. Following arguments are consumed as required by the options.
 
-Options are registered with default values which are used if the option is not found. If an option is found multiple times its value is the final value encountered, i.e. the value of `-o 123 -o 456` is `456`.
+Options are registered with default values which are retained if the option is not found. If an option is found multiple times its value is the final value encountered --- i.e. the value of `-o 123 -o 456` is `456`.
 
 
 ## List Options
 
 List options store multiple values. A list option can be *greedy* or *non-greedy* depending on its eagerness to consume arguments.
 
-* 	A *non-greedy* list option attempts to parse a single argument each time it
-    occurs, i.e. the value of a non-greedy option `foo` in the example below
-    would be `[123, 789]`.
+* 	A *non-greedy* list option attempts to parse a single argument each time
+    it occurs, i.e. the value of a non-greedy option `foo` in the example
+    below would be `[123, 789]`.
 
         $ myapp --foo 123 456 --foo 789
 

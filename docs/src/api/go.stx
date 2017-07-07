@@ -2,18 +2,22 @@
 title: Go
 ---
 
-Install:
+:insert toc
+
+---
+
+Install directly from Github:
 
     go get github.com/dmulholland/clio/go/clio
 
-Import:
+Import the `clio` package:
 
 ::: go
 
     import "github.com/dmulholland/clio/go/clio"
 
 
-## Usage
+## Basic Usage
 
 Initialize an argument parser, optionally specifying the application's help text and version:
 
@@ -180,7 +184,7 @@ Note that, internally, all options are list-options. An option's 'value' is simp
     Append a string value to the specified option's internal list.
 
 
-## Positional Arguments
+## Retrieve Positional Arguments
 
 
 The methods below provide access to positional arguments identified by the parser.
@@ -216,6 +220,11 @@ The methods below provide access to positional arguments identified by the parse
 ||  `func (parser *ArgParser) LenArgs() int`  ||
 
     Returns the length of the positional argument list.
+
+
+## Set Positional Arguments
+
+The methods below provide manual write access to the list of positional arguments.
 
 
 ||  `func (parser *ArgParser) ClearArgs()`  ||

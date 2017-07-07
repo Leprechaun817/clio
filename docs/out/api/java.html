@@ -41,14 +41,44 @@
             <h1>Java</h1>
         
 
-        <p>
+        <ul class="stx-toc">
+<li>
+<a href="#basic-usage">Basic Usage</a>
+</li>
+<li>
+<a href="#register-options">Register Options</a>
+</li>
+<li>
+<a href="#register-list-options">Register List Options</a>
+</li>
+<li>
+<a href="#retrieve-option-values">Retrieve Option Values</a>
+</li>
+<li>
+<a href="#retrieve-list-values">Retrieve List Values</a>
+</li>
+<li>
+<a href="#set-option-values">Set Option Values</a>
+</li>
+<li>
+<a href="#retrieve-positional-arguments">Retrieve Positional Arguments</a>
+</li>
+<li>
+<a href="#set-positional-arguments">Set Positional Arguments</a>
+</li>
+<li>
+<a href="#commands">Commands</a>
+</li>
+</ul>
+<hr>
+<p>
 To use Clio in your Java application add the <code>ArgParser.java</code> file directly to your application's source folder. The library exports a single <code>ArgParser</code> class.
 </p>
 <p>
 Clio is written in Java 8.
 </p>
-<h2 id="usage">
-Usage
+<h2 id="basic-usage">
+Basic Usage
 </h2>
 <p>
 Initialize an argument parser, optionally specifying the application's help text and version:
@@ -304,8 +334,8 @@ Append a string value to the specified option's internal list.
 </p>
 </dd>
 </dl>
-<h2 id="positional-arguments">
-Positional Arguments
+<h2 id="retrieve-positional-arguments">
+Retrieve Positional Arguments
 </h2>
 <p>
 The methods below provide access to positional arguments identified by the parser.
@@ -361,6 +391,14 @@ Returns true if at least one positional argument has been found.
 Returns the length of the positional argument list.
 </p>
 </dd>
+</dl>
+<h2 id="set-positional-arguments">
+Set Positional Arguments
+</h2>
+<p>
+The methods below provide manual write access to the list of positional arguments.
+</p>
+<dl>
 <dt>
 <code>void clearArgs()</code>
 </dt>

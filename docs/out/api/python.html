@@ -41,7 +41,37 @@
             <h1>Python</h1>
         
 
-        <p>
+        <ul class="stx-toc">
+<li>
+<a href="#basic-usage">Basic Usage</a>
+</li>
+<li>
+<a href="#register-options">Register Options</a>
+</li>
+<li>
+<a href="#register-list-options">Register List Options</a>
+</li>
+<li>
+<a href="#retrieve-option-values">Retrieve Option Values</a>
+</li>
+<li>
+<a href="#retrieve-list-values">Retrieve List Values</a>
+</li>
+<li>
+<a href="#set-option-values">Set Option Values</a>
+</li>
+<li>
+<a href="#retrieve-positional-arguments">Retrieve Positional Arguments</a>
+</li>
+<li>
+<a href="#set-positional-arguments">Set Positional Arguments</a>
+</li>
+<li>
+<a href="#commands">Commands</a>
+</li>
+</ul>
+<hr>
+<p>
 Install Clio from the Python package index using <code>pip</code>:
 </p>
 <pre>
@@ -59,8 +89,8 @@ Import the Clio module:
 <p>
 Clio requires Python &gt;= 3.0.
 </p>
-<h2 id="usage">
-Usage
+<h2 id="basic-usage">
+Basic Usage
 </h2>
 <p>
 Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
@@ -322,8 +352,8 @@ Append a string value to the specified option's internal list.
 </p>
 </dd>
 </dl>
-<h2 id="positional-arguments">
-Positional Arguments
+<h2 id="retrieve-positional-arguments">
+Retrieve Positional Arguments
 </h2>
 <p>
 The methods below provide access to positional arguments identified by the parser.
@@ -379,14 +409,20 @@ Returns true if at least one positional argument has been found.
 Returns the length of the positional argument list.
 </p>
 </dd>
-<dt>
-<code>.clear_args()</code>
-</dt>
-<dd>
+</dl>
 <p>
-Clears the list of positional arguments.
+Positional arguments can also be accessed using read-only list syntax:
 </p>
-</dd>
+<pre class="lang-python pygments" data-lang="python">
+<span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+</pre>
+<h2 id="set-positional-arguments">
+Set Positional Arguments
+</h2>
+<p>
+The methods below provide manual write access to the list of positional arguments.
+</p>
+<dl>
 <dt>
 <code>.append_arg(arg)</code>
 </dt>
@@ -395,13 +431,15 @@ Clears the list of positional arguments.
 Appends a string to the list of positional arguments.
 </p>
 </dd>
-</dl>
+<dt>
+<code>.clear_args()</code>
+</dt>
+<dd>
 <p>
-Positional arguments can also be accessed using read-only list syntax:
+Clears the list of positional arguments.
 </p>
-<pre class="lang-python pygments" data-lang="python">
-<span class="n">value</span> <span class="o">=</span> <span class="n">parser</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-</pre>
+</dd>
+</dl>
 <h2 id="commands">
 Commands
 </h2>

@@ -71,7 +71,7 @@ Clio supports four kinds of options: boolean, string, integer, and floating-poin
 <ul>
 <li>
 <p>
-Boolean options take no arguments but are either present (true) or absent (false).
+Boolean options take no arguments but are either present (<em>true</em>) or absent (<em>false</em>).
 </p>
 </li>
 <li>
@@ -87,10 +87,10 @@ An option can have an unlimited number of long-form aliases and single-character
 Option values can be separated by either a space, <code>--opt 123</code>, or an equals symbol, <code>--opt=123</code>. Either syntax can be used with shortcuts: <code>-o 123</code>, <code>-o=123</code>.
 </p>
 <p>
-Multiple shortcuts can be condensed into a single block, e.g. <code>-abc foo bar</code>. Arguments are processed in order, making this block equivalent to <code>-a foo -b  bar -c</code>.
+Multiple shortcuts can be condensed into a single block, e.g. <code>-abc foo bar</code>. Following arguments are consumed as required by the options.
 </p>
 <p>
-Options are registered with default values which are used if the option is not found. If an option is found multiple times its value is the final value encountered, i.e. the value of <code>-o 123 -o 456</code> is <code>456</code>.
+Options are registered with default values which are retained if the option is not found. If an option is found multiple times its value is the final value encountered &mdash; i.e. the value of <code>-o 123 -o 456</code> is <code>456</code>.
 </p>
 <h2 id="list-options">
 List Options
@@ -101,9 +101,9 @@ List options store multiple values. A list option can be <em>greedy</em> or <em>
 <ul>
 <li>
 <p>
-A <em>non-greedy</em> list option attempts to parse a single argument each time it
-occurs, i.e. the value of a non-greedy option <code>foo</code> in the example below
-would be <code>[123, 789]</code>.
+A <em>non-greedy</em> list option attempts to parse a single argument each time
+it occurs, i.e. the value of a non-greedy option <code>foo</code> in the example
+below would be <code>[123, 789]</code>.
 </p>
 <pre>
 $ myapp --foo 123 456 --foo 789

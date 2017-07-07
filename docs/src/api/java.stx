@@ -2,12 +2,16 @@
 title: Java
 ---
 
+:insert toc
+
+---
+
 To use Clio in your Java application add the `ArgParser.java` file directly to your application's source folder. The library exports a single `ArgParser` class.
 
 Clio is written in Java 8.
 
 
-## Usage
+## Basic Usage
 
 Initialize an argument parser, optionally specifying the application's help text and version:
 
@@ -174,8 +178,7 @@ Note that, internally, all options are list-options. An option's 'value' is simp
     Append a string value to the specified option's internal list.
 
 
-## Positional Arguments
-
+## Retrieve Positional Arguments
 
 The methods below provide access to positional arguments identified by the parser.
 
@@ -210,6 +213,11 @@ The methods below provide access to positional arguments identified by the parse
 ||  `int lenArgs()`  ||
 
     Returns the length of the positional argument list.
+
+
+## Set Positional Arguments
+
+The methods below provide manual write access to the list of positional arguments.
 
 
 ||  `void clearArgs()`  ||

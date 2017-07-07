@@ -2,6 +2,10 @@
 title: Python
 ---
 
+:insert toc
+
+---
+
 Install Clio from the Python package index using `pip`:
 
     $ pip install libclio
@@ -17,7 +21,7 @@ Import the Clio module:
 Clio requires Python >= 3.0.
 
 
-## Usage
+## Basic Usage
 
 Initialize an argument parser, optionally specifying the application's help text and version as string arguments:
 
@@ -191,7 +195,7 @@ Note that, internally, all options are list-options. An option's 'value' is simp
     Append a string value to the specified option's internal list.
 
 
-## Positional Arguments
+## Retrieve Positional Arguments
 
 
 The methods below provide access to positional arguments identified by the parser.
@@ -229,9 +233,16 @@ The methods below provide access to positional arguments identified by the parse
     Returns the length of the positional argument list.
 
 
-||  `.clear_args()`  ||
+Positional arguments can also be accessed using read-only list syntax:
 
-    Clears the list of positional arguments.
+::: python
+
+    value = parser[index]
+
+
+## Set Positional Arguments
+
+The methods below provide manual write access to the list of positional arguments.
 
 
 ||  `.append_arg(arg)`  ||
@@ -239,11 +250,9 @@ The methods below provide access to positional arguments identified by the parse
     Appends a string to the list of positional arguments.
 
 
-Positional arguments can also be accessed using read-only list syntax:
+||  `.clear_args()`  ||
 
-::: python
-
-    value = parser[index]
+    Clears the list of positional arguments.
 
 
 ## Commands
