@@ -33,15 +33,11 @@ Options are registered with default values which are retained if the option is n
 
 List options store multiple values. A list option can be *greedy* or *non-greedy* depending on its eagerness to consume arguments.
 
-* 	A *non-greedy* list option attempts to parse a single argument each time
-    it occurs, i.e. the value of a non-greedy option `foo` in the example
-    below would be `[123, 789]`.
+* A *non-greedy* list option attempts to parse a single argument each time it occurs, i.e. the value of a non-greedy option `foo` in the example below would be `[123, 789]`.
 
         $ myapp --foo 123 456 --foo 789
 
-*	A *greedy* list option attempts to parse multiple consecutive arguments
-    each time it occurs, i.e. the value of a greedy `foo` in the example above
-    would be `[123, 456, 789]`.
+* A *greedy* list option attempts to parse multiple consecutive arguments each time it occurs, i.e. the value of a greedy `foo` in the example above would be `[123, 456, 789]`.
 
 A greedy option will attempt to consume as many arguments as it can, continuing until it meets a new option or runs out of arguments.
 
