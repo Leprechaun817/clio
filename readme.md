@@ -11,10 +11,6 @@ Clio is implemented in:
 * [Java](http://mulholland.xyz/docs/clio/api/java//)
 * [Python](http://mulholland.xyz/docs/clio/api/python//)
 
-
-
-## Features
-
 All implementations support the same core feature set:
 
 * Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
@@ -33,9 +29,3 @@ All implementations support the same core feature set:
 See the [documentation][docs] for details.
 
 [docs]: http://mulholland.xyz/docs/clio/
-
-
-
-## License
-
-This work has been placed in the public domain.
