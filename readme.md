@@ -13,7 +13,7 @@ Clio is implemented in:
 
 
 
-### Features
+## Features
 
 All implementations support the same core feature set:
 
@@ -36,6 +36,6 @@ See the [documentation][docs] for details.
 
 
 
-### License
+## License
 
 This work has been placed in the public domain.
