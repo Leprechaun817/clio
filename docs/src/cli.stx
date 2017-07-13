@@ -35,6 +35,7 @@ List options store multiple values. A list option can be *greedy* or *non-greedy
 
 * A *non-greedy* list option attempts to parse a single argument each time it occurs, i.e. the value of a non-greedy option `foo` in the example below would be `[123, 789]`.
 
+    ::: 
         $ myapp --foo 123 456 --foo 789
 
 * A *greedy* list option attempts to parse multiple consecutive arguments each time it occurs, i.e. the value of a greedy `foo` in the example above would be `[123, 456, 789]`.

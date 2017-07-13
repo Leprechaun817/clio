@@ -2,9 +2,7 @@
 title: Clio
 ---
 
-Clio is a minimalist argument-parsing library designed for building elegant command-line interfaces.
-
-Clio supports long and short-form options and arbitrarily-nested commands. It aims to provide a consistent interface across multiple programming languages, implemented wherever possible as a simple drop-in file.
+Clio is an argument-parsing library designed for building elegant command-line interfaces. Argument-parsing libraries tend to be fiddly, complicated, and ugly. Clio aims for simplicity and for consistency across a range of programming languages.
 
 Clio is implemented in:
 
