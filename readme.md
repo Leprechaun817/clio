@@ -5,11 +5,11 @@ Clio is an argument-parsing library designed for building elegant command-line i
 
 Clio is implemented in:
 
-* [C](http://mulholland.xyz/docs/clio/api/c//)
-* [C++](http://mulholland.xyz/docs/clio/api/cpp//)
-* [Go](http://mulholland.xyz/docs/clio/api/go//)
-* [Java](http://mulholland.xyz/docs/clio/api/java//)
-* [Python](http://mulholland.xyz/docs/clio/api/python//)
+* [C](http://mulholland.xyz/docs/clio/api/c.html)
+* [C++](http://mulholland.xyz/docs/clio/api/cpp.html)
+* [Go](http://mulholland.xyz/docs/clio/api/go.html)
+* [Java](http://mulholland.xyz/docs/clio/api/java.html)
+* [Python](http://mulholland.xyz/docs/clio/api/python.html)
 
 All implementations support the same core feature set:
 
