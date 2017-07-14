@@ -18,7 +18,7 @@ Import the Clio module:
 
     >>> import clio
 
-Clio requires Python >= 3.0.
+Clio requires Python 3.0 or later.
 
 
 ## Basic Usage

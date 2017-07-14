@@ -7,7 +7,7 @@ Clio supports the same core feature set across all its language implementations:
 * Long-form boolean flags with single-character shortcuts: `--flag`, `-f`.
 
 * Long-form string, integer, and floating-point options with
-  single-character shortcuts: `--opt <arg>`, `-o <arg>`.
+  single-character shortcuts: `--option <arg>`, `-o <arg>`.
 
 * Git-style command interfaces with arbitrarily-nested commands.
 
@@ -20,7 +20,7 @@ Clio supports four kinds of options: boolean, string, integer, and floating-poin
 
 * String, integer, and floating-point options require arguments of the appropriate type.
 
-An option can have an unlimited number of long-form aliases and single-character shortcuts: `--opt`, `-o`.
+An option can have an unlimited number of long-form aliases and single-character shortcuts: `--option`, `-o`.
 
 Option values can be separated by either a space, `--opt 123`, or an equals symbol, `--opt=123`. Either syntax can be used with shortcuts: `-o 123`, `-o=123`.
 
@@ -35,7 +35,7 @@ List options store multiple values. A list option can be *greedy* or *non-greedy
 
 * A *non-greedy* list option attempts to parse a single argument each time it occurs, i.e. the value of a non-greedy option `foo` in the example below would be `[123, 789]`.
 
-    ::: 
+    :::
         $ myapp --foo 123 456 --foo 789
 
 * A *greedy* list option attempts to parse multiple consecutive arguments each time it occurs, i.e. the value of a greedy `foo` in the example above would be `[123, 456, 789]`.

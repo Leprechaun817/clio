@@ -19,7 +19,7 @@ Initialize an argument parser, optionally specifying the application's help text
 
     ArgParser(String helptext, String version)
 
-Supplying help text activates an automatic `--help` flag; supplying a version string activates an automatic `--version` flag.
+Supplying help text activates an automatic `--help` flag; supplying a version string activates an automatic `--version` flag. Either parameter can be set to `null`.
 
 You can now register your application's options and commands on the parser using the registration functions described below. Once the required options and commands have been registered, call the parser's `parse()` method to process the application's command line arguments:
 
