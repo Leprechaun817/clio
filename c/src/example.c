@@ -73,4 +73,9 @@ int main(int argc, char **argv) {
     // We can now retrieve our option and argument values from the parser
     // instance. Here we simply dump the parser to stdout.
     ap_print(parser);
+
+    // We can call ap_free() to free the memory occupied by the parser
+    // instance. This will automatically free the memory occupied by
+    // any associated command parsers.
+    ap_free(parser);
 }
